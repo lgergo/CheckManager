@@ -1,7 +1,5 @@
 package com.yevsp8.checkmanager;
 
-import java.util.Date;
-
 /**
  * Created by Gergo on 2018. 02. 11..
  */
@@ -9,13 +7,13 @@ import java.util.Date;
 public class Check {
 
     private String checkId;
-    private Date creationDate;
+    private long creationDate;
     private int amount;
     private String paidTo;
-    private Date paidDate;
+    private long paidDate;
     private boolean isUploaded;
 
-    public Check(String checkId, Date creationDate, int amount, String paidTo, Date paidDate, boolean isUploaded) {
+    public Check(String checkId, long creationDate, int amount, String paidTo, long paidDate, boolean isUploaded) {
         this.checkId = checkId;
         this.creationDate = creationDate;
         this.amount = amount;
@@ -28,7 +26,7 @@ public class Check {
         return checkId;
     }
 
-    public Date getCreationDate() {
+    public long getCreationDate() {
         return creationDate;
     }
 
@@ -40,7 +38,7 @@ public class Check {
         return paidTo;
     }
 
-    public Date getPaidDate() {
+    public long getPaidDate() {
         return paidDate;
     }
 

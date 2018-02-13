@@ -12,6 +12,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        DbHandler db = DbHandler.getInstance(this);
+        db.generateDemoData();
+
         ListCheckFragment fragment = ListCheckFragment.newInsatce();
 
         FragmentManager manager = getSupportFragmentManager();
