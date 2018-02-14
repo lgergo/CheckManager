@@ -21,5 +21,13 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.checklist_fragmentcontainer, fragment);
         transaction.commit();
+        
+        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.newImage_button); 
+        button.setOnClickListener(new View.OnClickListener() { 
+            public void onClick(View v) { 
+                //Intent intent = new Intent(getActivity(), NewImageActivity.class);
+               // startActivity(intent);
+            } 
+    });
     }
 }
