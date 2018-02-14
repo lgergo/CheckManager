@@ -20,7 +20,11 @@ public class CheckDetailsActivity extends AppCompatActivity {
 
 
         id.setText(getIntent().getStringExtra("selected_check_id"));
-
+        created.setText(getIntent().getStringExtra("selected_check_created"));
+        amount.setText(getIntent().getStringExtra("selected_check_amount"));
+        paidto.setText(getIntent().getStringExtra("selected_check_paidTo"));
+        paiddate.setText(getIntent().getStringExtra("selected_check_paidDate"));
+        isuploaded.setText(getIntent().getStringExtra("selected_check_isUploaded"));
     }
 
 }

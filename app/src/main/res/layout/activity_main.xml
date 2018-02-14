@@ -6,28 +6,28 @@
     android:layout_height="match_parent"
     tools:context="com.yevsp8.checkmanager.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/checklist_fragmentcontainer"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <FrameLayout
         android:id="@+id/checklist_fragmentcontainer"
         android:layout_width="368dp"
         android:layout_height="231dp"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="8dp"></FrameLayout>
-    
-     <android.support.design.widget.FloatingActionButton
-        android:"@+id/newImage_button"                                                 
-        android:src="@drawable/ic_done"
-        app:fabSize="normal"
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/latest_synch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/checklist_fragmentcontainer" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/newImage_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/ic_add_24dp"
+        android:tint="#fff"
+        app:backgroundTint="@color/colorPrimary" />
 
 </RelativeLayout>

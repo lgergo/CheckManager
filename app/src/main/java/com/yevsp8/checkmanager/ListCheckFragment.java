@@ -87,8 +87,17 @@ public class ListCheckFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Check selected = adapter.getItem(i);
 
+                //TODO parcelable ??
                 Intent intent = new Intent(getActivity(), CheckDetailsActivity.class);
                 intent.putExtra("selected_check_id", selected.getCheckId());
+                String created = Common.longDateToString(selected.getCreationDate());
+                intent.putExtra("selected_check_created", created);
+                intent.putExtra("selected_check_amount", Integer.toString(selected.getAmount()));
+                intent.putExtra("selected_check_paidTo", selected.getPaidTo());
+                String paidDate = Common.longDateToString(selected.getPaidDate());
+                intent.putExtra("selected_check_paidDate", paidDate);
+                intent.putExtra("selected_check_isUploaded", selected.getIsUploaded() ? "igen" : "nem");
+
                 startActivity(intent);
             }
         });
