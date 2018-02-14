@@ -22,5 +22,12 @@
         android:layout_height="231dp"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="8dp"></FrameLayout>
+    
+     <android.support.design.widget.FloatingActionButton
+        android:"@+id/newImage_button"                                                 
+        android:src="@drawable/ic_done"
+        app:fabSize="normal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>
