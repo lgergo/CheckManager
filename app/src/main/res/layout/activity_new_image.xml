@@ -5,4 +5,20 @@
     android:layout_height="match_parent"
     tools:context="com.yevsp8.checkmanager.NewImageActivity">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/take_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="81dp"
+            android:layout_marginTop="54dp"
+            android:text="Button" />
+    </RelativeLayout>
+
 </android.support.constraint.ConstraintLayout>
