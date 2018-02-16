@@ -22,7 +22,8 @@ public class NewImageActivity extends AppCompatActivity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
     private final int REQUEST_IMAGE_CAPTURE = 1;
-    private Button btn;
+    private Button buttonTakePhoto;
+    private Button buttonRecognise;
     private ImageView imageView;
     private String currentPhotoPath;
 
@@ -33,14 +34,24 @@ public class NewImageActivity extends AppCompatActivity {
 
         imageView = findViewById(R.id.captured_photo_imageView);
 
-        btn = findViewById(R.id.capture_photo_button);
-        btn.setOnClickListener(new View.OnClickListener() {
+        buttonTakePhoto = findViewById(R.id.button_capture_photo);
+        buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
                 dispatchTakePictureIntent();
                 // takePhoto();
             }
         });
+
+        buttonRecognise = findViewById(R.id.button_recognise_photo);
+        buttonRecognise.setEnabled(false);
+        buttonRecognise.setOnClickListener(new View.OnClickListener() {
+                                               public void onClick(View v) {
+                                                   Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
+                                                   startActivity(intent);
+                                               }
+                                           }
+        );
     }
 
     private void takePhoto() {
@@ -105,6 +116,7 @@ public class NewImageActivity extends AppCompatActivity {
                 ImageView myImage = findViewById(R.id.captured_photo_imageView);
                 myImage.setImageBitmap(myBitmap);
             }
+            buttonRecognise.setEnabled(true);
         }
 
     }

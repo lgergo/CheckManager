@@ -15,13 +15,19 @@
             android:contentDescription="Capture a photo" />
 
         <Button
-            android:id="@+id/capture_photo_button"
+            android:id="@+id/button_capture_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginLeft="81dp"
-            android:layout_marginTop="54dp"
-            android:text="Button" />
+            android:text="Capture" />
+
+        <Button
+            android:id="@+id/button_recognise_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:text="Recognise" />
 
 </RelativeLayout>

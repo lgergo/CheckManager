@@ -49,6 +49,8 @@ public class GoogleApiActivity extends Activity
     private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS_READONLY};
     GoogleAccountCredential mCredential;
     ProgressDialog mProgress;
+    private String spreadsheetId = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
+    private String sheetName = "Cég1";
     private TextView mOutputText;
     private Button mCallApiButton;
 
@@ -103,11 +105,10 @@ public class GoogleApiActivity extends Activity
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
-
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
+//
+//        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//        startActivity(intent);
     }
-
 
     /**
      * Attempt to call the API, after verifying that all the preconditions are
@@ -296,7 +297,6 @@ public class GoogleApiActivity extends Activity
         }
     }
 
-
     /**
      * Display an error dialog showing that Google Play Services is missing
      * or out of date.
@@ -313,6 +313,9 @@ public class GoogleApiActivity extends Activity
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
+
+
+    enum MajorDimension {COLUMNS, ROWS}
 
     /**
      * An asynchronous task that handles the Google Sheets API call.
@@ -355,9 +358,8 @@ public class GoogleApiActivity extends Activity
          * @throws IOException
          */
         private List<String> getDataFromApi() throws IOException {
-            String spreadsheetId = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
-            String range = "Cég1!F1:H4";
-            String majorDim = "COLUMNS";
+            String range = sheetName + "!F1:H4";
+            String majorDim = MajorDimension.COLUMNS.toString();
             List<String> results = new ArrayList<String>();
             ValueRange response = this.mService.spreadsheets().values()
                     .get(spreadsheetId, range).setMajorDimension(majorDim)
@@ -372,11 +374,6 @@ public class GoogleApiActivity extends Activity
             }
             return results;
         }
-
-        private void writeDataApi() throws IOException {
-
-        }
-
 
         @Override
         protected void onPreExecute() {
