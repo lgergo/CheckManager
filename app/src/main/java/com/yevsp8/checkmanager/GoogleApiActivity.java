@@ -14,11 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.text.method.ScrollingMovementMethod;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -64,7 +60,7 @@ public class GoogleApiActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LinearLayout activityLayout = new LinearLayout(this);
+        /*LinearLayout activityLayout = new LinearLayout(this);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT);
@@ -99,14 +95,17 @@ public class GoogleApiActivity extends Activity
         activityLayout.addView(mOutputText);
 
         mProgress = new ProgressDialog(this);
-        mProgress.setMessage("Calling Google Sheets API ...");
+        mProgress.setMessage("Calling Google Sheets API ...");*/
 
-        setContentView(activityLayout);
+        //setContentView(activityLayout);
 
         // Initialize credentials and service object.
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
     }
 
 
@@ -357,18 +356,25 @@ public class GoogleApiActivity extends Activity
          */
         private List<String> getDataFromApi() throws IOException {
             String spreadsheetId = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
-            String range = "Cég1!A2:13";
+            String range = "Cég1!F1:H4";
+            String majorDim = "COLUMNS";
             List<String> results = new ArrayList<String>();
             ValueRange response = this.mService.spreadsheets().values()
-                    .get(spreadsheetId, range)
+                    .get(spreadsheetId, range).setMajorDimension(majorDim)
                     .execute();
-            List<List<Object>> values = response.getValues();
+            List<List<Object>> values = response.getValues();   // belső lista a majorDiemnsion
             if (values != null) {
-                for (List row : values) {
-                    results.add(row.get(0) + ", " + row.get(12));
+                for (int i = 0; i < values.size(); i++) {
+                    for (int j = 0; j < values.get(i).size(); j++) {
+                        results.add(values.get(i).get(j).toString());
+                    }
                 }
             }
             return results;
+        }
+
+        private void writeDataApi() throws IOException {
+
         }
 
 
