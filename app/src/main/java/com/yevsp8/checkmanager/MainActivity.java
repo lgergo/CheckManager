@@ -11,31 +11,58 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
+    DbHandler db;
+    ListCheckFragment fragment;
+    TextView latestSynchTextView;
+    FloatingActionButton newImageButton;
+    FloatingActionButton testApiButton;
+    TextView googleApiResultTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DbHandler db = DbHandler.getInstance(this);
+        db = DbHandler.getInstance(this);
         db.generateDemoData();
 
-        ListCheckFragment fragment = ListCheckFragment.newInsatce();
+        fragment = ListCheckFragment.newInsatce();
 
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.checklist_fragmentcontainer, fragment);
         transaction.commit();
 
-        TextView latestSynch = findViewById(R.id.latest_synch);
+        latestSynchTextView = findViewById(R.id.latest_synch);
         //TODO resource-ba + lekérdezni az utolsó szinkronizációt
-        latestSynch.setText("Legutoljára szinkronizálva: ");
+        latestSynchTextView.setText("Legutoljára szinkronizálva: ");
 
-        FloatingActionButton button = findViewById(R.id.newImage_button);
-        button.setOnClickListener(new View.OnClickListener() {
+        newImageButton = findViewById(R.id.newImage_button);
+        newImageButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), NewImageActivity.class);
                 startActivity(intent);
-            } 
-    });
+            }
+        });
+
+        googleApiResultTextView = findViewById(R.id.googleApiResult_textView);
+
+        testApiButton = findViewById(R.id.testGoogleApi_button);
+        testApiButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+//                GoogleApiProvider googleApi=GoogleApiProvider.getInstance(MainActivity.this);
+//                googleApi.getResultsFromApi();
+
+                GoogleApiProvider googleApi = GoogleApiProvider.getInstance(MainActivity.this);
+                googleApi.updateData("010101", "11300", "Valaki", "2017.01.01");
+
+//                Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
+//                startActivity(intent);
+            }
+        });
+    }
+
+    public void updateGoogleApiTextView(String result) {
+        googleApiResultTextView.setText(result);
     }
 }
