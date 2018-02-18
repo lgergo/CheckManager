@@ -20,6 +20,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
@@ -46,6 +47,7 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
     String mOutputText;
     GoogleAccountCredential mCredential;
     MainActivity baseActivity;
+
     private String spreadsheetId = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
     private String sheetName = "Cég1!";
     //TODO kiemelés vhova
@@ -64,15 +66,22 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
         return provider;
     }
 
-
-    public void updateData(String checkid, String amount, String paidto, String paiddate) {
+    private void initializeAccountForApiCall() {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount();
         } else if (!isDeviceOnline()) {
             mOutputText = "No network connection available.";
-        } else if (mCredential.getSelectedAccountName() != null) {
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount();
+        }
+        baseActivity.updateGoogleApiTextView(mOutputText);
+    }
+
+
+    public void insertData(String checkid, String amount, String paidto, String paiddate) {
+
+        initializeAccountForApiCall();
+        if (mCredential.getSelectedAccountName() != null) {
             new UpdateRequestTask(mCredential).execute();
         }
     }
@@ -85,13 +94,9 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
      * appropriate.
      */
     public void getResultsFromApi() {
-        if (!isGooglePlayServicesAvailable()) {
-            acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount();
-        } else if (!isDeviceOnline()) {
-            mOutputText = "No network connection available.";
-        } else if (mCredential.getSelectedAccountName() != null) {
+
+        initializeAccountForApiCall();
+        if (mCredential.getSelectedAccountName() != null) {
             new MakeRequestTask(mCredential).execute();
         }
     }
@@ -157,7 +162,6 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
             //String accountName = baseActivity.getPreferences(Context.MODE_PRIVATE).getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
-                getResultsFromApi();
             } else {
                 // Start a dialog from which the user can choose an account
                 baseActivity.startActivityForResult(
@@ -271,12 +275,12 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
         @Override
         protected void onPreExecute() {
             mOutputText = "";
-            //mProgress.show();
+            baseActivity.updateProgressBar.show();
         }
 
         @Override
         protected void onPostExecute(List<String> output) {
-            //mProgress.hide();
+            baseActivity.updateProgressBar.hide();
             if (output == null || output.size() == 0) {
                 mOutputText = "No results returned.";
             } else {
@@ -288,7 +292,7 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
 
         @Override
         protected void onCancelled() {
-            //mProgress.hide();
+            baseActivity.updateProgressBar.hide();
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
                     showGooglePlayServicesAvailabilityErrorDialog(
@@ -309,7 +313,7 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
     }
 
 
-    private class UpdateRequestTask extends AsyncTask<Void, Void, List<String>> {
+    private class UpdateRequestTask extends AsyncTask<Void, Void, Boolean> {
         private com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
@@ -323,23 +327,23 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
         }
 
         @Override
-        protected List<String> doInBackground(Void... params) {
+        protected Boolean doInBackground(Void... params) {
             try {
                 updateDataThroughApi();
-                return null;
+                return true;
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
-                return null;
+                return false;
             }
         }
 
-        private void updateDataThroughApi() throws IOException {
+        private Boolean updateDataThroughApi() throws IOException {
             //TODO vhonnan az eredetit
             Object a1 = new Object();
-            a1 = "TEST Row 1 Column A";
+            a1 = "Test Row 1 Column A";
             Object b1 = new Object();
-            b1 = "TEST Row 1 Column B";
+            b1 = "Test Row 1 Column B";
 
 
             String range = sheetName + "F1:H4";
@@ -352,12 +356,12 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
                             Arrays.asList(a1, b1)
                     ));
 
-            this.mService.spreadsheets().values()
+            UpdateValuesResponse response = this.mService.spreadsheets().values()
                     .update(spreadsheetId, range, valueRange).setValueInputOption("RAW")
                     .execute();
 
             //TODO update sikeressége ???
-            //return results;
+            return response.getUpdatedCells() == 2;
         }
 
         @Override
@@ -367,13 +371,12 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
         }
 
         @Override
-        protected void onPostExecute(List<String> output) {
+        protected void onPostExecute(Boolean output) {
             //mProgress.hide();
-            if (output == null || output.size() == 0) {
+            if (!output) {
                 mOutputText = "No results returned.";
             } else {
-                output.add(0, "Data retrieved using the Google Sheets API:");
-                mOutputText = TextUtils.join("\n", output);
+                mOutputText = "Update was successful";
                 baseActivity.updateGoogleApiTextView(mOutputText);
             }
         }

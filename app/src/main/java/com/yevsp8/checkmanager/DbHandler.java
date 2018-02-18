@@ -78,6 +78,14 @@ public class DbHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    //TODO meghívás sikeres szinkronizáció után
+    public void deleteCheck(String checkId) {
+        SQLiteDatabase db = getWritableDatabase();
+        String[] args = {checkId};
+        db.delete(TABLE_CHECK, "_id=?", args);
+        db.close();
+    }
+
     public Cursor getNotUploadedCheckList() {
         //TODO rossz lekérdezés
         SQLiteDatabase db = getReadableDatabase();

@@ -1,5 +1,6 @@
 package com.yevsp8.checkmanager;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton newImageButton;
     FloatingActionButton testApiButton;
     TextView googleApiResultTextView;
+    ProgressDialog updateProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
 
         googleApiResultTextView = findViewById(R.id.googleApiResult_textView);
 
+        updateProgressBar = new ProgressDialog(this);
+        updateProgressBar.setMessage("Updating cell values ...");
+
         testApiButton = findViewById(R.id.testGoogleApi_button);
         testApiButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -54,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 //                googleApi.getResultsFromApi();
 
                 GoogleApiProvider googleApi = GoogleApiProvider.getInstance(MainActivity.this);
-                googleApi.updateData("010101", "11300", "Valaki", "2017.01.01");
+                googleApi.insertData("010101", "11300", "Valaki", "2017.01.01");
 
 //                Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
 //                startActivity(intent);
