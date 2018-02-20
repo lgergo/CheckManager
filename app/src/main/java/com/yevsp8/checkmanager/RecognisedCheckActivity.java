@@ -11,6 +11,10 @@ public class RecognisedCheckActivity extends AppCompatActivity {
 
     private Button buttonUpload;
     private ProgressDialog progressDialog;
+    private TextView id;
+    private TextView amount;
+    private TextView paidto;
+    private TextView paiddate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,9 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         paidto.setText(demo_paidTo);
         paiddate.setText(demo_paidDate);
 
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Recognise in progress...");
+
         buttonUpload = findViewById(R.id.button_upload);
         buttonUpload.setOnClickListener(new View.OnClickListener() {
                                             public void onClick(View v) {
@@ -42,7 +49,20 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         );
 
         progressDialog.show();
+        callTesseractForRecognise();
+        progressDialog.hide();
+
 
         //TODO Tesseract api meghívása, új adatok adatbázisba mentése
+    }
+
+    private void callTesseractForRecognise() {
+        //TODO context függőségek átnézése
+        //Check check;
+        TessTwoApi tesseract = TessTwoApi.getInstance(getApplicationContext());
+        String result = tesseract.getDataFromImage();
+
+        //TODO egyenlőre csak ide berakja
+        id.setText(result);
     }
 }

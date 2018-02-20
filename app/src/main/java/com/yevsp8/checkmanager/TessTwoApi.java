@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
@@ -22,10 +23,11 @@ public class TessTwoApi {
 
     private static TessTwoApi tessTwoApi;
     private Bitmap image;
+    private String tessdata = "/tessdata";
     private TessBaseAPI tesseract;
-    private String dataPath = "";
     private String language = "en";
     private Context context;
+    private String dataPath = Environment.getExternalStorageDirectory().toString() + "/Tess";
 
     private TessTwoApi(Context context) {
         this.context = context;
@@ -42,6 +44,13 @@ public class TessTwoApi {
         if (tessTwoApi == null)
             tessTwoApi = new TessTwoApi(context);
         return tessTwoApi;
+    }
+
+    public String getDataFromImage() {
+        String result = null;
+        tesseract.setImage(image);
+        result = tesseract.getUTF8Text();
+        return result;
     }
 
     //TODO miert kell ??
