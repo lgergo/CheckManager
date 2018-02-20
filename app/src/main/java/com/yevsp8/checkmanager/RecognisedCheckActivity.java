@@ -1,5 +1,6 @@
 package com.yevsp8.checkmanager;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -9,21 +10,12 @@ import android.widget.TextView;
 public class RecognisedCheckActivity extends AppCompatActivity {
 
     private Button buttonUpload;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recognised_check);
-
-        buttonUpload = findViewById(R.id.button_upload);
-        buttonUpload.setOnClickListener(new View.OnClickListener() {
-                                            public void onClick(View v) {
-                                                //TODO google api upload meghívása
-                                            }
-                                        }
-        );
-
-        //TODO Tesseract api meghívása, új adatok adatbázisba mentése
 
         //egyenlőre demo data
         String demo_checkId = "0123456789876";
@@ -40,5 +32,17 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         amount.setText(demo_amount);
         paidto.setText(demo_paidTo);
         paiddate.setText(demo_paidDate);
+
+        buttonUpload = findViewById(R.id.button_upload);
+        buttonUpload.setOnClickListener(new View.OnClickListener() {
+                                            public void onClick(View v) {
+                                                //TODO google api upload meghívása
+                                            }
+                                        }
+        );
+
+        progressDialog.show();
+
+        //TODO Tesseract api meghívása, új adatok adatbázisba mentése
     }
 }

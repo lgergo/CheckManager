@@ -27,6 +27,7 @@ public class NewImageActivity extends AppCompatActivity {
     private ImageView imageView;
     private String currentPhotoPath;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
