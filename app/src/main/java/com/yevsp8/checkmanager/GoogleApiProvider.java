@@ -47,6 +47,8 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
     String mOutputText;
     GoogleAccountCredential mCredential;
     MainActivity baseActivity;
+    
+    enum MajorDimension {COLUMNS, ROWS}
 
     private String spreadsheetId = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
     private String sheetName = "Cég1!";
@@ -84,6 +86,78 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
         if (mCredential.getSelectedAccountName() != null) {
             new UpdateRequestTask(mCredential).execute();
         }
+    }
+    
+    public void createEmptyCompanyTemplate(String companyName)
+    {
+        private com.google.api.services.sheets.v4.Sheets mService=mService = new com.google.api.services.sheets.v4.Sheets.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("Create sheet")
+                    .build();
+        initializeAccountForApiCall();
+        if(mCredential.getSelectedAccountName() != null && compnayName!=null)
+        {
+            SheetProperies sheetProp=new SheetProperties();
+            sheetProp.setSheetId=spreadsheetId;  // ???
+            sheetProp.setTitle=companyName;
+            
+            //TODO alsó class elérése innen is
+            Spreadsheet response=mService.spreadsheets().create(sheetProp);
+            //TODO sheet létezésének ellenőrzése
+
+            if(sheetlétezik)
+            {
+                String range = sheetName + "A15:D15";
+                ValueRange valueRange = new ValueRange(MajorDimension.COLUMNS.toString());
+                valueRange.setMajorDimension(majorDim);
+                valueRange.setRange(range);
+                valueRange.setValues(
+                        Arrays.asList(
+                                Arrays.asList("hónap","csekk sorszám","összeg","befizetés dátuma")
+                        ));
+
+                String range = sheetName + "A16:A28";
+                ValueRange valueRange2 = new ValueRange();
+                valueRange2.setMajorDimension(GoogleApiActivity.MajorDimension.ROWS.toString());
+                valueRange2.setRange(range);
+                valueRange2.setValues(
+                        Arrays.asList(
+                                Arrays.asList("január","február","március","április","május","június","július","augusztus","szeptember","október","november","december")
+                        ));
+
+                List<ValueRange> data = new ArrayList<>();
+                data.add(valueRange);
+                data.add(valueRange2);
+
+                BatchUpdateValuesRequest requestBody = new BatchUpdateValuesRequest();
+                requestBody.setValueInputOption(valueInputOption);
+                requestBody.setData(data);
+
+                BatchUpdate request =mService.spreadsheets().values().batchUpdate(spreadsheetId, requestBody);
+                BatchUpdateValuesResponse response = request.execute();
+            }
+        }
+    }
+    
+    public void checkIfRowIsEmptyByMonth(String month)
+    {
+        String range = sheetName + "B2:B13";
+        String majorDim = MajorDimension.ROWS.toString();
+        List<String> results = new ArrayList<String>();
+        ValueRange response = this.mService.spreadsheets().values()
+                .get(spreadsheetId, range).setMajorDimension(majorDim)
+                .execute();
+        List<List<Object>> values = response.getValues();
+        if (values != null) {
+            for (int i = 0; i < values.size(); i++) {
+                for (int j = 0; j < values.get(i).size(); j++) {
+                    results.add(values.get(i).get(j).toString());
+                }
+            }
+        }
+       //TODO check if contains month + egymás után ha több év van ?
+                
+        return results;
     }
 
     /**
