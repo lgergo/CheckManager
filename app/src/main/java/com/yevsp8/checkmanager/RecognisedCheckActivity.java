@@ -15,11 +15,14 @@ public class RecognisedCheckActivity extends AppCompatActivity {
     private TextView amount;
     private TextView paidto;
     private TextView paiddate;
+    private String path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recognised_check);
+
+        path = getIntent().getExtras().getString("path");
 
         //egyenlőre demo data
         String demo_checkId = "0123456789876";
@@ -27,10 +30,10 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         String demo_paidTo = "Főgáz";
         String demo_paidDate = "2017.12.02";
 
-        TextView id = findViewById(R.id.recognised_check_id);
-        TextView amount = findViewById(R.id.recognised_check_amount);
-        TextView paidto = findViewById(R.id.recognised_check_paidTo);
-        TextView paiddate = findViewById(R.id.recognised_check_paidDate);
+        id = findViewById(R.id.recognised_check_id);
+        amount = findViewById(R.id.recognised_check_amount);
+        paidto = findViewById(R.id.recognised_check_paidTo);
+        paiddate = findViewById(R.id.recognised_check_paidDate);
 
         id.setText(demo_checkId);
         amount.setText(demo_amount);
@@ -42,18 +45,14 @@ public class RecognisedCheckActivity extends AppCompatActivity {
 
         buttonUpload = findViewById(R.id.button_upload);
         buttonUpload.setOnClickListener(new View.OnClickListener() {
-                                            public void onClick(View v) {
-                                                //TODO google api upload meghívása
-                                            }
-                                        }
-        );
+            public void onClick(View v) {
+                //TODO google api upload meghívása
+            }
+        });
 
         progressDialog.show();
         callTesseractForRecognise();
         progressDialog.hide();
-
-
-        //TODO Tesseract api meghívása, új adatok adatbázisba mentése
     }
 
     private void callTesseractForRecognise() {
@@ -64,5 +63,7 @@ public class RecognisedCheckActivity extends AppCompatActivity {
 
         //TODO egyenlőre csak ide berakja
         id.setText(result);
+
+        //TODO check mentése adatbázisba
     }
 }

@@ -1,17 +1,16 @@
 package com.yevsp8.checkmanager;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -21,23 +20,22 @@ import java.io.OutputStream;
 
 public class TessTwoApi {
 
+    public static final String TESS_DATA = "/tessdata";
+    private static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/Tess";
     private static TessTwoApi tessTwoApi;
-    private Bitmap image;
-    private String tessdata = "/tessdata";
-    private TessBaseAPI tesseract;
+    private TessBaseAPI tessBaseAPI;
     private String language = "en";
     private Context context;
-    private String dataPath = Environment.getExternalStorageDirectory().toString() + "/Tess";
+    private String imagePath = Environment.getExternalStorageDirectory().toString() + "/DCIM/ocr.png";
+    private String textResult;
+    private String TAG = "Tesseract error";
+    private String fileName = "eng.traineddata";
 
     private TessTwoApi(Context context) {
         this.context = context;
-        image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ocr);
 
-        dataPath = context.getFilesDir() + "/tesseract/";
-
-        checkFile(new File(dataPath + "tessdata/"));
-        tesseract = new TessBaseAPI();
-        tesseract.init(dataPath, language);
+        prepareTessData();
+        startOCR();
     }
 
     public static TessTwoApi getInstance(Context context) {
@@ -46,56 +44,68 @@ public class TessTwoApi {
         return tessTwoApi;
     }
 
-    public String getDataFromImage() {
-        String result = null;
-        tesseract.setImage(image);
-        result = tesseract.getUTF8Text();
-        return result;
-    }
-
-    //TODO miert kell ??
-    //file eszkozre masolasa
-    private void copyFiles() {
+    private void prepareTessData() {
         try {
-            //location we want the file to be at
-            String filepath = dataPath + "/tessdata/eng.traineddata";
-
-            //get access to AssetManager
-            AssetManager assetManager = context.getAssets();
-
-            //open byte streams for reading/writing
-            InputStream instream = assetManager.open("tessdata/eng.traineddata");
-            OutputStream outstream = new FileOutputStream(filepath);
-
-            //copy the file to the location specified by filepath
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = instream.read(buffer)) != -1) {
-                outstream.write(buffer, 0, read);
+            File dir = context.getExternalFilesDir(TESS_DATA);
+            if (!dir.exists()) {
+                if (!dir.mkdir()) {
+                    //TODO logika ne toastoljon
+                    Toast.makeText(context.getApplicationContext(), "The folder " + dir.getPath() + "was not created", Toast.LENGTH_SHORT).show();
+                }
             }
-            outstream.flush();
-            outstream.close();
-            instream.close();
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            String fileList[] = context.getAssets().list("");
+            for (String fileName : fileList) {
+                String pathToDataFile = dir + "/" + fileName;
+                if (!(new File(pathToDataFile)).exists()) {
+                    InputStream in = context.getAssets().open(fileName);
+                    OutputStream out = new FileOutputStream(pathToDataFile);
+                    byte[] buff = new byte[1024];
+                    int len;
+                    while ((len = in.read(buff)) > 0) {
+                        out.write(buff, 0, len);
+                    }
+                    in.close();
+                    out.close();
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
     }
 
-    private void checkFile(File dir) {
-        //directory does not exist, but we can successfully create it
-        if (!dir.exists() && dir.mkdirs()) {
-            copyFiles();
+    public String getDataFromImage() {
+        return textResult;
+    }
+
+    private void startOCR() {
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = false;
+            options.inSampleSize = 6;
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+            textResult = this.getText(bitmap);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
-        //The directory exists, but there is no data file in it
-        if (dir.exists()) {
-            String datafilepath = dataPath + "/tessdata/eng.traineddata";
-            File datafile = new File(datafilepath);
-            if (!datafile.exists()) {
-                copyFiles();
-            }
+    }
+
+    private String getText(Bitmap bitmap) {
+        try {
+            tessBaseAPI = new TessBaseAPI();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
+        String dataPath = context.getExternalFilesDir("/").getPath() + "/";
+        tessBaseAPI.init(dataPath, "eng");
+        tessBaseAPI.setImage(bitmap);
+        String retStr = "No result";
+        try {
+            retStr = tessBaseAPI.getUTF8Text();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+        tessBaseAPI.end();
+        return retStr;
     }
 }
