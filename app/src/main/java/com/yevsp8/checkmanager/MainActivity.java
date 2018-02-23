@@ -58,11 +58,15 @@ public class MainActivity extends AppCompatActivity {
 //                GoogleApiProvider googleApi=GoogleApiProvider.getInstance(MainActivity.this);
 //                googleApi.getResultsFromApi();
 
-                GoogleApiProvider googleApi = GoogleApiProvider.getInstance(MainActivity.this);
-                googleApi.insertData("010101", "11300", "Valaki", "2017.01.01");
+//                GoogleApiProvider googleApi = GoogleApiProvider.getInstance(MainActivity.this);
+//                googleApi.insertData("010101", "11300", "Valaki", "2017.01.01");
 
-//                Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
-//                startActivity(intent);
+//                GoogleApiProvider googleApi = GoogleApiProvider.getInstance(MainActivity.this);
+//                googleApi.createEmptyCompanyTemplate("újcég");
+
+                Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
+                startActivity(intent);
+
             }
         });
     }

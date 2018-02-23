@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -31,7 +32,12 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
+import com.google.api.services.sheets.v4.model.Spreadsheet;
+import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
@@ -50,11 +56,11 @@ public class GoogleApiActivity extends Activity
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
     private static final String BUTTON_TEXT = "Call Google Sheets API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS_READONLY};
+    private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS};
     GoogleAccountCredential mCredential;
     ProgressDialog mProgress;
     private String spreadsheetId = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
-    private String sheetName = "Cég1";
+    private String sheetName = "Cég1!";
     private TextView mOutputText;
     private Button mCallApiButton;
 
@@ -85,7 +91,9 @@ public class GoogleApiActivity extends Activity
             public void onClick(View v) {
                 mCallApiButton.setEnabled(false);
                 mOutputText.setText("");
-                getResultsFromApi();
+                //getResultsFromApi();
+                //updateDataApi();
+                createSheetApi();
                 mCallApiButton.setEnabled(true);
             }
         });
@@ -119,7 +127,7 @@ public class GoogleApiActivity extends Activity
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    private void getResultsFromApi() {
+    public void getResultsFromApi() {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -130,6 +138,31 @@ public class GoogleApiActivity extends Activity
             new MakeRequestTask(mCredential).execute();
         }
     }
+
+    public void updateDataApi() {
+        if (!isGooglePlayServicesAvailable()) {
+            acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount();
+        } else if (!isDeviceOnline()) {
+            mOutputText.setText("No network connection available.");
+        } else {
+            new UpdateRequestTask(mCredential).execute();
+        }
+    }
+
+    public void createSheetApi() {
+        if (!isGooglePlayServicesAvailable()) {
+            acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount();
+        } else if (!isDeviceOnline()) {
+            mOutputText.setText("No network connection available.");
+        } else {
+            new CreateSheetRequestTask(mCredential).execute();
+        }
+    }
+
 
     /**
      * Attempts to set the account used with the API credentials. If an account
@@ -149,7 +182,10 @@ public class GoogleApiActivity extends Activity
                     .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
-                getResultsFromApi();
+                //TODO
+                //getResultsFromApi();
+                //updateDataApi();
+                createSheetApi();
             } else {
                 // Start a dialog from which the user can choose an account
                 startActivityForResult(
@@ -188,7 +224,10 @@ public class GoogleApiActivity extends Activity
                             "This app requires Google Play Services. Please install " +
                                     "Google Play Services on your device and relaunch this app.");
                 } else {
-                    getResultsFromApi();
+                    //TODO
+                    //updateDataApi();
+                    //getResultsFromApi();
+                    createSheetApi();
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
@@ -203,13 +242,20 @@ public class GoogleApiActivity extends Activity
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
                         mCredential.setSelectedAccountName(accountName);
-                        getResultsFromApi();
+
+                        //TODO
+                        //updateDataApi();
+                        //getResultsFromApi();
+                        createSheetApi();
                     }
                 }
                 break;
             case REQUEST_AUTHORIZATION:
                 if (resultCode == RESULT_OK) {
-                    getResultsFromApi();
+                    //TODO
+                    //updateDataApi();
+                    //getResultsFromApi();
+                    createSheetApi();
                 }
                 break;
         }
@@ -391,6 +437,235 @@ public class GoogleApiActivity extends Activity
             } else {
                 output.add(0, "Data retrieved using the Google Sheets API:");
                 mOutputText.setText(TextUtils.join("\n", output));
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mProgress.hide();
+            if (mLastError != null) {
+                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+                    showGooglePlayServicesAvailabilityErrorDialog(
+                            ((GooglePlayServicesAvailabilityIOException) mLastError)
+                                    .getConnectionStatusCode());
+                } else if (mLastError instanceof UserRecoverableAuthIOException) {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            GoogleApiActivity.REQUEST_AUTHORIZATION);
+                } else {
+                    mOutputText.setText("The following error occurred:\n"
+                            + mLastError.getMessage());
+                }
+            } else {
+                mOutputText.setText("Request cancelled.");
+            }
+        }
+    }
+
+    private class UpdateRequestTask extends AsyncTask<Void, Void, Boolean> {
+        private com.google.api.services.sheets.v4.Sheets mService = null;
+        private Exception mLastError = null;
+
+        UpdateRequestTask(GoogleAccountCredential credential) {
+            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+            mService = new com.google.api.services.sheets.v4.Sheets.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("Google Sheets API Update")
+                    .build();
+        }
+
+        /**
+         * Background task to call Google Sheets API.
+         *
+         * @param params no parameters needed for this task.
+         */
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                return updateDataApi();
+            } catch (Exception e) {
+                mLastError = e;
+                cancel(true);
+                return false;
+            }
+        }
+
+        /**
+         * Fetch a list of names and majors of students in a sample spreadsheet:
+         * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+         *
+         * @return List of names and majors
+         * @throws IOException
+         */
+        private Boolean updateDataApi() {
+            //TODO vhonnan az eredetit
+            Object a1 = "Test Rowww 1 Column A";
+            Object b1 = "Test Rowww 1 Column B";
+
+            String range = sheetName + "F1:G1";
+            String majorDim = MajorDimension.ROWS.toString();
+            ValueRange valueRange = new ValueRange();
+            valueRange.setMajorDimension(majorDim);
+            valueRange.setRange(range);
+            valueRange.setValues(
+                    Arrays.asList(
+                            Arrays.asList(a1, b1)
+                    ));
+            try {
+                UpdateValuesResponse response = this.mService.spreadsheets().values()
+                        .update(spreadsheetId, range, valueRange).setValueInputOption("RAW")
+                        .execute();
+                return response.getUpdatedCells() == 2;
+            } catch (UserRecoverableAuthIOException e) {
+                startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+            } catch (Exception ex) {
+                Log.e("google", ex.getMessage());
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mOutputText.setText("");
+            mProgress.show();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean output) {
+            mProgress.hide();
+            if (output) {
+                mOutputText.setText("Update was successful");
+            } else {
+                mOutputText.setText("Unsuccesful update");
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mProgress.hide();
+            if (mLastError != null) {
+                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+                    showGooglePlayServicesAvailabilityErrorDialog(
+                            ((GooglePlayServicesAvailabilityIOException) mLastError)
+                                    .getConnectionStatusCode());
+                } else if (mLastError instanceof UserRecoverableAuthIOException) {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            GoogleApiActivity.REQUEST_AUTHORIZATION);
+                } else {
+                    mOutputText.setText("The following error occurred:\n"
+                            + mLastError.getMessage());
+                }
+            } else {
+                mOutputText.setText("Request cancelled.");
+            }
+        }
+    }
+
+    private class CreateSheetRequestTask extends AsyncTask<Void, Void, Boolean> {
+        private com.google.api.services.sheets.v4.Sheets mService = null;
+        private Exception mLastError = null;
+
+        CreateSheetRequestTask(GoogleAccountCredential credential) {
+            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+            mService = new com.google.api.services.sheets.v4.Sheets.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("Google Sheets API Create Sheet")
+                    .build();
+        }
+
+        /**
+         * Background task to call Google Sheets API.
+         *
+         * @param params no parameters needed for this task.
+         */
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                return createEmptyCompanyTemplate();
+            } catch (Exception e) {
+                mLastError = e;
+                cancel(true);
+                return false;
+            }
+        }
+
+        /**
+         * Fetch a list of names and majors of students in a sample spreadsheet:
+         * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+         *
+         * @return List of names and majors
+         * @throws IOException
+         */
+        private boolean createEmptyCompanyTemplate() {
+            String paidTo = "ÚjCég";
+            if (paidTo != null) {
+                Spreadsheet requestBody = new Spreadsheet();
+                try {
+                    Sheets.Spreadsheets.Create request = this.mService.spreadsheets().create(requestBody);
+
+                    Spreadsheet response = request.execute();
+
+                    //TODO sheet létezésének ellenőrzése
+
+                    if (response != null) {
+                        String range = sheetName + "A15:D15";
+                        ValueRange valueRange = new ValueRange();
+                        valueRange.setMajorDimension(MajorDimension.ROWS.toString());
+                        valueRange.setRange(range);
+                        valueRange.setValues(
+                                Arrays.asList(
+                                        Arrays.asList((Object) "hónap", "csekk sorszám", "összeg", "befizetés dátuma")
+                                ));
+
+
+                        String range2 = sheetName + "A16:A28";
+                        ValueRange valueRange2 = new ValueRange();
+                        valueRange2.setMajorDimension(MajorDimension.COLUMNS.toString());
+                        valueRange2.setRange(range2);
+                        valueRange2.setValues(
+                                Arrays.asList(
+                                        Arrays.asList((Object) "január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december")
+                                ));
+
+                        List<ValueRange> data = new ArrayList<>();
+                        data.add(valueRange);
+                        data.add(valueRange2);
+
+                        BatchUpdateValuesRequest updateRequestBody = new BatchUpdateValuesRequest();
+                        updateRequestBody.setValueInputOption("RAW");
+                        updateRequestBody.setData(data);
+
+                        Sheets.Spreadsheets.Values.BatchUpdate batchUpdateRequest = mService.spreadsheets().values().batchUpdate(spreadsheetId, updateRequestBody);
+                        BatchUpdateValuesResponse updateValueResponse = batchUpdateRequest.execute();
+
+                        return updateValueResponse.getTotalUpdatedCells() == 16;
+                    }
+
+                } catch (UserRecoverableAuthIOException e) {
+                    startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+                } catch (Exception ex) {
+                    Log.e("credentials", ex.getMessage());
+                }
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mOutputText.setText("");
+            mProgress.show();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean output) {
+            mProgress.hide();
+            if (output) {
+                mOutputText.setText("Creation was successful");
+            } else {
+                mOutputText.setText("Unsuccesful creation");
             }
         }
 

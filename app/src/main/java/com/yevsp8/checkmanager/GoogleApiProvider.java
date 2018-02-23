@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -19,7 +20,11 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
+import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
@@ -47,14 +52,10 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
     String mOutputText;
     GoogleAccountCredential mCredential;
     MainActivity baseActivity;
-    
-    enum MajorDimension {COLUMNS, ROWS}
-
     private String spreadsheetId = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
     private String sheetName = "Cég1!";
     //TODO kiemelés vhova
     private String accountName = "lg.gergo@gmail.com";
-
     private GoogleApiProvider(final MainActivity activity) {
         baseActivity = activity;
         mCredential = GoogleAccountCredential.usingOAuth2(
@@ -62,9 +63,9 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
                 .setBackOff(new ExponentialBackOff());
     }
 
-    public static GoogleApiProvider getInstance(final MainActivity acitvity) {
+    public static GoogleApiProvider getInstance(final MainActivity activity) {
         if (provider == null)
-            provider = new GoogleApiProvider(acitvity);
+            provider = new GoogleApiProvider(activity);
         return provider;
     }
 
@@ -79,7 +80,6 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
         baseActivity.updateGoogleApiTextView(mOutputText);
     }
 
-
     public void insertData(String checkid, String amount, String paidto, String paiddate) {
 
         initializeAccountForApiCall();
@@ -87,79 +87,75 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
             new UpdateRequestTask(mCredential).execute();
         }
     }
-    
-    public void createEmptyCompanyTemplate(String companyName)
+
+    public void createEmptyCompanyTemplate(String paidToCompany)
     {
-        private com.google.api.services.sheets.v4.Sheets mService=mService = new com.google.api.services.sheets.v4.Sheets.Builder(
-                    transport, jsonFactory, credential)
+        HttpTransport transport = AndroidHttp.newCompatibleTransport();
+        JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        com.google.api.services.sheets.v4.Sheets mService = new com.google.api.services.sheets.v4.Sheets.Builder(
+                transport, jsonFactory, mCredential)
                     .setApplicationName("Create sheet")
                     .build();
         initializeAccountForApiCall();
-        if(mCredential.getSelectedAccountName() != null && compnayName!=null)
-        {
-            SheetProperies sheetProp=new SheetProperties();
-            sheetProp.setSheetId=spreadsheetId;  // ???
-            sheetProp.setTitle=companyName;
-            
-            //TODO alsó class elérése innen is
-            Spreadsheet response=mService.spreadsheets().create(sheetProp);
-            //TODO sheet létezésének ellenőrzése
+        //TODO accout name
+        mCredential.setSelectedAccountName(accountName);
+        if (/*mCredential.getSelectedAccountName() != null &&*/ paidToCompany != null) {
+            Spreadsheet requestBody = new Spreadsheet();
 
-            if(sheetlétezik)
-            {
-                String range = sheetName + "A15:D15";
-                ValueRange valueRange = new ValueRange(MajorDimension.COLUMNS.toString());
-                valueRange.setMajorDimension(majorDim);
-                valueRange.setRange(range);
-                valueRange.setValues(
-                        Arrays.asList(
-                                Arrays.asList("hónap","csekk sorszám","összeg","befizetés dátuma")
-                        ));
+            Sheets sheetsService = new Sheets.Builder(transport, jsonFactory, mCredential)
+                    .setApplicationName("Google-SheetsSample/0.1")
+                    .build();
 
-                String range = sheetName + "A16:A28";
-                ValueRange valueRange2 = new ValueRange();
-                valueRange2.setMajorDimension(GoogleApiActivity.MajorDimension.ROWS.toString());
-                valueRange2.setRange(range);
-                valueRange2.setValues(
-                        Arrays.asList(
-                                Arrays.asList("január","február","március","április","május","június","július","augusztus","szeptember","október","november","december")
-                        ));
+            try {
+                Sheets.Spreadsheets.Create request = sheetsService.spreadsheets().create(requestBody);
 
-                List<ValueRange> data = new ArrayList<>();
-                data.add(valueRange);
-                data.add(valueRange2);
+                Spreadsheet response = request.execute();
 
-                BatchUpdateValuesRequest requestBody = new BatchUpdateValuesRequest();
-                requestBody.setValueInputOption(valueInputOption);
-                requestBody.setData(data);
+                //TODO sheet létezésének ellenőrzése
 
-                BatchUpdate request =mService.spreadsheets().values().batchUpdate(spreadsheetId, requestBody);
-                BatchUpdateValuesResponse response = request.execute();
+                if (response != null) {
+                    String range = sheetName + "A15:D15";
+                    ValueRange valueRange = new ValueRange();
+                    valueRange.setMajorDimension(MajorDimension.COLUMNS.toString());
+                    valueRange.setRange(range);
+                    valueRange.setValues(
+                            Arrays.asList(
+                                    Arrays.asList((Object) "hónap", "csekk sorszám", "összeg", "befizetés dátuma")
+                            ));
+
+
+                    String range2 = sheetName + "A16:A28";
+                    ValueRange valueRange2 = new ValueRange();
+                    valueRange2.setMajorDimension(MajorDimension.ROWS.toString());
+                    valueRange2.setRange(range2);
+                    valueRange2.setValues(
+                            Arrays.asList(
+                                    Arrays.asList((Object) "január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december")
+                            ));
+
+                    List<ValueRange> data = new ArrayList<>();
+                    data.add(valueRange);
+                    data.add(valueRange2);
+
+                    BatchUpdateValuesRequest updateRequestBody = new BatchUpdateValuesRequest();
+                    // updateRequestBody.setValueInputOption(valueInputOption);
+                    updateRequestBody.setData(data);
+
+                    Sheets.Spreadsheets.Values.BatchUpdate batchUpdateRequest = mService.spreadsheets().values().batchUpdate(spreadsheetId, updateRequestBody);
+                    BatchUpdateValuesResponse updateValueResponse = batchUpdateRequest.execute();
+
+                    //TODO for debug
+                    baseActivity.updateGoogleApiTextView("sikeres sheet generálás");
+                }
+
+                //TODO for debug
+                baseActivity.updateGoogleApiTextView("null response");
+            } catch (Exception ex) {
+                Log.e("credentials", ex.getMessage());
             }
         }
     }
     
-    public void checkIfRowIsEmptyByMonth(String month)
-    {
-        String range = sheetName + "B2:B13";
-        String majorDim = MajorDimension.ROWS.toString();
-        List<String> results = new ArrayList<String>();
-        ValueRange response = this.mService.spreadsheets().values()
-                .get(spreadsheetId, range).setMajorDimension(majorDim)
-                .execute();
-        List<List<Object>> values = response.getValues();
-        if (values != null) {
-            for (int i = 0; i < values.size(); i++) {
-                for (int j = 0; j < values.get(i).size(); j++) {
-                    results.add(values.get(i).get(j).toString());
-                }
-            }
-        }
-       //TODO check if contains month + egymás után ha több év van ?
-                
-        return results;
-    }
-
     /**
      * Attempt to call the API, after verifying that all the preconditions are
      * satisfied. The preconditions are: Google Play Services installed, an
@@ -174,6 +170,27 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
             new MakeRequestTask(mCredential).execute();
         }
     }
+
+//    public void checkIfRowIsEmptyByMonth(String month)
+//    {
+//        String range = sheetName + "B2:B13";
+//        String majorDim = MajorDimension.ROWS.toString();
+//        List<String> results = new ArrayList<String>();
+//        ValueRange response = this.mService.spreadsheets().values()
+//                .get(spreadsheetId, range).setMajorDimension(majorDim)
+//                .execute();
+//        List<List<Object>> values = response.getValues();
+//        if (values != null) {
+//            for (int i = 0; i < values.size(); i++) {
+//                for (int j = 0; j < values.get(i).size(); j++) {
+//                    results.add(values.get(i).get(j).toString());
+//                }
+//            }
+//        }
+//       //TODO check if contains month + egymás után ha több év van ?
+//
+//        return results;
+//    }
 
     /**
      * Check that Google Play services APK is installed and up to date.
@@ -287,6 +304,8 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
         EasyPermissions.onRequestPermissionsResult(
                 requestCode, permissions, grantResults, this);
     }
+
+    enum MajorDimension {COLUMNS, ROWS}
 
     /**
      * An asynchronous task that handles the Google Sheets API call.
@@ -414,11 +433,8 @@ public class GoogleApiProvider implements EasyPermissions.PermissionCallbacks {
 
         private Boolean updateDataThroughApi() throws IOException {
             //TODO vhonnan az eredetit
-            Object a1 = new Object();
-            a1 = "Test Row 1 Column A";
-            Object b1 = new Object();
-            b1 = "Test Row 1 Column B";
-
+            Object a1 = "Test Row 1 Column A";
+            Object b1 = "Test Row 1 Column B";
 
             String range = sheetName + "F1:H4";
             String majorDim = GoogleApiActivity.MajorDimension.ROWS.toString();
