@@ -47,10 +47,10 @@ public class CheckAdapter extends BaseAdapter {
         }
         Check check = getItem(i);
 
-        TextView id = newView.findViewById(R.id.check_paidto);
-        TextView uploaded = newView.findViewById(R.id.check_isuploaded);
-        id.setText(check.getCheckId());
-        uploaded.setText(!check.getIsUploaded() ? "0" : "1");
+        TextView paidTo = newView.findViewById(R.id.check_paidto);
+        TextView paidDate = newView.findViewById(R.id.check_paiddate);
+        paidTo.setText(check.getPaidTo());
+        paidDate.setText(Common.longDateToString(check.getPaidDate()));
 
         return newView;
     }

@@ -45,16 +45,25 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public void generateDemoData() {
-        Date date = Calendar.getInstance().getTime();
-        for (int i = 0; i < 5; i++) {
-            Check c = new Check(
-                    Integer.toString(i),
-                    date.getTime(),
-                    i * 1000,
-                    i + ". szervezet",
-                    date.getTime(),
-                    false
-            );
+
+        SQLiteDatabase db = getWritableDatabase();
+        String count = "SELECT count(*) FROM " + TABLE_CHECK;
+        Cursor mcursor = db.rawQuery(count, null);
+        mcursor.moveToFirst();
+        int icount = mcursor.getInt(0);
+        db.close();
+        if (icount > 0)
+            return;
+        else {
+
+            Date date = Calendar.getInstance().getTime();
+            Check c = new Check("01301823", date.getTime(), 1250, "Főtáv", date.getTime(), false);
+            insertCheck(c);
+            c = new Check("471145743", date.getTime(), 1250, "Telekom", date.getTime(), false);
+            insertCheck(c);
+            c = new Check("963349038", date.getTime(), 8900, "Upc", date.getTime(), false);
+            insertCheck(c);
+            c = new Check("459231004", date.getTime(), 22340, "Közművek", date.getTime(), false);
             insertCheck(c);
         }
     }
