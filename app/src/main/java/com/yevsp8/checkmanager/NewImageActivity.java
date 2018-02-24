@@ -29,6 +29,7 @@ public class NewImageActivity extends AppCompatActivity {
     private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     private Button buttonTakePhoto;
     private Button buttonRecognise;
+    private Button buttonDemo;
     private ImageView imageView;
     private String currentPhotoPath;
 

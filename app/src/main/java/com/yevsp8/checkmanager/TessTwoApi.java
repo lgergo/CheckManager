@@ -29,19 +29,23 @@ public class TessTwoApi {
     private String imagePath = Environment.getExternalStorageDirectory().toString() + "/DCIM/ocr.png";
     private String textResult;
     private String TAG = "Tesseract error";
-    private String fileName = "eng.traineddata";
+    private String imageToRegognisePath;
 
     private TessTwoApi(Context context) {
         this.context = context;
-
-        prepareTessData();
-        startOCR();
     }
 
     public static TessTwoApi getInstance(Context context) {
         if (tessTwoApi == null)
             tessTwoApi = new TessTwoApi(context);
         return tessTwoApi;
+    }
+
+    public String startRegognition(String imagePath) {
+        imageToRegognisePath = imagePath;
+        prepareTessData();
+        startOCR();
+        return getDataFromImage();
     }
 
     private void prepareTessData() {
@@ -83,7 +87,7 @@ public class TessTwoApi {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = false;
             options.inSampleSize = 6;
-            Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+            Bitmap bitmap = BitmapFactory.decodeFile(imageToRegognisePath, options);
             textResult = this.getText(bitmap);
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());

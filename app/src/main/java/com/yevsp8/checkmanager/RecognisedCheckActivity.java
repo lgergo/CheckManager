@@ -59,7 +59,7 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         //TODO context függőségek átnézése
         //Check check;
         TessTwoApi tesseract = TessTwoApi.getInstance(getApplicationContext());
-        String result = tesseract.getDataFromImage();
+        String result = tesseract.startRegognition(path);
 
         //TODO egyenlőre csak ide berakja
         id.setText(result);
