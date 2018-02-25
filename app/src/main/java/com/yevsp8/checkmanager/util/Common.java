@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

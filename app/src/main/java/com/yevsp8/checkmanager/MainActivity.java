@@ -5,9 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.TextView;
+
+import com.yevsp8.checkmanager.data.DbHandler;
 
 public class MainActivity extends BaseActivity {
 
@@ -27,12 +28,16 @@ public class MainActivity extends BaseActivity {
         db = DbHandler.getInstance(this);
         db.generateDemoData();
 
-        fragment = ListCheckFragment.newInsatce();
-
         FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.checklist_fragmentcontainer, fragment);
-        transaction.commit();
+        fragment = (ListCheckFragment) manager.findFragmentById(R.id.checklist_fragmentcontainer);
+        if (fragment == null) {
+            fragment = ListCheckFragment.newInsatce();
+        }
+
+        addFragmentToActivity(manager, fragment, R.id.checklist_fragmentcontainer, "tag");
+//        FragmentTransaction transaction = manager.beginTransaction();
+//        transaction.replace(R.id.checklist_fragmentcontainer, fragment);
+//        transaction.commit();
 
         latestSynchTextView = findViewById(R.id.latest_synch);
         //TODO resource-ba + lekérdezni az utolsó szinkronizációt

@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.data;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -57,14 +57,10 @@ public class DbHandler extends SQLiteOpenHelper {
         else {
 
             Date date = Calendar.getInstance().getTime();
-            Check c = new Check("01301823", date.getTime(), 1250, "Főtáv", date.getTime(), false);
-            insertCheck(c);
-            c = new Check("471145743", date.getTime(), 1250, "Telekom", date.getTime(), false);
-            insertCheck(c);
-            c = new Check("963349038", date.getTime(), 8900, "Upc", date.getTime(), false);
-            insertCheck(c);
-            c = new Check("459231004", date.getTime(), 22340, "Közművek", date.getTime(), false);
-            insertCheck(c);
+            insertCheck("01301823", date.getTime(), 1250, "Főtáv", date.getTime(), false);
+            insertCheck("471145743", date.getTime(), 1250, "Telekom", date.getTime(), false);
+            insertCheck("963349038", date.getTime(), 8900, "Upc", date.getTime(), false);
+            insertCheck("459231004", date.getTime(), 22340, "Közművek", date.getTime(), false);
         }
     }
 
@@ -74,15 +70,15 @@ public class DbHandler extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public void insertCheck(Check check) {
+    public void insertCheck(String checkId, long creationDate, int amount, String paidTo, long paidDate, boolean isUploaded) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("_id", check.getCheckId());
-        values.put("created", check.getCreationDate());
-        values.put("amount", check.getAmount());
-        values.put("paid_to", check.getPaidTo());
-        values.put("paid_date", check.getPaidDate());
-        values.put("is_uploaded", check.getIsUploaded());
+        values.put("_id", checkId);
+        values.put("created", creationDate);
+        values.put("amount", amount);
+        values.put("paid_to", paidTo);
+        values.put("paid_date", paidDate);
+        values.put("is_uploaded", isUploaded);
         db.insert(TABLE_CHECK, null, values);
         db.close();
     }
@@ -95,17 +91,17 @@ public class DbHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public Cursor getNotUploadedCheckList() {
-        //TODO rossz lekérdezés
-        SQLiteDatabase db = getReadableDatabase();
-        String table = TABLE_CHECK;
-        String[] columns = null;
-        String selection = null;//"is_uploaded=?";
-        String[] selectionArgs = null;//new String[]{"false"};
-        Cursor result = db.query(table, columns, selection, selectionArgs, null, null, null);
-
-        result.moveToFirst();
-        db.close();
-        return result;
-    }
+//    public Cursor getNotUploadedCheckList() {
+//        //TODO rossz lekérdezés
+//        SQLiteDatabase db = getReadableDatabase();
+//        String table = TABLE_CHECK;
+//        String[] columns = null;
+//        String selection = null;//"is_uploaded=?";
+//        String[] selectionArgs = null;//new String[]{"false"};
+//        Cursor result = db.query(table, columns, selection, selectionArgs, null, null, null);
+//
+//        result.moveToFirst();
+//        db.close();
+//        return result;
+//    }
 }

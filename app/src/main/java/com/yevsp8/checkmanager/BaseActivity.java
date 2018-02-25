@@ -4,17 +4,33 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import javax.inject.Inject;
+
 public class BaseActivity extends AppCompatActivity {
+
+    @Inject
+    SharedPreferences sharedPreferences;
+
+    public void addFragmentToActivity(FragmentManager manager, Fragment fragment, int frameId, String frameTag) {
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(frameId, fragment, frameTag);
+        transaction.commit();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
+
+        //((CheckManagerApplication)getActivity().get)
 
     }
 

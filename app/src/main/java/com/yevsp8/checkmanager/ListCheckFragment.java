@@ -1,8 +1,10 @@
 package com.yevsp8.checkmanager;
 
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,8 +14,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.util.ArrayList;
+import com.yevsp8.checkmanager.data.Check;
+import com.yevsp8.checkmanager.util.Common;
+import com.yevsp8.checkmanager.viewModel.CheckListViewModel;
+
 import java.util.List;
+
+import javax.inject.Inject;
 
 
 /**
@@ -22,6 +29,11 @@ import java.util.List;
 public class ListCheckFragment extends Fragment {
 
     View rootView;
+    List<Check> checkList;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+    CheckListViewModel viewModel;
 
     public ListCheckFragment() {
         // Required empty public constructor
@@ -36,8 +48,17 @@ public class ListCheckFragment extends Fragment {
 
 
     @Override
+    public void onCreate(Bundle savedInstancestate) {
+        super.onCreate(savedInstancestate);
+        ((CheckManagerApplication) getActivity().getApplication())
+                .getApplicationComponenet()
+                .inject(this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_list_check, container, false);
         return rootView;
@@ -46,40 +67,48 @@ public class ListCheckFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //adapter adatokkal való feltöltése
 
-        List<Check> items = new ArrayList<>();
-        //TODO adatbázisból való feltöltés
-        //TODO date long konverzió agyalás
-       /* Date date=Calendar.getInstance().getTime();
-        for (int i = 0; i < 5; i++) {
-            items.add(new Check(
-                    Integer.toString(i),
-                    date.getTime(),
-                    i * 1000,
-                    i + ". szervezet",
-                    date.getTime(),
-                    false
-            ));
-        }*/
-        //TODO provider rátegen keresztül jöjjön már csak a lista
-        //TODO dependency injection
-        //TODO oszlopnevek kiemel
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckListViewModel.class);
 
-        Cursor cursor = DbHandler.getInstance(getContext()).getNotUploadedCheckList();
-        while (!cursor.isAfterLast()) {
-            items.add(new Check(
-                    cursor.getString(cursor.getColumnIndex("_id")),
-                    cursor.getLong(cursor.getColumnIndex("created")),
-                    cursor.getInt(cursor.getColumnIndex("amount")),
-                    cursor.getString(cursor.getColumnIndex("paid_to")),
-                    cursor.getLong(cursor.getColumnIndex("paid_date")),
-                    cursor.getInt(cursor.getColumnIndex("is_uploaded")) != 0
-            ));
-            cursor.moveToNext();
-        }
-
-        final CheckAdapter adapter = new CheckAdapter(items);
+        viewModel.getCheckList().observe(this, new Observer<List<Check>>() {
+            @Override
+            public void onChanged(@Nullable List<Check> checks) {
+                if (ListCheckFragment.this.checkList == null)
+                    ListCheckFragment.this.checkList = checks;
+            }
+        });
+//        List<Check> items = new ArrayList<>();
+//        //TODO adatbázisból való feltöltés
+//        //TODO date long konverzió agyalás
+//       /* Date date=Calendar.getInstance().getTime();
+//        for (int i = 0; i < 5; i++) {
+//            items.add(new Check(
+//                    Integer.toString(i),
+//                    date.getTime(),
+//                    i * 1000,
+//                    i + ". szervezet",
+//                    date.getTime(),
+//                    false
+//            ));
+//        }*/
+//        //TODO provider rátegen keresztül jöjjön már csak a lista
+//        //TODO dependency injection
+//        //TODO oszlopnevek kiemel
+//
+//        Cursor cursor = DbHandler.getInstance(getContext()).getNotUploadedCheckList();
+//        while (!cursor.isAfterLast()) {
+//            items.add(new Check(
+//                    cursor.getString(cursor.getColumnIndex("_id")),
+//                    cursor.getLong(cursor.getColumnIndex("created")),
+//                    cursor.getInt(cursor.getColumnIndex("amount")),
+//                    cursor.getString(cursor.getColumnIndex("paid_to")),
+//                    cursor.getLong(cursor.getColumnIndex("paid_date")),
+//                    cursor.getInt(cursor.getColumnIndex("is_uploaded")) != 0
+//            ));
+//            cursor.moveToNext();
+//        }
+//
+        final CheckAdapter adapter = new CheckAdapter(checkList);
         ListView listView = rootView.findViewById(R.id.listview_check);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
