@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,10 +12,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.yevsp8.checkmanager.R;
+import com.yevsp8.checkmanager.di.ApplicationModule;
+import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.di.ContextModule;
+import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+
 import javax.inject.Inject;
 
 public class BaseActivity extends AppCompatActivity {
 
+    @Inject
+    protected Context context;
     @Inject
     SharedPreferences sharedPreferences;
 
@@ -30,8 +38,11 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
-        //((CheckManagerApplication)getActivity().get)
-
+        CheckManagerApplicationComponent component = DaggerCheckManagerApplicationComponent.builder()
+                .contextModule(new ContextModule(this))
+                .applicationModule(new ApplicationModule(getApplication()))
+                .build();
+        component.injectBaseActivity(this);
     }
 
     @Override
@@ -50,26 +61,24 @@ public class BaseActivity extends AppCompatActivity {
 
                 break;
             case R.id.menu_settings:
-                Intent settings = new Intent(getApplicationContext(), SettingsActivity.class);
+                Intent settings = new Intent(context, SettingsActivity.class);
                 startActivity(settings);
                 break;
             case R.id.menu_home:
-                Intent home = new Intent(getApplicationContext(), MainActivity.class);
+                Intent home = new Intent(context, MainActivity.class);
                 startActivity(home);
         }
         return super.onOptionsItemSelected(item);
     }
 
     protected void saveToSharedPreferences(String key, String value) {
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(key, value);
         editor.apply();
     }
 
     protected String getValueFromSharedPreferences(String key) {
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        String value = sharedPref.getString(key, null);
+        String value = sharedPreferences.getString(key, null);
 
         return value;
     }

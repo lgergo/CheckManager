@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.view;
 
 import android.os.Bundle;
 import android.view.View;
@@ -6,6 +6,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.yevsp8.checkmanager.R;
 
 public class SettingsActivity extends BaseActivity {
 

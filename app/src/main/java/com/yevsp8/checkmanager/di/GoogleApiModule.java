@@ -1,11 +1,17 @@
 package com.yevsp8.checkmanager.di;
 
+import android.content.Context;
+
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.SheetsScopes;
+
+import java.util.Arrays;
 
 import dagger.Module;
 import dagger.Provides;
@@ -14,34 +20,34 @@ import dagger.Provides;
  * Created by Gergo on 2018. 02. 25..
  */
 
-@Module
+@Module(includes = ContextModule.class)
 public class GoogleApiModule {
 
-    Sheets.Builder provide
-
-    GoogleapiService(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
-
-        return new com.google.api.services.sheets.v4.Sheets.Builder(
-                transport, jsonFactory, credential)
-                .setApplicationName("Google Sheets API Create Sheet")
-                .build();
+    @Provides
+    public com.google.api.services.sheets.v4.Sheets provideGoogleApi(HttpTransport httpTransport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
+        return new Sheets.Builder(httpTransport, jsonFactory, credential).build();
     }
 
     @Provides
-    GoogleAccountCredential provideGoogleApiCredentials() {
-
-    }
-
-    @Provides
-
-    @Provides
-    HttpTransport provideHttpTransport() {
+    public HttpTransport provideHttpTransport() {
         return AndroidHttp.newCompatibleTransport();
     }
 
     @Provides
-    JsonFactory provideJsonFactory() {
-        return new JacksonFactory.getDefaultInstance();
+    public JsonFactory provideJsonFactory() {
+        return JacksonFactory.getDefaultInstance();
+    }
+
+    @Provides
+    public GoogleAccountCredential provideCredential(Context context, /*String[] SCOPES,*/ ExponentialBackOff exponentialBackOff) {
+        return GoogleAccountCredential.usingOAuth2(
+                context, Arrays.asList(SheetsScopes.SPREADSHEETS))
+                .setBackOff(exponentialBackOff);
+    }
+
+    @Provides
+    public ExponentialBackOff provideExponentialBackOff() {
+        return new ExponentialBackOff();
     }
 
 }

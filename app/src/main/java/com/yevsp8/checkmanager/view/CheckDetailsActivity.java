@@ -1,8 +1,10 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
+
+import com.yevsp8.checkmanager.R;
 
 public class CheckDetailsActivity extends AppCompatActivity {
 

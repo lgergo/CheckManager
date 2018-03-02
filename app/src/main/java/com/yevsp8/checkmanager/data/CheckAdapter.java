@@ -1,11 +1,11 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.data;
 
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.yevsp8.checkmanager.data.Check;
+import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.util.Common;
 
 import java.util.List;

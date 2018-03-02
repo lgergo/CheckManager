@@ -11,7 +11,7 @@ import dagger.Provides;
  * Created by Gergo on 2018. 02. 25..
  */
 
-@Module
+@Module(includes = ContextModule.class)
 public class TessTwoModule {
 
     @Provides

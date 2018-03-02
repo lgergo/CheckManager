@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.view;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -6,6 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.yevsp8.checkmanager.R;
+import com.yevsp8.checkmanager.TessTwoApi;
 
 public class RecognisedCheckActivity extends AppCompatActivity {
 

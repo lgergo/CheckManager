@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.view;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -8,25 +8,23 @@ import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.TextView;
 
-import com.yevsp8.checkmanager.data.DbHandler;
+import com.yevsp8.checkmanager.GoogleApiActivity;
+import com.yevsp8.checkmanager.ListCheckFragment;
+import com.yevsp8.checkmanager.R;
 
 public class MainActivity extends BaseActivity {
 
-    DbHandler db;
+    public ProgressDialog updateProgressBar;
     ListCheckFragment fragment;
     TextView latestSynchTextView;
     FloatingActionButton newImageButton;
     FloatingActionButton testApiButton;
     TextView googleApiResultTextView;
-    ProgressDialog updateProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        db = DbHandler.getInstance(this);
-        db.generateDemoData();
 
         FragmentManager manager = getSupportFragmentManager();
         fragment = (ListCheckFragment) manager.findFragmentById(R.id.checklist_fragmentcontainer);
@@ -35,9 +33,6 @@ public class MainActivity extends BaseActivity {
         }
 
         addFragmentToActivity(manager, fragment, R.id.checklist_fragmentcontainer, "tag");
-//        FragmentTransaction transaction = manager.beginTransaction();
-//        transaction.replace(R.id.checklist_fragmentcontainer, fragment);
-//        transaction.commit();
 
         latestSynchTextView = findViewById(R.id.latest_synch);
         //TODO resource-ba + lekérdezni az utolsó szinkronizációt
@@ -46,7 +41,7 @@ public class MainActivity extends BaseActivity {
         newImageButton = findViewById(R.id.newImage_button);
         newImageButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewImageActivity.class);
+                Intent intent = new Intent(context, NewImageActivity.class);
                 startActivity(intent);
             }
         });
@@ -68,7 +63,7 @@ public class MainActivity extends BaseActivity {
 //                GoogleApiProvider googleApi = GoogleApiProvider.getInstance(MainActivity.this);
 //                googleApi.createEmptyCompanyTemplate("újcég");
 
-                Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
+                Intent intent = new Intent(context, GoogleApiActivity.class);
                 startActivity(intent);
 
             }

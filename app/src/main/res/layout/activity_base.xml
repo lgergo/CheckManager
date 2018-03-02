@@ -3,6 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yevsp8.checkmanager.BaseActivity">
+    tools:context="com.yevsp8.checkmanager.view.BaseActivity">
 
 </android.support.constraint.ConstraintLayout>
