@@ -9,10 +9,19 @@ import android.widget.TextView;
 
 import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.TessTwoApi;
+import com.yevsp8.checkmanager.data.CheckRepository;
+import com.yevsp8.checkmanager.di.ContextModule;
+import com.yevsp8.checkmanager.di.DaggerTesseractComponent;
+import com.yevsp8.checkmanager.di.TesseractComponent;
+
+import javax.inject.Inject;
 
 public class RecognisedCheckActivity extends AppCompatActivity {
 
-    private Button buttonUpload;
+    @Inject
+    TessTwoApi tesseract;
+    @Inject
+    CheckRepository repo;
     private ProgressDialog progressDialog;
     private TextView id;
     private TextView amount;
@@ -24,6 +33,12 @@ public class RecognisedCheckActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recognised_check);
+
+        TesseractComponent component = DaggerTesseractComponent.builder()
+                .contextModule(new ContextModule(this))
+                .build();
+
+        component.injectRecognisedCheckActivity(this);
 
         path = getIntent().getExtras().getString("path");
 
@@ -46,7 +61,7 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Recognise in progress...");
 
-        buttonUpload = findViewById(R.id.button_upload);
+        Button buttonUpload = findViewById(R.id.button_upload);
         buttonUpload.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //TODO google api upload meghívása
@@ -59,14 +74,11 @@ public class RecognisedCheckActivity extends AppCompatActivity {
     }
 
     private void callTesseractForRecognise() {
-        //TODO context függőségek átnézése
-        //Check check;
-        TessTwoApi tesseract = TessTwoApi.getInstance(getApplicationContext());
         String result = tesseract.startRegognition(path);
 
         //TODO egyenlőre csak ide berakja
         id.setText(result);
 
-        //TODO check mentése adatbázisba
+        //TODO check mentése adatbázisba repo-n keresztül
     }
 }

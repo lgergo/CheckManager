@@ -24,13 +24,11 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
@@ -39,11 +37,17 @@ import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import com.yevsp8.checkmanager.di.ApplicationModule;
+import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.di.ContextModule;
+import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -57,6 +61,12 @@ public class GoogleApiActivity extends Activity
     private static final String BUTTON_TEXT = "Call Google Sheets API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS};
+    APICallType type;
+    @Inject
+    HttpTransport transport;
+    @Inject
+    JsonFactory jsonFactory;
+    @Inject
     GoogleAccountCredential mCredential;
     ProgressDialog mProgress;
     private String spreadsheetId = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
@@ -64,14 +74,19 @@ public class GoogleApiActivity extends Activity
     private TextView mOutputText;
     private Button mCallApiButton;
 
-    /**
-     * Create the main activity.
-     *
-     * @param savedInstanceState previously saved instance data.
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        type = APICallType.Get_data;
+
+        CheckManagerApplicationComponent component = DaggerCheckManagerApplicationComponent.builder()
+                .contextModule(new ContextModule(this))
+                .applicationModule(new ApplicationModule(getApplication()))
+                .build();
+        component.injectGooglaApiActivity(this);
+
+
         LinearLayout activityLayout = new LinearLayout(this);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -91,9 +106,7 @@ public class GoogleApiActivity extends Activity
             public void onClick(View v) {
                 mCallApiButton.setEnabled(false);
                 mOutputText.setText("");
-                //getResultsFromApi();
-                //updateDataApi();
-                createSheetApi();
+                callGoogleApi(type);
                 mCallApiButton.setEnabled(true);
             }
         });
@@ -117,7 +130,6 @@ public class GoogleApiActivity extends Activity
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
-
     }
 
     /**
@@ -127,7 +139,8 @@ public class GoogleApiActivity extends Activity
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    public void getResultsFromApi() {
+
+    public void callGoogleApi(APICallType type) {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -135,34 +148,19 @@ public class GoogleApiActivity extends Activity
         } else if (!isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
-            new MakeRequestTask(mCredential).execute();
+            switch (type) {
+
+                case Get_data:
+                    new MakeRequestTask(transport, jsonFactory, mCredential).execute();
+                    break;
+                case Update_data:
+                    new UpdateRequestTask(transport, jsonFactory, mCredential).execute();
+                    break;
+                case CreateSheet:
+                    new CreateSheetRequestTask(transport, jsonFactory, mCredential).execute();
+            }
         }
     }
-
-    public void updateDataApi() {
-        if (!isGooglePlayServicesAvailable()) {
-            acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount();
-        } else if (!isDeviceOnline()) {
-            mOutputText.setText("No network connection available.");
-        } else {
-            new UpdateRequestTask(mCredential).execute();
-        }
-    }
-
-    public void createSheetApi() {
-        if (!isGooglePlayServicesAvailable()) {
-            acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
-            chooseAccount();
-        } else if (!isDeviceOnline()) {
-            mOutputText.setText("No network connection available.");
-        } else {
-            new CreateSheetRequestTask(mCredential).execute();
-        }
-    }
-
 
     /**
      * Attempts to set the account used with the API credentials. If an account
@@ -183,9 +181,7 @@ public class GoogleApiActivity extends Activity
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
                 //TODO
-                //getResultsFromApi();
-                //updateDataApi();
-                createSheetApi();
+                callGoogleApi(type);
             } else {
                 // Start a dialog from which the user can choose an account
                 startActivityForResult(
@@ -225,9 +221,7 @@ public class GoogleApiActivity extends Activity
                                     "Google Play Services on your device and relaunch this app.");
                 } else {
                     //TODO
-                    //updateDataApi();
-                    //getResultsFromApi();
-                    createSheetApi();
+                    callGoogleApi(type);
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
@@ -244,22 +238,54 @@ public class GoogleApiActivity extends Activity
                         mCredential.setSelectedAccountName(accountName);
 
                         //TODO
-                        //updateDataApi();
-                        //getResultsFromApi();
-                        createSheetApi();
+                        callGoogleApi(type);
                     }
                 }
                 break;
             case REQUEST_AUTHORIZATION:
                 if (resultCode == RESULT_OK) {
                     //TODO
-                    //updateDataApi();
-                    //getResultsFromApi();
-                    createSheetApi();
+                    callGoogleApi(type);
                 }
                 break;
         }
     }
+
+//    public void getResultsFromApi() {
+//        if (!isGooglePlayServicesAvailable()) {
+//            acquireGooglePlayServices();
+//        } else if (mCredential.getSelectedAccountName() == null) {
+//            chooseAccount();
+//        } else if (!isDeviceOnline()) {
+//            mOutputText.setText("No network connection available.");
+//        } else {
+//            new MakeRequestTask(transport,jsonFactory,mCredential).execute();
+//        }
+//    }
+//
+//    public void updateDataApi() {
+//        if (!isGooglePlayServicesAvailable()) {
+//            acquireGooglePlayServices();
+//        } else if (mCredential.getSelectedAccountName() == null) {
+//            chooseAccount();
+//        } else if (!isDeviceOnline()) {
+//            mOutputText.setText("No network connection available.");
+//        } else {
+//            new UpdateRequestTask(transport,jsonFactory,mCredential).execute();
+//        }
+//    }
+//
+//    public void createSheetApi() {
+//        if (!isGooglePlayServicesAvailable()) {
+//            acquireGooglePlayServices();
+//        } else if (mCredential.getSelectedAccountName() == null) {
+//            chooseAccount();
+//        } else if (!isDeviceOnline()) {
+//            mOutputText.setText("No network connection available.");
+//        } else {
+//            new CreateSheetRequestTask(transport,jsonFactory,mCredential).execute();
+//        }
+//    }
 
     /**
      * Respond to requests for permissions at runtime for API 23 and above.
@@ -362,20 +388,23 @@ public class GoogleApiActivity extends Activity
         dialog.show();
     }
 
-
     enum MajorDimension {COLUMNS, ROWS}
+
+    public enum APICallType {Get_data, Update_data, CreateSheet}
+
+    //region AsyncTasks
 
     /**
      * An asynchronous task that handles the Google Sheets API call.
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
     private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
-        private com.google.api.services.sheets.v4.Sheets mService = null;
+        com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
-        MakeRequestTask(GoogleAccountCredential credential) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        MakeRequestTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
+//            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+//            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             mService = new com.google.api.services.sheets.v4.Sheets.Builder(
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Sheets API Android Quickstart")
@@ -406,7 +435,7 @@ public class GoogleApiActivity extends Activity
          * @throws IOException
          */
         private List<String> getDataFromApi() throws IOException {
-            String range = sheetName + "!F1:H4";
+            String range = sheetName + "F1:H4";
             String majorDim = MajorDimension.COLUMNS.toString();
             List<String> results = new ArrayList<String>();
             ValueRange response = this.mService.spreadsheets().values()
@@ -466,9 +495,9 @@ public class GoogleApiActivity extends Activity
         private com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
-        UpdateRequestTask(GoogleAccountCredential credential) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        UpdateRequestTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
+//            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+//            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             mService = new com.google.api.services.sheets.v4.Sheets.Builder(
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Sheets API Update")
@@ -567,9 +596,9 @@ public class GoogleApiActivity extends Activity
         private com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
-        CreateSheetRequestTask(GoogleAccountCredential credential) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        CreateSheetRequestTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
+//            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+//            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             mService = new com.google.api.services.sheets.v4.Sheets.Builder(
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Sheets API Create Sheet")
@@ -690,4 +719,6 @@ public class GoogleApiActivity extends Activity
             }
         }
     }
+
+    //endregion
 }

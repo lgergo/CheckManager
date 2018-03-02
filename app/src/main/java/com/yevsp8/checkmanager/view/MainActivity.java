@@ -16,7 +16,7 @@ public class MainActivity extends BaseActivity {
 
     public ProgressDialog updateProgressBar;
     ListCheckFragment fragment;
-    TextView latestSynchTextView;
+    TextView latestSyncTextView;
     FloatingActionButton newImageButton;
     FloatingActionButton testApiButton;
     TextView googleApiResultTextView;
@@ -31,12 +31,11 @@ public class MainActivity extends BaseActivity {
         if (fragment == null) {
             fragment = ListCheckFragment.newInsatce();
         }
-
         addFragmentToActivity(manager, fragment, R.id.checklist_fragmentcontainer, "tag");
 
-        latestSynchTextView = findViewById(R.id.latest_synch);
-        //TODO resource-ba + lekérdezni az utolsó szinkronizációt
-        latestSynchTextView.setText("Legutoljára szinkronizálva: ");
+        latestSyncTextView = findViewById(R.id.latest_synch);
+        String lastSync = getValueFromSharedPreferences("last_sync");
+        latestSyncTextView.setText("Legutoljára szinkronizálva: " + lastSync);
 
         newImageButton = findViewById(R.id.newImage_button);
         newImageButton.setOnClickListener(new View.OnClickListener() {
@@ -54,13 +53,13 @@ public class MainActivity extends BaseActivity {
         testApiButton = findViewById(R.id.testGoogleApi_button);
         testApiButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                GoogleApiProvider googleApi=GoogleApiProvider.getInstance(MainActivity.this);
+//                GoogleApiProviderOld googleApi=GoogleApiProviderOld.getInstance(MainActivity.this);
 //                googleApi.getResultsFromApi();
 
-//                GoogleApiProvider googleApi = GoogleApiProvider.getInstance(MainActivity.this);
+//                GoogleApiProviderOld googleApi = GoogleApiProviderOld.getInstance(MainActivity.this);
 //                googleApi.insertData("010101", "11300", "Valaki", "2017.01.01");
 
-//                GoogleApiProvider googleApi = GoogleApiProvider.getInstance(MainActivity.this);
+//                GoogleApiProviderOld googleApi = GoogleApiProviderOld.getInstance(MainActivity.this);
 //                googleApi.createEmptyCompanyTemplate("újcég");
 
                 Intent intent = new Intent(context, GoogleApiActivity.class);

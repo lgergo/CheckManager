@@ -22,7 +22,6 @@ public class CheckManagerApplication extends Application {
     Context context;
     @Inject
     com.google.api.services.sheets.v4.Sheets googleSheetApi;
-    // private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS};
     @Inject
     TessBaseAPI tessBaseAPI;
     // @Inject
@@ -51,9 +50,4 @@ public class CheckManagerApplication extends Application {
     public Context getContext() {
         return context;
     }
-
-//    public CheckDatabase getDatabase()
-//    {
-//        return database;
-//    }
 }

@@ -27,7 +27,6 @@ import java.util.Date;
 public class NewImageActivity extends AppCompatActivity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
-    private final int REQUEST_IMAGE_CAPTURE = 1;
     private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     private Button buttonTakePhoto;
     private Button buttonRecognise;
@@ -46,7 +45,6 @@ public class NewImageActivity extends AppCompatActivity {
         buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dispatchTakePictureIntent();
-                // takePhoto();
             }
         });
 
@@ -57,13 +55,6 @@ public class NewImageActivity extends AppCompatActivity {
                 permissionCheck();
             }
         });
-    }
-
-    private void takePhoto() {
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePhotoIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePhotoIntent, REQUEST_IMAGE_CAPTURE);
-        }
     }
 
     private void dispatchTakePictureIntent() {
@@ -132,7 +123,6 @@ public class NewImageActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(NewImageActivity.this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-
             }
         } else {
             startewImageActivity();
@@ -166,7 +156,6 @@ public class NewImageActivity extends AppCompatActivity {
         }
     }
 
-    //TODO készített kép címének átadása
     private void startewImageActivity() {
         Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
         intent.putExtra("path", currentPhotoPath);

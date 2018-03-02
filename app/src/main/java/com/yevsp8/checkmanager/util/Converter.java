@@ -8,7 +8,7 @@ import java.util.Locale;
  * Created by Gergo on 2018. 02. 14..
  */
 
-public class Common {
+public class Converter {
 
     public static long dateToLong(Date date) {
         return date.getTime();

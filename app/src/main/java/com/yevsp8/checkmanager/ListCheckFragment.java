@@ -19,7 +19,7 @@ import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
-import com.yevsp8.checkmanager.util.Common;
+import com.yevsp8.checkmanager.util.Converter;
 import com.yevsp8.checkmanager.view.CheckDetailsActivity;
 import com.yevsp8.checkmanager.viewModel.CheckListViewModel;
 
@@ -55,7 +55,7 @@ public class ListCheckFragment extends Fragment {
                 .contextModule(new ContextModule(getContext()))
                 .applicationModule(new ApplicationModule(getActivity().getApplication()))
                 .build();
-        component.injectCheckViewModel(this);
+        component.injectListCheckViewModel(this);
     }
 
 //    //TODO only for testing
@@ -104,11 +104,11 @@ public class ListCheckFragment extends Fragment {
                 //TODO parcelable ??
                 Intent intent = new Intent(getActivity(), CheckDetailsActivity.class);
                 intent.putExtra("selected_check_id", selected.getCheckId());
-                String created = Common.longDateToString(selected.getCreationDate());
+                String created = Converter.longDateToString(selected.getCreationDate());
                 intent.putExtra("selected_check_created", created);
                 intent.putExtra("selected_check_amount", Integer.toString(selected.getAmount()));
                 intent.putExtra("selected_check_paidTo", selected.getPaidTo());
-                String paidDate = Common.longDateToString(selected.getPaidDate());
+                String paidDate = Converter.longDateToString(selected.getPaidDate());
                 intent.putExtra("selected_check_paidDate", paidDate);
                 intent.putExtra("selected_check_isUploaded", selected.getIsUploaded() ? "igen" : "nem");
 

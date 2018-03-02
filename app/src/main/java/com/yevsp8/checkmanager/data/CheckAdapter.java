@@ -6,7 +6,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.yevsp8.checkmanager.R;
-import com.yevsp8.checkmanager.util.Common;
+import com.yevsp8.checkmanager.util.Converter;
 
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class CheckAdapter extends BaseAdapter {
         TextView paidTo = newView.findViewById(R.id.check_paidto);
         TextView paidDate = newView.findViewById(R.id.check_paiddate);
         paidTo.setText(check.getPaidTo());
-        paidDate.setText(Common.longDateToString(check.getPaidDate()));
+        paidDate.setText(Converter.longDateToString(check.getPaidDate()));
 
         return newView;
     }

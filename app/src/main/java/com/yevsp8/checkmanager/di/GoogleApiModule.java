@@ -24,21 +24,25 @@ import dagger.Provides;
 public class GoogleApiModule {
 
     @Provides
+    @CustomScope
     public com.google.api.services.sheets.v4.Sheets provideGoogleApi(HttpTransport httpTransport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
         return new Sheets.Builder(httpTransport, jsonFactory, credential).build();
     }
 
     @Provides
+    @CustomScope
     public HttpTransport provideHttpTransport() {
         return AndroidHttp.newCompatibleTransport();
     }
 
     @Provides
+    @CustomScope
     public JsonFactory provideJsonFactory() {
         return JacksonFactory.getDefaultInstance();
     }
 
     @Provides
+    @CustomScope
     public GoogleAccountCredential provideCredential(Context context, /*String[] SCOPES,*/ ExponentialBackOff exponentialBackOff) {
         return GoogleAccountCredential.usingOAuth2(
                 context, Arrays.asList(SheetsScopes.SPREADSHEETS))
@@ -46,6 +50,7 @@ public class GoogleApiModule {
     }
 
     @Provides
+    @CustomScope
     public ExponentialBackOff provideExponentialBackOff() {
         return new ExponentialBackOff();
     }

@@ -20,6 +20,7 @@ public class ContextModule {
     }
 
     @Provides
+    @CustomScope
     Context provideContext() {
         return context;
     }

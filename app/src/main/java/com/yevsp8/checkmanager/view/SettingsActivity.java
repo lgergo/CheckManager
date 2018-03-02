@@ -46,7 +46,8 @@ public class SettingsActivity extends BaseActivity {
         });
 
 
-        //TODO test connection to sheet + első induláskor állítsa be pop up window + link hogy honann szerezheti meg
+        //TODO test connection to sheet + első induláskor állítsa be pop up window + link hogy honann szerezheti meg a sheet id-t
+
     }
 
 

@@ -22,6 +22,7 @@ import dagger.Provides;
 public class DatabaseModule {
 
     @Provides
+    @CustomScope
     public CheckDatabase provideCheckDatabase(Application application) {
         return Room.databaseBuilder(
                 application,
@@ -31,22 +32,26 @@ public class DatabaseModule {
     }
 
     @Provides
+    @CustomScope
     SharedPreferences provideSharedPreferences(Application application) {
         return PreferenceManager.getDefaultSharedPreferences(application);
     }
 
     @Provides
+    @CustomScope
     CheckRepository provideCheckRepository(CheckDAO checkDAO) {
         return new CheckRepository(checkDAO);
     }
 
     @Provides
+    @CustomScope
     CheckDAO provideCheckDao(CheckDatabase database) {
         return database.checkDAO();
     }
 
 
     @Provides
+    @CustomScope
     ViewModelProvider.Factory provideViewModelFactory(CheckRepository repository) {
         return new CustomViewModelFactory(repository);
     }
