@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.view;
 
 import android.Manifest;
 import android.content.Intent;
@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.yevsp8.checkmanager.R;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -25,7 +27,6 @@ import java.util.Date;
 public class NewImageActivity extends AppCompatActivity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
-    private final int REQUEST_IMAGE_CAPTURE = 1;
     private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     private Button buttonTakePhoto;
     private Button buttonRecognise;
@@ -44,7 +45,6 @@ public class NewImageActivity extends AppCompatActivity {
         buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dispatchTakePictureIntent();
-                // takePhoto();
             }
         });
 
@@ -55,13 +55,6 @@ public class NewImageActivity extends AppCompatActivity {
                 permissionCheck();
             }
         });
-    }
-
-    private void takePhoto() {
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePhotoIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePhotoIntent, REQUEST_IMAGE_CAPTURE);
-        }
     }
 
     private void dispatchTakePictureIntent() {
@@ -130,7 +123,6 @@ public class NewImageActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(NewImageActivity.this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-
             }
         } else {
             startewImageActivity();
@@ -164,33 +156,9 @@ public class NewImageActivity extends AppCompatActivity {
         }
     }
 
-    //TODO készített kép címének átadása
     private void startewImageActivity() {
         Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
         intent.putExtra("path", currentPhotoPath);
         startActivity(intent);
     }
-
-
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 }

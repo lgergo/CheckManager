@@ -1,47 +1,46 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.view;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.TextView;
 
+import com.yevsp8.checkmanager.GoogleApiActivity;
+import com.yevsp8.checkmanager.ListCheckFragment;
+import com.yevsp8.checkmanager.R;
+
 public class MainActivity extends BaseActivity {
 
-    DbHandler db;
+    public ProgressDialog updateProgressBar;
     ListCheckFragment fragment;
-    TextView latestSynchTextView;
+    TextView latestSyncTextView;
     FloatingActionButton newImageButton;
     FloatingActionButton testApiButton;
     TextView googleApiResultTextView;
-    ProgressDialog updateProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        db = DbHandler.getInstance(this);
-        db.generateDemoData();
-
-        fragment = ListCheckFragment.newInsatce();
-
         FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.checklist_fragmentcontainer, fragment);
-        transaction.commit();
+        fragment = (ListCheckFragment) manager.findFragmentById(R.id.checklist_fragmentcontainer);
+        if (fragment == null) {
+            fragment = ListCheckFragment.newInsatce();
+        }
+        addFragmentToActivity(manager, fragment, R.id.checklist_fragmentcontainer, "tag");
 
-        latestSynchTextView = findViewById(R.id.latest_synch);
-        //TODO resource-ba + lekérdezni az utolsó szinkronizációt
-        latestSynchTextView.setText("Legutoljára szinkronizálva: ");
+        latestSyncTextView = findViewById(R.id.latest_synch);
+        String lastSync = getValueFromSharedPreferences("last_sync");
+        latestSyncTextView.setText("Legutoljára szinkronizálva: " + lastSync);
 
         newImageButton = findViewById(R.id.newImage_button);
         newImageButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewImageActivity.class);
+                Intent intent = new Intent(context, NewImageActivity.class);
                 startActivity(intent);
             }
         });
@@ -54,16 +53,16 @@ public class MainActivity extends BaseActivity {
         testApiButton = findViewById(R.id.testGoogleApi_button);
         testApiButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                GoogleApiProvider googleApi=GoogleApiProvider.getInstance(MainActivity.this);
+//                GoogleApiProviderOld googleApi=GoogleApiProviderOld.getInstance(MainActivity.this);
 //                googleApi.getResultsFromApi();
 
-//                GoogleApiProvider googleApi = GoogleApiProvider.getInstance(MainActivity.this);
+//                GoogleApiProviderOld googleApi = GoogleApiProviderOld.getInstance(MainActivity.this);
 //                googleApi.insertData("010101", "11300", "Valaki", "2017.01.01");
 
-//                GoogleApiProvider googleApi = GoogleApiProvider.getInstance(MainActivity.this);
+//                GoogleApiProviderOld googleApi = GoogleApiProviderOld.getInstance(MainActivity.this);
 //                googleApi.createEmptyCompanyTemplate("újcég");
 
-                Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
+                Intent intent = new Intent(context, GoogleApiActivity.class);
                 startActivity(intent);
 
             }

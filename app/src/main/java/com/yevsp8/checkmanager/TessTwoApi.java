@@ -8,11 +8,16 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
+import com.yevsp8.checkmanager.di.ContextModule;
+import com.yevsp8.checkmanager.di.DaggerTesseractComponent;
+import com.yevsp8.checkmanager.di.TesseractComponent;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import javax.inject.Inject;
 
 /**
  * Created by Gergo on 2018. 02. 18..
@@ -21,28 +26,34 @@ import java.io.OutputStream;
 public class TessTwoApi {
 
     public static final String TESS_DATA = "/tessdata";
-    private static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/Tess";
-    private static TessTwoApi tessTwoApi;
-    private TessBaseAPI tessBaseAPI;
+    @Inject
+    TessBaseAPI tessBaseAPI;
+    @Inject
+    Context context;
     private String language = "en";
-    private Context context;
     private String imagePath = Environment.getExternalStorageDirectory().toString() + "/DCIM/ocr.png";
     private String textResult;
     private String TAG = "Tesseract error";
-    private String imageToRegognisePath;
+    private String imageToRecognisePath;
 
-    private TessTwoApi(Context context) {
+    public TessTwoApi(Context context) {
         this.context = context;
+
+        TesseractComponent component = DaggerTesseractComponent.builder()
+                .contextModule(new ContextModule(context))
+                .build();
+
+        component.injectTessTwoApi(this);
     }
 
-    public static TessTwoApi getInstance(Context context) {
-        if (tessTwoApi == null)
-            tessTwoApi = new TessTwoApi(context);
-        return tessTwoApi;
-    }
+//    public static TessTwoApi getInstance(Context context) {
+//        if (tessTwoApi == null)
+//            tessTwoApi = new TessTwoApi(context);
+//        return tessTwoApi;
+//    }
 
     public String startRegognition(String imagePath) {
-        imageToRegognisePath = imagePath;
+        imageToRecognisePath = imagePath;
         prepareTessData();
         startOCR();
         return getDataFromImage();
@@ -87,7 +98,7 @@ public class TessTwoApi {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = false;
             options.inSampleSize = 6;
-            Bitmap bitmap = BitmapFactory.decodeFile(imageToRegognisePath, options);
+            Bitmap bitmap = BitmapFactory.decodeFile(imageToRecognisePath, options);
             textResult = this.getText(bitmap);
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
@@ -101,7 +112,7 @@ public class TessTwoApi {
             Log.e(TAG, e.getMessage());
         }
         String dataPath = context.getExternalFilesDir("/").getPath() + "/";
-        tessBaseAPI.init(dataPath, "eng");
+        tessBaseAPI.init(dataPath, language);
         tessBaseAPI.setImage(bitmap);
         String retStr = "No result";
         try {

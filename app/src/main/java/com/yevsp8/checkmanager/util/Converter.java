@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,7 +8,7 @@ import java.util.Locale;
  * Created by Gergo on 2018. 02. 14..
  */
 
-public class Common {
+public class Converter {
 
     public static long dateToLong(Date date) {
         return date.getTime();
