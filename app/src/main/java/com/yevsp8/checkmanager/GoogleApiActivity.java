@@ -467,6 +467,7 @@ public class GoogleApiActivity extends Activity
                 output.add(0, "Data retrieved using the Google Sheets API:");
                 mOutputText.setText(TextUtils.join("\n", output));
             }
+            mProgress.dismiss();
         }
 
         @Override
@@ -568,6 +569,7 @@ public class GoogleApiActivity extends Activity
             } else {
                 mOutputText.setText("Unsuccesful update");
             }
+            mProgress.dismiss();
         }
 
         @Override
@@ -696,6 +698,7 @@ public class GoogleApiActivity extends Activity
             } else {
                 mOutputText.setText("Unsuccesful creation");
             }
+            mProgress.dismiss();
         }
 
         @Override

@@ -12,7 +12,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:contentDescription="Capture a photo" />
+            android:contentDescription="Capture a photo"
+            android:scaleType="fitXY" />
 
         <Button
             android:id="@+id/button_capture_photo"
@@ -36,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:text="recognise with demo image" />
+            android:text="Demo" />
 
 
 </RelativeLayout>

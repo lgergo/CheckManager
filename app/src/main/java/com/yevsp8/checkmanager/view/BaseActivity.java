@@ -1,5 +1,7 @@
 package com.yevsp8.checkmanager.view;
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +19,7 @@ import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import javax.inject.Inject;
 
@@ -25,12 +28,18 @@ public class BaseActivity extends AppCompatActivity {
     @Inject
     protected Context context;
     @Inject
-    SharedPreferences sharedPreferences;
+    protected SharedPreferences sharedPreferences;
+    protected CheckViewModel viewModel;
+    //TODO csak a demo data miatt
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
 
-    public void addFragmentToActivity(FragmentManager manager, Fragment fragment, int frameId, String frameTag) {
+    public void replaceFragmentToActivity(FragmentManager manager, Fragment fragment, int frameId) {
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(frameId, fragment, frameTag);
+        transaction.replace(frameId, fragment);
+        //transaction.addToBackStack(null);
         transaction.commit();
+        //manager.executePendingTransactions();
     }
 
     @Override
@@ -43,6 +52,8 @@ public class BaseActivity extends AppCompatActivity {
                 .applicationModule(new ApplicationModule(getApplication()))
                 .build();
         component.injectBaseActivity(this);
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckViewModel.class);
     }
 
     @Override

@@ -9,8 +9,8 @@ import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 import com.yevsp8.checkmanager.di.ContextModule;
-import com.yevsp8.checkmanager.di.DaggerTesseractComponent;
-import com.yevsp8.checkmanager.di.TesseractComponent;
+import com.yevsp8.checkmanager.di.DaggerImageProcessingComponent;
+import com.yevsp8.checkmanager.di.ImageProcessingComponent;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,18 +39,12 @@ public class TessTwoApi {
     public TessTwoApi(Context context) {
         this.context = context;
 
-        TesseractComponent component = DaggerTesseractComponent.builder()
+        ImageProcessingComponent component = DaggerImageProcessingComponent.builder()
                 .contextModule(new ContextModule(context))
                 .build();
 
         component.injectTessTwoApi(this);
     }
-
-//    public static TessTwoApi getInstance(Context context) {
-//        if (tessTwoApi == null)
-//            tessTwoApi = new TessTwoApi(context);
-//        return tessTwoApi;
-//    }
 
     public String startRegognition(String imagePath) {
         imageToRecognisePath = imagePath;

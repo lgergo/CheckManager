@@ -1,5 +1,6 @@
 package com.yevsp8.checkmanager.di;
 
+import com.yevsp8.checkmanager.ImageProcessor;
 import com.yevsp8.checkmanager.TessTwoApi;
 import com.yevsp8.checkmanager.view.RecognisedCheckActivity;
 
@@ -11,9 +12,11 @@ import dagger.Component;
 
 @CustomScope
 @Component(modules = {TessTwoModule.class, DatabaseModule.class})  //database for saving result
-public interface TesseractComponent {
+public interface ImageProcessingComponent {
 
     void injectTessTwoApi(TessTwoApi tessTwoApi);
 
     void injectRecognisedCheckActivity(RecognisedCheckActivity recognisedCheckActivity);
+
+    void injectImageProcessing(ImageProcessor imageProcessor);
 }

@@ -3,6 +3,7 @@ package com.yevsp8.checkmanager.di;
 import android.content.Context;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
+import com.yevsp8.checkmanager.ImageProcessor;
 import com.yevsp8.checkmanager.TessTwoApi;
 
 import dagger.Module;
@@ -19,6 +20,12 @@ public class TessTwoModule {
 
     public TessTwoModule(Context context) {
         this.context = context;
+    }
+
+    @Provides
+    @CustomScope
+    ImageProcessor provideImageProcessing() {
+        return new ImageProcessor(context);
     }
 
     @Provides

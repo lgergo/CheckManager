@@ -7,19 +7,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.yevsp8.checkmanager.ImageProcessor;
 import com.yevsp8.checkmanager.R;
-import com.yevsp8.checkmanager.TessTwoApi;
 import com.yevsp8.checkmanager.data.CheckRepository;
 import com.yevsp8.checkmanager.di.ContextModule;
-import com.yevsp8.checkmanager.di.DaggerTesseractComponent;
-import com.yevsp8.checkmanager.di.TesseractComponent;
+import com.yevsp8.checkmanager.di.DaggerImageProcessingComponent;
+import com.yevsp8.checkmanager.di.ImageProcessingComponent;
 
 import javax.inject.Inject;
 
 public class RecognisedCheckActivity extends AppCompatActivity {
 
     @Inject
-    TessTwoApi tesseract;
+    ImageProcessor imageProcessor;
     @Inject
     CheckRepository repo;
     private ProgressDialog progressDialog;
@@ -34,7 +34,7 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recognised_check);
 
-        TesseractComponent component = DaggerTesseractComponent.builder()
+        ImageProcessingComponent component = DaggerImageProcessingComponent.builder()
                 .contextModule(new ContextModule(this))
                 .build();
 
@@ -74,7 +74,7 @@ public class RecognisedCheckActivity extends AppCompatActivity {
     }
 
     private void callTesseractForRecognise() {
-        String result = tesseract.startRegognition(path);
+        String result = imageProcessor.startImageProcess(path);
 
         //TODO egyenlőre csak ide berakja
         id.setText(result);

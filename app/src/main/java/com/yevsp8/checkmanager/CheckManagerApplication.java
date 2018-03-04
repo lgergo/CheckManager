@@ -3,7 +3,6 @@ package com.yevsp8.checkmanager;
 import android.app.Application;
 import android.content.Context;
 
-import com.googlecode.tesseract.android.TessBaseAPI;
 import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
@@ -22,8 +21,8 @@ public class CheckManagerApplication extends Application {
     Context context;
     @Inject
     com.google.api.services.sheets.v4.Sheets googleSheetApi;
-    @Inject
-    TessBaseAPI tessBaseAPI;
+//    @Inject
+//    TessBaseAPI tessBaseAPI;
     // @Inject
     // CheckDatabase database;
 
@@ -37,10 +36,6 @@ public class CheckManagerApplication extends Application {
                 .build();
 
         component.injectApplication(this);
-    }
-
-    public TessBaseAPI getTessBaseApi() {
-        return tessBaseAPI;
     }
 
     public com.google.api.services.sheets.v4.Sheets getGoogleSheetApi() {

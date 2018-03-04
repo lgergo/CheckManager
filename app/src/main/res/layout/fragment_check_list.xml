@@ -3,12 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.yevsp8.checkmanager.ListCheckFragment"
-
-    >
+    tools:context="com.yevsp8.checkmanager.CheckListFragment">
 
     <android.support.v7.widget.AppCompatTextView
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"

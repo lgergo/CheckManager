@@ -23,7 +23,7 @@ public class CheckViewModel extends ViewModel {
         return repo.getCheck(id);
     }
 
-    public void addcheck(Check check) {
+    public void insertCheck(Check check) {
         InsertCheckTask task = new InsertCheckTask();
         task.execute(check);
     }
