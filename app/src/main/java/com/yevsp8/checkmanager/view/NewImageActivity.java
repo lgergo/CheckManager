@@ -125,7 +125,7 @@ public class NewImageActivity extends AppCompatActivity {
                         MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             }
         } else {
-            startewImageActivity();
+            startRecognition();
         }
     }
 
@@ -140,7 +140,7 @@ public class NewImageActivity extends AppCompatActivity {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
 
-                    startewImageActivity();
+                    startRecognition();
 
                 } else {
 
@@ -156,7 +156,9 @@ public class NewImageActivity extends AppCompatActivity {
         }
     }
 
-    private void startewImageActivity() {
+    //TODO ha nem jó a kép akkor ne is mentse le / vagy töröljük
+
+    private void startRecognition() {
         Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
         intent.putExtra("path", currentPhotoPath);
         startActivity(intent);

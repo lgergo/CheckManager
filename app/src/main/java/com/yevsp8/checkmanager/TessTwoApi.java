@@ -2,7 +2,6 @@ package com.yevsp8.checkmanager;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -11,6 +10,7 @@ import com.googlecode.tesseract.android.TessBaseAPI;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerImageProcessingComponent;
 import com.yevsp8.checkmanager.di.ImageProcessingComponent;
+import com.yevsp8.checkmanager.di.TessTwoModule;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,23 +34,22 @@ public class TessTwoApi {
     private String imagePath = Environment.getExternalStorageDirectory().toString() + "/DCIM/ocr.png";
     private String textResult;
     private String TAG = "Tesseract error";
-    private String imageToRecognisePath;
 
     public TessTwoApi(Context context) {
         this.context = context;
 
         ImageProcessingComponent component = DaggerImageProcessingComponent.builder()
                 .contextModule(new ContextModule(context))
+                .tessTwoModule(new TessTwoModule(context))
                 .build();
 
         component.injectTessTwoApi(this);
     }
 
-    public String startRegognition(String imagePath) {
-        imageToRecognisePath = imagePath;
+    public String startRecognition(Bitmap image) {
         prepareTessData();
-        startOCR();
-        return getDataFromImage();
+        startOCR(image);
+        return textResult;
     }
 
     private void prepareTessData() {
@@ -83,17 +82,9 @@ public class TessTwoApi {
         }
     }
 
-    public String getDataFromImage() {
-        return textResult;
-    }
-
-    private void startOCR() {
+    private void startOCR(Bitmap image) {
         try {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = false;
-            options.inSampleSize = 6;
-            Bitmap bitmap = BitmapFactory.decodeFile(imageToRecognisePath, options);
-            textResult = this.getText(bitmap);
+            textResult = this.getText(image);
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }

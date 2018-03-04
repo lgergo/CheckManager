@@ -13,7 +13,7 @@ import dagger.Provides;
  * Created by Gergo on 2018. 02. 25..
  */
 
-@Module(includes = ContextModule.class)
+@Module(includes = {ContextModule.class})
 public class TessTwoModule {
 
     public final Context context;
@@ -24,7 +24,7 @@ public class TessTwoModule {
 
     @Provides
     @CustomScope
-    ImageProcessor provideImageProcessing() {
+    ImageProcessor provideImageProcessor() {
         return new ImageProcessor(context);
     }
 

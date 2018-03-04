@@ -11,12 +11,12 @@ import dagger.Component;
  */
 
 @CustomScope
-@Component(modules = {TessTwoModule.class, DatabaseModule.class})  //database for saving result
+@Component(modules = {TessTwoModule.class})
 public interface ImageProcessingComponent {
 
     void injectTessTwoApi(TessTwoApi tessTwoApi);
 
     void injectRecognisedCheckActivity(RecognisedCheckActivity recognisedCheckActivity);
 
-    void injectImageProcessing(ImageProcessor imageProcessor);
+    void injectImageProcessor(ImageProcessor imageProcessor);
 }

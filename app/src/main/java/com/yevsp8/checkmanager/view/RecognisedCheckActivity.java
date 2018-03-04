@@ -13,6 +13,7 @@ import com.yevsp8.checkmanager.data.CheckRepository;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerImageProcessingComponent;
 import com.yevsp8.checkmanager.di.ImageProcessingComponent;
+import com.yevsp8.checkmanager.di.TessTwoModule;
 
 import javax.inject.Inject;
 
@@ -20,7 +21,7 @@ public class RecognisedCheckActivity extends AppCompatActivity {
 
     @Inject
     ImageProcessor imageProcessor;
-    @Inject
+    //@Inject
     CheckRepository repo;
     private ProgressDialog progressDialog;
     private TextView id;
@@ -36,6 +37,8 @@ public class RecognisedCheckActivity extends AppCompatActivity {
 
         ImageProcessingComponent component = DaggerImageProcessingComponent.builder()
                 .contextModule(new ContextModule(this))
+                //.applicationModule(new ApplicationModule(getApplication()))
+                .tessTwoModule(new TessTwoModule(this))
                 .build();
 
         component.injectRecognisedCheckActivity(this);
@@ -69,11 +72,12 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         });
 
         progressDialog.show();
-        callTesseractForRecognise();
+        startImagePreprocessing();
         progressDialog.hide();
     }
 
-    private void callTesseractForRecognise() {
+    private void startImagePreprocessing() {
+        //TODO kép átadása path helyett??
         String result = imageProcessor.startImageProcess(path);
 
         //TODO egyenlőre csak ide berakja
