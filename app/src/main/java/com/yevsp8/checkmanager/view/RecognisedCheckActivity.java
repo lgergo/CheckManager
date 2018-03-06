@@ -74,6 +74,7 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         progressDialog.show();
         startImagePreprocessing();
         progressDialog.hide();
+        progressDialog.dismiss();
     }
 
     private void startImagePreprocessing() {
