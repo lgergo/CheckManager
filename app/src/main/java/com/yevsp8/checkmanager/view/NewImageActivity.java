@@ -55,6 +55,14 @@ public class NewImageActivity extends AppCompatActivity {
                 permissionCheck();
             }
         });
+
+        buttonDemo = findViewById(R.id.button_demoData);
+        buttonDemo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startDemoRecognition();
+            }
+        });
     }
 
     private void dispatchTakePictureIntent() {
@@ -161,6 +169,13 @@ public class NewImageActivity extends AppCompatActivity {
     private void startRecognition() {
         Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
         intent.putExtra("path", currentPhotoPath);
+        startActivity(intent);
+    }
+
+    private void startDemoRecognition() {
+        String demoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test3.png";
+        Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
+        intent.putExtra("path", demoPath);
         startActivity(intent);
     }
 }

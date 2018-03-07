@@ -11,6 +11,7 @@ import com.yevsp8.checkmanager.di.ImageProcessingComponent;
 import com.yevsp8.checkmanager.di.TessTwoModule;
 
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
@@ -47,15 +48,16 @@ public class ImageProcessor {
     public String startImageProcess(String imagePath) {
         this.imagePath = imagePath;
 
-        dest = new Mat();
         loadImage();
 
-//        src=new Mat(bitmap.getHeight(),bitmap.getWidth(), CvType.CV_8UC1);
-//
-//        Imgproc.cvtColor(src, dest, Imgproc.COLOR_BayerBG2GRAY);
-//        adaptiveThreshold();
-//
-//        Utils.matToBitmap(src,bitmap);
+        src = new Mat();
+        //src=new Mat(bitmap.getHeight(),bitmap.getWidth(), CvType.CV_8UC1);
+
+        //Imgproc.cvtColor(src, dest, Imgproc.COLOR_BayerBG2GRAY);
+        //adaptiveThreshold();
+
+        Utils.bitmapToMat(bitmap, src);
+        Utils.matToBitmap(src, bitmap);
         return tessTwoApi.startRecognition(bitmap);
         //return tessTwoApi.startRecognitionWithByteArray(Mat.,src.width(),src.height(),src.channels(),(int)src.step1());
     }
@@ -63,7 +65,10 @@ public class ImageProcessor {
     private void loadImage() {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = false;
-        options.inSampleSize = 10;  //higher is smaller image
+        //TODO for demo data only
+        if (imagePath.contains("JPEG_")) {
+            options.inSampleSize = 8;  //higher is smaller image
+        }
         bitmap = BitmapFactory.decodeFile(imagePath, options);
     }
 
