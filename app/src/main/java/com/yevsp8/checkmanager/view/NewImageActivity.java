@@ -173,7 +173,7 @@ public class NewImageActivity extends AppCompatActivity {
     }
 
     private void startDemoRecognition() {
-        String demoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test3.png";
+        String demoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test4.png";
         Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
         intent.putExtra("path", demoPath);
         startActivity(intent);

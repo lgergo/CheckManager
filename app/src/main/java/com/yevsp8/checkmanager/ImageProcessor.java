@@ -13,6 +13,7 @@ import com.yevsp8.checkmanager.di.TessTwoModule;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import javax.inject.Inject;
@@ -48,16 +49,26 @@ public class ImageProcessor {
     public String startImageProcess(String imagePath) {
         this.imagePath = imagePath;
 
-        loadImage();
+        bitmap = BitmapFactory.decodeFile(imagePath);
+        //loadImage();
 
-        src = new Mat();
-        //src=new Mat(bitmap.getHeight(),bitmap.getWidth(), CvType.CV_8UC1);
+//        src = new Mat(bitmap.getHeight(),bitmap.getWidth(), CvType.CV_8UC1);
+//        dest=new Mat(bitmap.getHeight(),bitmap.getWidth(), CvType.CV_8UC1);
+//
+//        src.create(bitmap.getHeight(),bitmap.getWidth(),CvType.CV_8UC1);
+        src = Imgcodecs.imread(imagePath, Imgcodecs.IMREAD_GRAYSCALE);   // + reduced
+        dest = new Mat(src.rows(), src.cols(), Imgcodecs.IMREAD_GRAYSCALE);
 
-        //Imgproc.cvtColor(src, dest, Imgproc.COLOR_BayerBG2GRAY);
-        //adaptiveThreshold();
 
-        Utils.bitmapToMat(bitmap, src);
-        Utils.matToBitmap(src, bitmap);
+        //Utils.bitmapToMat(bitmap, src);
+
+        //Imgproc.cvtColor(src, dest, Imgproc.COLOR_BGR2GRAY);
+
+        //adaptiveThreshold();   // nagyon elrontja
+
+        Utils.matToBitmap(src, bitmap);   // src ha nincs adaptive
+
+        //TODO külön szálon fusson
         return tessTwoApi.startRecognition(bitmap);
         //return tessTwoApi.startRecognitionWithByteArray(Mat.,src.width(),src.height(),src.channels(),(int)src.step1());
     }

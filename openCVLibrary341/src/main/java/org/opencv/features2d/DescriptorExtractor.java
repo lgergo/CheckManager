@@ -22,14 +22,14 @@ public class DescriptorExtractor {
             BRIEF = 4,
             BRISK = 5,
             FREAK = 6,
-            AKAZE = 7,
-            OPPONENT_SIFT = OPPONENTEXTRACTOR + SIFT,
-            OPPONENT_SURF = OPPONENTEXTRACTOR + SURF,
-            OPPONENT_ORB = OPPONENTEXTRACTOR + ORB,
-            OPPONENT_BRIEF = OPPONENTEXTRACTOR + BRIEF,
-            OPPONENT_BRISK = OPPONENTEXTRACTOR + BRISK,
-            OPPONENT_FREAK = OPPONENTEXTRACTOR + FREAK,
-            OPPONENT_AKAZE = OPPONENTEXTRACTOR + AKAZE;
+            AKAZE = 7;
+    //            OPPONENT_SIFT = OPPONENTEXTRACTOR + SIFT,
+//            OPPONENT_SURF = OPPONENTEXTRACTOR + SURF,
+//            OPPONENT_ORB = OPPONENTEXTRACTOR + ORB,
+//            OPPONENT_BRIEF = OPPONENTEXTRACTOR + BRIEF,
+//            OPPONENT_BRISK = OPPONENTEXTRACTOR + BRISK,
+//            OPPONENT_FREAK = OPPONENTEXTRACTOR + FREAK,
+//            OPPONENT_AKAZE = OPPONENTEXTRACTOR + AKAZE;
     private static final int
             OPPONENTEXTRACTOR = 1000;
     protected final long nativeObj;
