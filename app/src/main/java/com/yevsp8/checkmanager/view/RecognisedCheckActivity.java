@@ -1,6 +1,8 @@
 package com.yevsp8.checkmanager.view;
 
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -29,6 +31,7 @@ public class RecognisedCheckActivity extends AppCompatActivity {
     private TextView paidto;
     private TextView paiddate;
     private String path;
+    private Bitmap bitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,7 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         component.injectRecognisedCheckActivity(this);
 
         path = getIntent().getExtras().getString("path");
+        //bitmap=getIntent().getParcelableExtra("image");
 
         //egyenlőre demo data
         String demo_checkId = "0123456789876";
@@ -78,8 +82,14 @@ public class RecognisedCheckActivity extends AppCompatActivity {
     }
 
     private void startImagePreprocessing() {
-        //TODO kép átadása path helyett??
-        String result = imageProcessor.startImageProcess(path);
+
+        String result = "";
+        if (bitmap == null) {
+            Bitmap myBitmap = BitmapFactory.decodeFile(path);
+            result = imageProcessor.recognition(myBitmap);
+        } else {
+            result = imageProcessor.recognition(bitmap);
+        }
 
         //TODO egyenlőre csak ide berakja
         id.setText(result);

@@ -12,9 +12,10 @@ import com.yevsp8.checkmanager.di.TessTwoModule;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.photo.Photo;
 
 import javax.inject.Inject;
 
@@ -46,18 +47,43 @@ public class ImageProcessor {
         }
     }
 
-    public String startImageProcess(String imagePath) {
-        this.imagePath = imagePath;
+    public Bitmap preProcessing(Bitmap rawBitmap) {
+        Log.e("Preprocess", "PREPROCESSING STARTED");
 
-        bitmap = BitmapFactory.decodeFile(imagePath);
+        bitmap = rawBitmap;
+
+        src = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
+        dest = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
+
+        Utils.bitmapToMat(rawBitmap, src);
+        Imgproc.cvtColor(src, dest, Imgproc.COLOR_BGR2GRAY);
+        src = dest;
+        //Imgproc.medianBlur(src,dest,7);
+        Photo.fastNlMeansDenoising(src, dest);
+        src = dest;
+        //adaptiveThreshold(src,dest);
+        //canny();
+        Utils.matToBitmap(dest, bitmap);
+
+        Log.e("Preprocess", "PREPROCESSING ENDED");
+
+        return bitmap;
+    }
+
+    public String recognition(Bitmap rawBitmap) {
+        //this.imagePath = imagePath;
+
+        this.bitmap = rawBitmap;
         //loadImage();
 
 //        src = new Mat(bitmap.getHeight(),bitmap.getWidth(), CvType.CV_8UC1);
 //        dest=new Mat(bitmap.getHeight(),bitmap.getWidth(), CvType.CV_8UC1);
 //
 //        src.create(bitmap.getHeight(),bitmap.getWidth(),CvType.CV_8UC1);
-        src = Imgcodecs.imread(imagePath, Imgcodecs.IMREAD_GRAYSCALE);   // + reduced
-        dest = new Mat(src.rows(), src.cols(), Imgcodecs.IMREAD_GRAYSCALE);
+        src = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
+        dest = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
+
+        Utils.bitmapToMat(rawBitmap, src);
 
 
         //Utils.bitmapToMat(bitmap, src);
@@ -83,8 +109,14 @@ public class ImageProcessor {
         bitmap = BitmapFactory.decodeFile(imagePath, options);
     }
 
-    private void adaptiveThreshold() {
-        Imgproc.adaptiveThreshold(src, dest, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 5, 5);
+    private void adaptiveThreshold(Mat source, Mat destination) {
+        Imgproc.adaptiveThreshold(source, destination, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 11, 2);
+    }
+
+    private void canny() {
+        int lowThreshold = 3;
+        int kernelSize = 3;
+        Imgproc.Canny(src, dest, lowThreshold, lowThreshold * 2, kernelSize, false);
     }
 
 
