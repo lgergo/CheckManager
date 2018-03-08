@@ -8,14 +8,18 @@ import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.TextView;
 
+import com.yevsp8.checkmanager.CheckListFragment;
 import com.yevsp8.checkmanager.GoogleApiActivity;
-import com.yevsp8.checkmanager.ListCheckFragment;
 import com.yevsp8.checkmanager.R;
+import com.yevsp8.checkmanager.data.Check;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends BaseActivity {
 
     public ProgressDialog updateProgressBar;
-    ListCheckFragment fragment;
+    CheckListFragment fragment;
     TextView latestSyncTextView;
     FloatingActionButton newImageButton;
     FloatingActionButton testApiButton;
@@ -26,12 +30,15 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Date date = Calendar.getInstance().getTime();
+        viewModel.insertCheck(new Check("013018234", date.getTime(), 1250, "Főtáv", date.getTime(), false));
+        viewModel.insertCheck(new Check("471145743", date.getTime(), 1250, "Telekom", date.getTime(), false));
+        viewModel.insertCheck(new Check("963349038", date.getTime(), 8900, "Upc", date.getTime(), false));
+        viewModel.insertCheck(new Check("459231004", date.getTime(), 22340, "Közművek", date.getTime(), false));
+
         FragmentManager manager = getSupportFragmentManager();
-        fragment = (ListCheckFragment) manager.findFragmentById(R.id.checklist_fragmentcontainer);
-        if (fragment == null) {
-            fragment = ListCheckFragment.newInsatce();
-        }
-        addFragmentToActivity(manager, fragment, R.id.checklist_fragmentcontainer, "tag");
+        fragment = new CheckListFragment();
+        replaceFragmentToActivity(manager, fragment, R.id.checklist_fragmentcontainer);
 
         latestSyncTextView = findViewById(R.id.latest_synch);
         String lastSync = getValueFromSharedPreferences("last_sync");
@@ -64,7 +71,6 @@ public class MainActivity extends BaseActivity {
 
                 Intent intent = new Intent(context, GoogleApiActivity.class);
                 startActivity(intent);
-
             }
         });
     }

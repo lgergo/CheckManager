@@ -1,26 +1,29 @@
 package com.yevsp8.checkmanager.view;
 
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.yevsp8.checkmanager.ImageProcessor;
 import com.yevsp8.checkmanager.R;
-import com.yevsp8.checkmanager.TessTwoApi;
 import com.yevsp8.checkmanager.data.CheckRepository;
 import com.yevsp8.checkmanager.di.ContextModule;
-import com.yevsp8.checkmanager.di.DaggerTesseractComponent;
-import com.yevsp8.checkmanager.di.TesseractComponent;
+import com.yevsp8.checkmanager.di.DaggerImageProcessingComponent;
+import com.yevsp8.checkmanager.di.ImageProcessingComponent;
+import com.yevsp8.checkmanager.di.TessTwoModule;
 
 import javax.inject.Inject;
 
 public class RecognisedCheckActivity extends AppCompatActivity {
 
     @Inject
-    TessTwoApi tesseract;
-    @Inject
+    ImageProcessor imageProcessor;
+    //@Inject
     CheckRepository repo;
     private ProgressDialog progressDialog;
     private TextView id;
@@ -28,19 +31,23 @@ public class RecognisedCheckActivity extends AppCompatActivity {
     private TextView paidto;
     private TextView paiddate;
     private String path;
+    private Bitmap bitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recognised_check);
 
-        TesseractComponent component = DaggerTesseractComponent.builder()
+        ImageProcessingComponent component = DaggerImageProcessingComponent.builder()
                 .contextModule(new ContextModule(this))
+                //.applicationModule(new ApplicationModule(getApplication()))
+                .tessTwoModule(new TessTwoModule(this))
                 .build();
 
         component.injectRecognisedCheckActivity(this);
 
         path = getIntent().getExtras().getString("path");
+        //bitmap=getIntent().getParcelableExtra("image");
 
         //egyenlőre demo data
         String demo_checkId = "0123456789876";
@@ -69,12 +76,20 @@ public class RecognisedCheckActivity extends AppCompatActivity {
         });
 
         progressDialog.show();
-        callTesseractForRecognise();
+        startImagePreprocessing();
         progressDialog.hide();
+        progressDialog.dismiss();
     }
 
-    private void callTesseractForRecognise() {
-        String result = tesseract.startRegognition(path);
+    private void startImagePreprocessing() {
+
+        String result = "";
+        if (bitmap == null) {
+            Bitmap myBitmap = BitmapFactory.decodeFile(path);
+            result = imageProcessor.recognition(myBitmap);
+        } else {
+            result = imageProcessor.recognition(bitmap);
+        }
 
         //TODO egyenlőre csak ide berakja
         id.setText(result);

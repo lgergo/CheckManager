@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.yevsp8.checkmanager.ImageProcessor;
 import com.yevsp8.checkmanager.R;
 
 import java.io.File;
@@ -32,14 +33,13 @@ public class NewImageActivity extends AppCompatActivity {
     private Button buttonRecognise;
     private Button buttonDemo;
     private ImageView imageView;
+    private Bitmap myBitmap;
     private String currentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_image);
-
-        imageView = findViewById(R.id.captured_photo_imageView);
 
         buttonTakePhoto = findViewById(R.id.button_capture_photo);
         buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
@@ -55,6 +55,15 @@ public class NewImageActivity extends AppCompatActivity {
                 permissionCheck();
             }
         });
+
+        buttonDemo = findViewById(R.id.button_demoData);
+        buttonDemo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startDemoRecognition();
+            }
+        });
+        loadDemoImage();
     }
 
     private void dispatchTakePictureIntent() {
@@ -76,6 +85,22 @@ public class NewImageActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            File imgFile = new File(currentPhotoPath);
+            if (imgFile.exists()) {
+                myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                //ImageView myImage = findViewById(R.id.captured_photo_imageView);
+                imageView.setImageBitmap(myBitmap);
+
+                //TODO kamera ok gombra elvégzi a kép transzformációját és ezt jeleníti meg, eztuán hívható meg rá a recognise
+
+            }
+            buttonRecognise.setEnabled(true);
+        }
+    }
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -90,19 +115,6 @@ public class NewImageActivity extends AppCompatActivity {
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
         return image;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1) {
-            File imgFile = new File(currentPhotoPath);
-            if (imgFile.exists()) {
-                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                ImageView myImage = findViewById(R.id.captured_photo_imageView);
-                myImage.setImageBitmap(myBitmap);
-            }
-            buttonRecognise.setEnabled(true);
-        }
     }
 
     private void permissionCheck() {
@@ -125,7 +137,7 @@ public class NewImageActivity extends AppCompatActivity {
                         MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             }
         } else {
-            startewImageActivity();
+            startRecognition();
         }
     }
 
@@ -140,7 +152,7 @@ public class NewImageActivity extends AppCompatActivity {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
 
-                    startewImageActivity();
+                    startRecognition();
 
                 } else {
 
@@ -156,9 +168,37 @@ public class NewImageActivity extends AppCompatActivity {
         }
     }
 
-    private void startewImageActivity() {
+    //TODO ha nem jó a kép akkor ne is mentse le / vagy töröljük
+
+    private Bitmap getPreprocessedImage(Bitmap rawImage) {
+        //TODO inject
+        ImageProcessor imp = new ImageProcessor(this);
+        return imp.preProcessing(rawImage);
+    }
+
+    private void startRecognition() {
         Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
-        intent.putExtra("path", currentPhotoPath);
+        intent.putExtra("path", getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/szines.png");//currentPhotoPath);
+        //intent.putExtra("image",myBitmap);
         startActivity(intent);
+    }
+
+    private void loadDemoImage() {
+        myBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test4.png");
+        imageView = findViewById(R.id.captured_photo_imageView);
+        imageView.setImageBitmap(myBitmap);
+
+        buttonRecognise.setEnabled(true);
+    }
+
+    private void startDemoRecognition() {
+
+        imageView.setImageBitmap(getPreprocessedImage(myBitmap));
+
+
+//        String demoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test4.png";
+//        Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
+//        intent.putExtra("path", demoPath);
+//        startActivity(intent);
     }
 }

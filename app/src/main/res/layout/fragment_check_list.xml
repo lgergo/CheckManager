@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.yevsp8.checkmanager.CheckListFragment">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:text="Nem szinkronizált csekkek"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
+    <ListView
+        android:id="@+id/listview_check"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="20dp">
+    </ListView>
+
+</LinearLayout>
