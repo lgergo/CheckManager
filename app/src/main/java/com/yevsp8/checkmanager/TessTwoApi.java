@@ -2,7 +2,6 @@ package com.yevsp8.checkmanager;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -31,7 +30,6 @@ public class TessTwoApi {
     @Inject
     Context context;
     private String language = "eng";
-    private String imagePath = Environment.getExternalStorageDirectory().toString() + "/DCIM/ocr.png";
     private String textResult;
     private String TAG = "Tesseract error";
 
@@ -44,7 +42,6 @@ public class TessTwoApi {
                 .build();
 
         component.injectTessTwoApi(this);
-
     }
 
     public String startRecognition(Bitmap bitmap) {

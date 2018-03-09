@@ -21,10 +21,6 @@ public class CheckManagerApplication extends Application {
     Context context;
     @Inject
     com.google.api.services.sheets.v4.Sheets googleSheetApi;
-//    @Inject
-//    TessBaseAPI tessBaseAPI;
-    // @Inject
-    // CheckDatabase database;
 
     @Override
     public void onCreate() {
@@ -36,10 +32,6 @@ public class CheckManagerApplication extends Application {
                 .build();
 
         component.injectApplication(this);
-    }
-
-    public com.google.api.services.sheets.v4.Sheets getGoogleSheetApi() {
-        return googleSheetApi;
     }
 
     public Context getContext() {

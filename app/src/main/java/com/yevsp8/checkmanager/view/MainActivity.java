@@ -1,6 +1,8 @@
 package com.yevsp8.checkmanager.view;
 
 import android.app.ProgressDialog;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,9 +14,16 @@ import com.yevsp8.checkmanager.CheckListFragment;
 import com.yevsp8.checkmanager.GoogleApiActivity;
 import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.data.Check;
+import com.yevsp8.checkmanager.di.ApplicationModule;
+import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.di.ContextModule;
+import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import java.util.Calendar;
 import java.util.Date;
+
+import javax.inject.Inject;
 
 public class MainActivity extends BaseActivity {
 
@@ -25,10 +34,23 @@ public class MainActivity extends BaseActivity {
     FloatingActionButton testApiButton;
     TextView googleApiResultTextView;
 
+    //TODO csak a demo data miatt
+    CheckViewModel viewModel;
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        CheckManagerApplicationComponent component = DaggerCheckManagerApplicationComponent.builder()
+                .contextModule(new ContextModule(this))
+                .applicationModule(new ApplicationModule(getApplication()))
+                .build();
+        component.injectMainActivity(this);
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckViewModel.class);
 
         Date date = Calendar.getInstance().getTime();
         viewModel.insertCheck(new Check("013018234", date.getTime(), 1250, "Főtáv", date.getTime(), false));

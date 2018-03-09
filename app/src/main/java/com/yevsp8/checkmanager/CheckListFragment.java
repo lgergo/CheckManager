@@ -39,13 +39,6 @@ public class CheckListFragment extends Fragment {
         // Required empty public constructor
     }
 
-//    public static CheckListFragment newInsatce() {
-//        Bundle args = new Bundle();
-//        CheckListFragment fragment = new CheckListFragment();
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-
     @Override
     public void onCreate(Bundle savedInstancestate) {
         super.onCreate(savedInstancestate);
@@ -95,17 +88,6 @@ public class CheckListFragment extends Fragment {
                 intent.putExtra("selected_check_id", selected.getCheckId());
                 startActivity(intent);
 
-//                Bundle toNewFragmentBundle=new Bundle();
-//                toNewFragmentBundle.putString("selected_check_id",selected.getCheckId());
-//                CheckDetailsFragment detailsFragment=new CheckDetailsFragment();
-//                detailsFragment.setArguments(toNewFragmentBundle);
-//
-//                ((BaseActivity)getActivity()).replaceFragmentToActivity(
-//                        getActivity().getSupportFragmentManager(),
-//                        detailsFragment,
-//                        R.id.checklist_fragmentcontainer,
-//                        "tag"
-//                );
             }
         });
     }

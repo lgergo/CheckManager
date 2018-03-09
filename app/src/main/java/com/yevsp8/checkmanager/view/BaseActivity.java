@@ -1,11 +1,10 @@
 package com.yevsp8.checkmanager.view;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -15,11 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.yevsp8.checkmanager.R;
-import com.yevsp8.checkmanager.di.ApplicationModule;
-import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
-import com.yevsp8.checkmanager.di.ContextModule;
-import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
-import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import javax.inject.Inject;
 
@@ -27,12 +21,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Inject
     protected Context context;
-    @Inject
     protected SharedPreferences sharedPreferences;
-    protected CheckViewModel viewModel;
-    //TODO csak a demo data miatt
-    @Inject
-    ViewModelProvider.Factory viewModelFactory;
 
     public void replaceFragmentToActivity(FragmentManager manager, Fragment fragment, int frameId) {
         FragmentTransaction transaction = manager.beginTransaction();
@@ -47,13 +36,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
-        CheckManagerApplicationComponent component = DaggerCheckManagerApplicationComponent.builder()
-                .contextModule(new ContextModule(this))
-                .applicationModule(new ApplicationModule(getApplication()))
-                .build();
-        component.injectBaseActivity(this);
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckViewModel.class);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.yevsp8.checkmanager.di;
 
 import com.yevsp8.checkmanager.ImageProcessor;
 import com.yevsp8.checkmanager.TessTwoApi;
-import com.yevsp8.checkmanager.view.RecognisedCheckActivity;
+import com.yevsp8.checkmanager.view.NewImageActivity;
 
 import dagger.Component;
 
@@ -16,7 +16,7 @@ public interface ImageProcessingComponent {
 
     void injectTessTwoApi(TessTwoApi tessTwoApi);
 
-    void injectRecognisedCheckActivity(RecognisedCheckActivity recognisedCheckActivity);
-
     void injectImageProcessor(ImageProcessor imageProcessor);
+
+    void injectNewImageActivtiy(NewImageActivity newImageActivity);
 }
