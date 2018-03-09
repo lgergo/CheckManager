@@ -12,23 +12,30 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import com.yevsp8.checkmanager.ImageProcessor;
 import com.yevsp8.checkmanager.R;
+import com.yevsp8.checkmanager.di.ContextModule;
+import com.yevsp8.checkmanager.di.DaggerImageProcessingComponent;
+import com.yevsp8.checkmanager.di.ImageProcessingComponent;
+import com.yevsp8.checkmanager.di.TessTwoModule;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class NewImageActivity extends AppCompatActivity {
+import javax.inject.Inject;
+
+public class NewImageActivity extends BaseActivity {
 
     static final int REQUEST_TAKE_PHOTO = 1;
     private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
+    @Inject
+    ImageProcessor processor;
     private Button buttonTakePhoto;
     private Button buttonRecognise;
     private Button buttonDemo;
@@ -40,6 +47,13 @@ public class NewImageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_image);
+
+        ImageProcessingComponent component = DaggerImageProcessingComponent.builder()
+                .contextModule(new ContextModule(this))
+                .tessTwoModule(new TessTwoModule(this))
+                .build();
+
+        component.injectNewImageActivtiy(this);
 
         buttonTakePhoto = findViewById(R.id.button_capture_photo);
         buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
@@ -90,12 +104,10 @@ public class NewImageActivity extends AppCompatActivity {
         if (requestCode == 1) {
             File imgFile = new File(currentPhotoPath);
             if (imgFile.exists()) {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 2;
                 myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                //ImageView myImage = findViewById(R.id.captured_photo_imageView);
                 imageView.setImageBitmap(myBitmap);
-
-                //TODO kamera ok gombra elvégzi a kép transzformációját és ezt jeleníti meg, eztuán hívható meg rá a recognise
-
             }
             buttonRecognise.setEnabled(true);
         }
@@ -170,21 +182,16 @@ public class NewImageActivity extends AppCompatActivity {
 
     //TODO ha nem jó a kép akkor ne is mentse le / vagy töröljük
 
-    private Bitmap getPreprocessedImage(Bitmap rawImage) {
-        //TODO inject
-        ImageProcessor imp = new ImageProcessor(this);
-        return imp.preProcessing(rawImage);
-    }
 
     private void startRecognition() {
-        Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
-        intent.putExtra("path", getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/szines.png");//currentPhotoPath);
-        //intent.putExtra("image",myBitmap);
+        String recognisedText = processor.recognition(myBitmap);
+        Intent intent = new Intent(this, CheckDetailsActivity.class);
+        intent.putExtra("recognised_text", recognisedText);
         startActivity(intent);
     }
 
     private void loadDemoImage() {
-        myBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test4.png");
+        myBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test3.png");
         imageView = findViewById(R.id.captured_photo_imageView);
         imageView.setImageBitmap(myBitmap);
 
@@ -193,12 +200,7 @@ public class NewImageActivity extends AppCompatActivity {
 
     private void startDemoRecognition() {
 
-        imageView.setImageBitmap(getPreprocessedImage(myBitmap));
-
-
-//        String demoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test4.png";
-//        Intent intent = new Intent(getApplicationContext(), RecognisedCheckActivity.class);
-//        intent.putExtra("path", demoPath);
-//        startActivity(intent);
+        Bitmap b = processor.preProcessing(myBitmap);
+        imageView.setImageBitmap(b);
     }
 }

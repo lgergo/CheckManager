@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.yevsp8.checkmanager.data.Check;
@@ -31,6 +32,7 @@ public class CheckDetailsFragment extends Fragment {
     View rootView;
     Check check;
     String checkId;
+    String recognisedText;
 
     TextView id;
     TextView created;
@@ -38,6 +40,9 @@ public class CheckDetailsFragment extends Fragment {
     TextView paidto;
     TextView paiddate;
     TextView isuploaded;
+
+    Button button_edit;
+    Button button_upload;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -57,9 +62,6 @@ public class CheckDetailsFragment extends Fragment {
                 .applicationModule(new ApplicationModule(getActivity().getApplication()))
                 .build();
         component.injectCheckViewModel(this);
-
-        Bundle args = getArguments();
-        checkId = args.getString("selected_check_id");
     }
 
     @Override
@@ -88,6 +90,18 @@ public class CheckDetailsFragment extends Fragment {
     private void setTextViewValues(Check check) {
 
         CheckDetailsFragment.this.check = check;
+
+        button_edit = getActivity().findViewById(R.id.button_details_edit);
+        //TODO google api meghívása
+        button_upload = getActivity().findViewById(R.id.button_details_upload);
+
+        Bundle args = getArguments();
+        checkId = args.getString("selected_check_id");
+        recognisedText = args.getString("recognised_text");
+        if (check == null) {
+            //TODO valós adatokkal
+            check = new Check(recognisedText, 20180303, 1500, "Minta Kft", 20180303, false);
+        }
 
         id = rootView.findViewById(R.id.check_details_id);
         created = rootView.findViewById(R.id.check_details_create);

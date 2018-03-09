@@ -4,7 +4,7 @@ import com.yevsp8.checkmanager.CheckDetailsFragment;
 import com.yevsp8.checkmanager.CheckListFragment;
 import com.yevsp8.checkmanager.CheckManagerApplication;
 import com.yevsp8.checkmanager.GoogleApiActivity;
-import com.yevsp8.checkmanager.view.BaseActivity;
+import com.yevsp8.checkmanager.view.MainActivity;
 
 import dagger.Component;
 
@@ -17,7 +17,7 @@ public interface CheckManagerApplicationComponent {
 
     void injectApplication(CheckManagerApplication app);
 
-    void injectBaseActivity(BaseActivity baseActivity);
+    void injectMainActivity(MainActivity mainActivity);
 
     void injectCheckListViewModel(CheckListFragment checkListFragment);
 

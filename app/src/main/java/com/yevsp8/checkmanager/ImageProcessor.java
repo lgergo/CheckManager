@@ -19,7 +19,6 @@ import org.opencv.photo.Photo;
 
 import javax.inject.Inject;
 
-
 /**
  * Created by Gergo on 2018. 03. 04..
  */
@@ -71,28 +70,6 @@ public class ImageProcessor {
     }
 
     public String recognition(Bitmap rawBitmap) {
-        //this.imagePath = imagePath;
-
-        this.bitmap = rawBitmap;
-        //loadImage();
-
-//        src = new Mat(bitmap.getHeight(),bitmap.getWidth(), CvType.CV_8UC1);
-//        dest=new Mat(bitmap.getHeight(),bitmap.getWidth(), CvType.CV_8UC1);
-//
-//        src.create(bitmap.getHeight(),bitmap.getWidth(),CvType.CV_8UC1);
-        src = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
-        dest = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
-
-        Utils.bitmapToMat(rawBitmap, src);
-
-
-        //Utils.bitmapToMat(bitmap, src);
-
-        //Imgproc.cvtColor(src, dest, Imgproc.COLOR_BGR2GRAY);
-
-        //adaptiveThreshold();   // nagyon elrontja
-
-        Utils.matToBitmap(src, bitmap);   // src ha nincs adaptive
 
         //TODO külön szálon fusson
         return tessTwoApi.startRecognition(bitmap);
@@ -118,7 +95,6 @@ public class ImageProcessor {
         int kernelSize = 3;
         Imgproc.Canny(src, dest, lowThreshold, lowThreshold * 2, kernelSize, false);
     }
-
 
    /*
    * dinamikus lokális küszöbölés

@@ -3,8 +3,6 @@ package com.yevsp8.checkmanager.di;
 import android.app.Application;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.persistence.room.Room;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import com.yevsp8.checkmanager.data.CheckDAO;
 import com.yevsp8.checkmanager.data.CheckDatabase;
@@ -29,12 +27,6 @@ public class DatabaseModule {
                 CheckDatabase.class,
                 "Check.db"
         ).build();
-    }
-
-    @Provides
-    @CustomScope
-    SharedPreferences provideSharedPreferences(Application application) {
-        return PreferenceManager.getDefaultSharedPreferences(application);
     }
 
     @Provides
