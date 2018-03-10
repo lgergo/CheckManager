@@ -1,6 +1,5 @@
 package com.yevsp8.checkmanager;
 
-
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
@@ -22,7 +21,6 @@ import com.yevsp8.checkmanager.util.Converter;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import javax.inject.Inject;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,7 +48,6 @@ public class CheckDetailsFragment extends Fragment {
 
 
     public CheckDetailsFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -86,6 +83,7 @@ public class CheckDetailsFragment extends Fragment {
             }
         });
     }
+
 
     private void setTextViewValues(Check check) {
 

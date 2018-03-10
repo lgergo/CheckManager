@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -12,6 +14,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -74,7 +77,7 @@ public class NewImageActivity extends BaseActivity {
         buttonDemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startDemoRecognition();
+                startPreprocessing();
             }
         });
         loadDemoImage();
@@ -104,14 +107,16 @@ public class NewImageActivity extends BaseActivity {
         if (requestCode == 1) {
             File imgFile = new File(currentPhotoPath);
             if (imgFile.exists()) {
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inSampleSize = 2;
-                myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                imageView.setImageBitmap(myBitmap);
+//                BitmapFactory.Options options = new BitmapFactory.Options();
+//                options.inSampleSize = 2;
+//                myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+//                imageView.setImageBitmap(myBitmap);
+
             }
             buttonRecognise.setEnabled(true);
         }
     }
+
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -191,16 +196,64 @@ public class NewImageActivity extends BaseActivity {
     }
 
     private void loadDemoImage() {
-        myBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test3.png");
+        String imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/skew.jpg";
+        currentPhotoPath = imagePath;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        //options.inSampleSize = 2;
+        myBitmap = BitmapFactory.decodeFile(imagePath, options);
         imageView = findViewById(R.id.captured_photo_imageView);
-        imageView.setImageBitmap(myBitmap);
+        imageView.setImageBitmap(rotate(myBitmap));
 
         buttonRecognise.setEnabled(true);
     }
 
-    private void startDemoRecognition() {
+    private void startPreprocessing() {
 
-        Bitmap b = processor.preProcessing(myBitmap);
-        imageView.setImageBitmap(b);
+        Bitmap b = processor.preProcessing(myBitmap, currentPhotoPath);
+        imageView.setImageBitmap(rotate(b));
+    }
+
+    private Bitmap rotate(Bitmap source) {
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(currentPhotoPath);
+        } catch (IOException ex) {
+            Log.e("exif", ex.getLocalizedMessage());
+        }
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                return source;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.setScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.setRotate(180);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.setRotate(90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return source;
+        }
+        Bitmap result = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+        return result;
     }
 }

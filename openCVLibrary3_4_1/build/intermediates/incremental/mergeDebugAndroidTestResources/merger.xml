@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3">
+    <dataSet config="__tested_artifact__::openCVLibrary3_4_1$Generated" generated="true">
+        <source
+            path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\build\intermediates\bundles\debug\res" />
+    </dataSet>
+    <dataSet config="__tested_artifact__::openCVLibrary3_4_1" from-dependency="true"
+        generated-set="__tested_artifact__::openCVLibrary3_4_1$Generated">
+        <source
+            path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\build\intermediates\bundles\debug\res">
+            <file
+                path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\build\intermediates\bundles\debug\res\values\values.xml"
+                qualifiers="">
+                <declare-styleable name="CameraBridgeViewBase">
+                    <attr name="show_fps" format="boolean" />
+                    <attr name="camera_id" format="integer">
+                        <enum name="any" value="-1" />
+                        <enum name="back" value="99" />
+                        <enum name="front" value="98" />
+                    </attr>
+                </declare-styleable>
+            </file>
+        </source>
+    </dataSet>
+    <dataSet config="main$Generated" generated="true">
+        <source
+            path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\src\androidTest\res" />
+        <source
+            path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\build\generated\res\rs\androidTest\debug" />
+        <source
+            path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\build\generated\res\resValues\androidTest\debug" />
+    </dataSet>
+    <dataSet config="main" generated-set="main$Generated">
+        <source
+            path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\src\androidTest\res" />
+        <source
+            path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\build\generated\res\rs\androidTest\debug" />
+        <source
+            path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\build\generated\res\resValues\androidTest\debug" />
+    </dataSet>
+    <dataSet config="debug$Generated" generated="true">
+        <source
+            path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\src\androidTestDebug\res" />
+    </dataSet>
+    <dataSet config="debug" generated-set="debug$Generated">
+        <source
+            path="C:\Users\Gergo\AndroidStudioProjects\openCVLibrary3_4_1\src\androidTestDebug\res" />
+    </dataSet>
+    <mergedItems>
+        <configuration qualifiers="">
+            <declare-styleable name="CameraBridgeViewBase">
+                <attr name="show_fps" format="boolean" />
+                <attr name="camera_id" format="integer">
+                    <enum name="any" value="-1" />
+                    <enum name="back" value="99" />
+                    <enum name="front" value="98" />
+                </attr>
+            </declare-styleable>
+        </configuration>
+    </mergedItems>
+</merger>
