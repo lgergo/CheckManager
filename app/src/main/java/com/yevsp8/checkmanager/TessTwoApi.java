@@ -29,7 +29,7 @@ public class TessTwoApi {
     TessBaseAPI tessBaseAPI;
     @Inject
     Context context;
-    private String language = "eng";
+    private String language = "hun";//"eng";
     private String textResult;
     private String TAG = "Tesseract error";
 
@@ -71,7 +71,7 @@ public class TessTwoApi {
             String fileList[] = context.getAssets().list("");
             for (String fileName : fileList) {
                 String pathToDataFile = dir + "/" + fileName;
-                if ((fileName.equals("eng.traineddata") || fileName.equals("hu.traineddata")) && !(new File(pathToDataFile)).exists()) {
+                if ((fileName.equals("eng.traineddata") || fileName.equals("hun.traineddata")) && !(new File(pathToDataFile)).exists()) {
                     InputStream in = context.getAssets().open(fileName);
                     OutputStream out = new FileOutputStream(pathToDataFile);
                     byte[] buff = new byte[1024];

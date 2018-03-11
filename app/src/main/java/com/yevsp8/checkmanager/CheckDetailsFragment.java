@@ -30,7 +30,7 @@ public class CheckDetailsFragment extends Fragment {
     View rootView;
     Check check;
     String checkId;
-    String recognisedText;
+    String[] recognisedText;
 
     TextView id;
     TextView created;
@@ -95,10 +95,16 @@ public class CheckDetailsFragment extends Fragment {
 
         Bundle args = getArguments();
         checkId = args.getString("selected_check_id");
-        recognisedText = args.getString("recognised_text");
+        recognisedText = args.getStringArray("result_array");
         if (check == null) {
             //TODO valós adatokkal
-            check = new Check(recognisedText, 20180303, 1500, "Minta Kft", 20180303, false);
+            int amountValue;
+            try {
+                amountValue = Integer.getInteger(recognisedText[1]);
+            } catch (Exception ex) {
+                amountValue = 0;
+            }
+            check = new Check(recognisedText[0], 20180303, amountValue, recognisedText[2], 20180303, false);
         }
 
         id = rootView.findViewById(R.id.check_details_id);

@@ -14,13 +14,13 @@ public class CheckDetailsActivity extends BaseActivity {
         setContentView(R.layout.activity_check_details);
 
         String checkId = getIntent().getExtras().getString("selected_check_id");
-        String recognisedText = getIntent().getExtras().getString("recognised_text");
+        String[] recognisedText = getIntent().getExtras().getStringArray("result_array");
 
         FragmentManager manager = getSupportFragmentManager();
         CheckDetailsFragment fragment = new CheckDetailsFragment();
         Bundle bundle = new Bundle();
         bundle.putString("selected_check_id", checkId);
-        bundle.putString("recognised_text", recognisedText);
+        bundle.putStringArray("result_array", recognisedText);
         fragment.setArguments(bundle);
 
         replaceFragmentToActivity(manager, fragment, R.id.checkdetails_fragmentcontainer);

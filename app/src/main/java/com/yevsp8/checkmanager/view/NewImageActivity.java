@@ -107,10 +107,10 @@ public class NewImageActivity extends BaseActivity {
         if (requestCode == 1) {
             File imgFile = new File(currentPhotoPath);
             if (imgFile.exists()) {
-//                BitmapFactory.Options options = new BitmapFactory.Options();
-//                options.inSampleSize = 2;
-//                myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-//                imageView.setImageBitmap(myBitmap);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 2;
+                myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                imageView.setImageBitmap(myBitmap);
 
             }
             buttonRecognise.setEnabled(true);
@@ -128,8 +128,6 @@ public class NewImageActivity extends BaseActivity {
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
-        // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
         return image;
     }
@@ -189,9 +187,9 @@ public class NewImageActivity extends BaseActivity {
 
 
     private void startRecognition() {
-        String recognisedText = processor.recognition(myBitmap);
+        String[] recognisedText = processor.recognition();
         Intent intent = new Intent(this, CheckDetailsActivity.class);
-        intent.putExtra("recognised_text", recognisedText);
+        intent.putExtra("result_array", recognisedText);
         startActivity(intent);
     }
 

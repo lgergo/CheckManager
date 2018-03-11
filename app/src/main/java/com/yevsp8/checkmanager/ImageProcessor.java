@@ -8,6 +8,7 @@ import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerImageProcessingComponent;
 import com.yevsp8.checkmanager.di.ImageProcessingComponent;
 import com.yevsp8.checkmanager.di.TessTwoModule;
+import com.yevsp8.checkmanager.util.Constants;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -17,6 +18,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -35,10 +37,14 @@ public class ImageProcessor {
 
     @Inject
     TessTwoApi tessTwoApi;
+    String checkIdResult;
+    String amountResult;
+    String paidToResult;
     String imagePath;
     Bitmap bitmap;
+    Bitmap toTestOnly;
     Mat src;
-    Mat contoured;
+    Mat corrected;
     Mat dest;
 
     public ImageProcessor(Context context) {
@@ -61,7 +67,7 @@ public class ImageProcessor {
         imagePath = filePath;
 
         src = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
-        contoured = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
+        corrected = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
         dest = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
         Utils.bitmapToMat(rawBitmap, src);
         gammaCorrection();
@@ -74,40 +80,53 @@ public class ImageProcessor {
         src = dest;
         Imgproc.threshold(src, dest, getMatMean(), 256, Imgproc.THRESH_BINARY);
         src = dest;
-        //ez így jó hogy meghatározzuk hol a csekk
 
+        //---------ez így jó hogy meghatározzuk hol a csekk
 
-//        Imgproc.Laplacian(src,dest, CvType.CV_8UC1,3,1,0);
-//        src=dest;
-//        adaptiveThreshold(src,dest);
-//        src=dest;
+        //Mat contoured = drawContours();
+        corrected = correctPerspective(src);
 
-//        //deskew();
+//        Bitmap output = Bitmap.createBitmap(corrected.cols(), corrected.rows(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(corrected, output);
 
-//        Photo.fastNlMeansDenoising(src, dest);
-//        src = dest;
-//        canny();
-//        src=dest;
-
-        contoured = drawContours();
-        logMat("contoured", contoured);
-
-        Mat corrected = correctPerspective(contoured);
-        logMat("corrected", corrected);
-
-        Bitmap output = Bitmap.createBitmap(corrected.cols(), corrected.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(corrected, output);
+        //---------------------
+        Mat rect = getRectOfCheckId(corrected);
+        Core.bitwise_not(rect, rect);
+        Imgproc.GaussianBlur(rect, rect, new Size(9, 9), 1);
+        Bitmap output = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(rect, output);
+        toTestOnly = output;
+        //-------------------------
 
         Log.e("Preprocess", "PREPROCESSING ENDED");
         return output;
     }
 
-    public String recognition(Bitmap rawBitmap) {
+    public String[] recognition() {
 
-        //TODO külön szálon fusson
-        return tessTwoApi.startRecognition(bitmap);
-        //return tessTwoApi.startRecognitionWithByteArray(Mat.,src.width(),src.height(),src.channels(),(int)src.step1());
+        String reuslt = tessTwoApi.startRecognition(toTestOnly);
+        return new String[]{reuslt, "-", "-"};
+
+//        //TODO külön szálon fusson
+//        Mat rect= getRectOfCheckId(corrected);
+//        adaptiveThreshold(rect,rect);
+//        Bitmap rectBitmapTemp=Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(rect, rectBitmapTemp);
+//        checkIdResult=tessTwoApi.startRecognition(rectBitmapTemp);
+//
+//        rect= getRectOfAmount(corrected);
+//        rectBitmapTemp=Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(rect, rectBitmapTemp);
+//        amountResult=tessTwoApi.startRecognition(rectBitmapTemp);
+//
+//        rect= getRectOfPaidTo(corrected);
+//        rectBitmapTemp=Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(rect, rectBitmapTemp);
+//        paidToResult=tessTwoApi.startRecognition(rectBitmapTemp);
+//
+//        return new String[]{checkIdResult,amountResult,paidToResult};
     }
+
 
 //    private void loadImage() {
 //        BitmapFactory.Options options = new BitmapFactory.Options();
@@ -138,7 +157,7 @@ public class ImageProcessor {
     }
 
     private void adaptiveThreshold(Mat source, Mat destination) {
-        Imgproc.adaptiveThreshold(source, destination, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 15, 3);
+        Imgproc.adaptiveThreshold(source, destination, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.ADAPTIVE_THRESH_MEAN_C, 207, 3);
     }
 
     private void canny() {
@@ -154,7 +173,6 @@ public class ImageProcessor {
         double mean = meanScalar.val[0];
         return mean;
     }
-
 
     private Mat correctPerspective(Mat toCorrect) {
 
@@ -209,6 +227,7 @@ public class ImageProcessor {
         int resultWidth = inputMat.width();
         int resultHeight = inputMat.height();
 
+        //point(col, row)
         Point p2 = new Point(0, 0);
         Point p1 = new Point(resultWidth, 0);
         Point p4 = new Point(resultWidth, resultHeight);
@@ -228,11 +247,36 @@ public class ImageProcessor {
         return output;
     }
 
-    private void logMat(String name, Mat toLog) {
+    private void logMatDataToConsole(String name, Mat toLog) {
         Log.e("IMG_DETAILS: " + name + " ",
                 "dim: " + String.valueOf(toLog.dims())
                         + "; channel: " + String.valueOf(toLog.channels())
                         + "; depth: " + String.valueOf(toLog.depth())
         );
+    }
+
+    private Mat getRectOfCheckId(Mat image) {
+        //rect x=col, y=row, jobb felso sarokbol szamol
+        Point p1 = new Point(image.cols() * Constants.Check_ID_Top_DistFrom_Top, 0);
+        Point p2 = new Point(image.cols() * Constants.Check_ID_Bottom_DistFrom_Top, image.rows());
+        return getMatOfRect(image, p1, p2);
+    }
+
+    private Mat getRectOfAmount(Mat image) {
+        Point p1 = new Point(image.cols() * Constants.Check_Amount_Top_DistFrom_Top, image.rows() * Constants.Check_Amount_Right_DistFrom_Right);
+        Point p2 = new Point(image.cols() * Constants.Check_Amount_Bottom_DistFrom_Top, image.rows());
+        return getMatOfRect(image, p1, p2);
+    }
+
+    private Mat getRectOfPaidTo(Mat image) {
+        Point p1 = new Point(image.cols() * Constants.Check_PaidTo_Top_DistFrom_Top, 0);
+        Point p2 = new Point(image.cols() * Constants.Check_PaidTo_Bottom_DistFrom_Top, image.rows());
+        return getMatOfRect(image, p1, p2);
+    }
+
+    private Mat getMatOfRect(Mat image, Point p1, Point p2) {
+        Rect rect = new Rect(p1, p2);
+        Mat result = new Mat(image, rect);
+        return result;
     }
 }
