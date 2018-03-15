@@ -2,6 +2,7 @@ package com.yevsp8.checkmanager.view;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.view.Menu;
 
 import com.yevsp8.checkmanager.CheckDetailsFragment;
 import com.yevsp8.checkmanager.R;
@@ -24,5 +25,10 @@ public class CheckDetailsActivity extends BaseActivity {
         fragment.setArguments(bundle);
 
         replaceFragmentToActivity(manager, fragment, R.id.checkdetails_fragmentcontainer);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
     }
 }

@@ -29,7 +29,8 @@ public class TessTwoApi {
     TessBaseAPI tessBaseAPI;
     @Inject
     Context context;
-    private String language = "hun";//"eng";
+    private String language = "hun";
+    private String requiredTraineddata = language + ".traineddata";
     private String textResult;
     private String TAG = "Tesseract error";
 
@@ -44,17 +45,10 @@ public class TessTwoApi {
         component.injectTessTwoApi(this);
     }
 
-    public String startRecognition(Bitmap bitmap) {
+    public String startRecognition(Bitmap bitmap, String whiteList) {
 
         prepareTessData();
-        startOCR(bitmap);
-        return textResult;
-    }
-
-    public String startRecognitionWithByteArray(byte[] imagedata, int width, int height, int bytes_per_pixel, int bytes_per_line) {
-
-        prepareTessData();
-        startOCRWithByteArray(imagedata, width, height, bytes_per_pixel, bytes_per_line);
+        startOCR(bitmap, whiteList);
         return textResult;
     }
 
@@ -71,7 +65,7 @@ public class TessTwoApi {
             String fileList[] = context.getAssets().list("");
             for (String fileName : fileList) {
                 String pathToDataFile = dir + "/" + fileName;
-                if ((fileName.equals("eng.traineddata") || fileName.equals("hun.traineddata")) && !(new File(pathToDataFile)).exists()) {
+                if (fileName.equals(requiredTraineddata) && !(new File(pathToDataFile)).exists()) {
                     InputStream in = context.getAssets().open(fileName);
                     OutputStream out = new FileOutputStream(pathToDataFile);
                     byte[] buff = new byte[1024];
@@ -88,23 +82,15 @@ public class TessTwoApi {
         }
     }
 
-    private void startOCR(Bitmap bitmap) {
+    private void startOCR(Bitmap bitmap, String whiteList) {
         try {
-            textResult = this.getText(bitmap);
+            textResult = this.getText(bitmap, whiteList);
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
     }
 
-    private void startOCRWithByteArray(byte[] imagedata, int width, int height, int bytes_per_pixel, int bytes_per_line) {
-        try {
-            textResult = this.getTextWithByteArray(imagedata, width, height, bytes_per_pixel, bytes_per_line);
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-    }
-
-    private String getText(Bitmap bitmap) {
+    private String getText(Bitmap bitmap, String whiteList) {
         try {
             tessBaseAPI = new TessBaseAPI();
         } catch (Exception e) {
@@ -112,6 +98,9 @@ public class TessTwoApi {
         }
         String dataPath = context.getExternalFilesDir("/").getPath() + "/";
         tessBaseAPI.init(dataPath, language);
+        if (whiteList != null) {
+            tessBaseAPI.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, whiteList);
+        }
         tessBaseAPI.setImage(bitmap);
         String retStr = "No result";
         try {
@@ -122,27 +111,7 @@ public class TessTwoApi {
             Log.e(TAG, e.getMessage());
         }
         tessBaseAPI.end();
-        return retStr;
-    }
 
-    private String getTextWithByteArray(byte[] imagedata, int width, int height, int bytes_per_pixel, int bytes_per_line) {
-        try {
-            tessBaseAPI = new TessBaseAPI();
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-        String dataPath = context.getExternalFilesDir("/").getPath() + "/";
-        tessBaseAPI.init(dataPath, language);
-        tessBaseAPI.setImage(imagedata, width, height, bytes_per_pixel, bytes_per_line);
-        String retStr = "No result";
-        try {
-            Log.e("--------------", "STARTING RECOGNITION");
-            retStr = tessBaseAPI.getUTF8Text();
-            Log.e("--------------", "RECOGNITION ENDED");
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-        tessBaseAPI.end();
         return retStr;
     }
 }

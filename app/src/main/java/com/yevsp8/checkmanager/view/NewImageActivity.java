@@ -2,6 +2,7 @@ package com.yevsp8.checkmanager.view;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -50,6 +51,7 @@ public class NewImageActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_image);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         ImageProcessingComponent component = DaggerImageProcessingComponent.builder()
                 .contextModule(new ContextModule(this))
@@ -97,7 +99,11 @@ public class NewImageActivity extends BaseActivity {
                         "com.example.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                try {
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                } catch (Exception ex) {
+                    Log.e("CAM", ex.getMessage());
+                }
             }
         }
     }
@@ -108,15 +114,13 @@ public class NewImageActivity extends BaseActivity {
             File imgFile = new File(currentPhotoPath);
             if (imgFile.exists()) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inSampleSize = 2;
+                //options.inSampleSize = 2;
                 myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                 imageView.setImageBitmap(myBitmap);
-
             }
             buttonRecognise.setEnabled(true);
         }
     }
-
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -136,8 +140,6 @@ public class NewImageActivity extends BaseActivity {
         if (ContextCompat.checkSelfPermission(NewImageActivity.this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(NewImageActivity.this,
                     Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
@@ -146,7 +148,6 @@ public class NewImageActivity extends BaseActivity {
                 // sees the explanation, try again to request the permission.
 
             } else {
-
                 ActivityCompat.requestPermissions(NewImageActivity.this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
@@ -160,26 +161,14 @@ public class NewImageActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-
                     startRecognition();
-
                 } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                     buttonRecognise.setEnabled(false);
                 }
                 return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request.
         }
     }
 
@@ -194,13 +183,15 @@ public class NewImageActivity extends BaseActivity {
     }
 
     private void loadDemoImage() {
-        String imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/skew.jpg";
+        String imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
         currentPhotoPath = imagePath;
+
         BitmapFactory.Options options = new BitmapFactory.Options();
         //options.inSampleSize = 2;
         myBitmap = BitmapFactory.decodeFile(imagePath, options);
+        myBitmap = rotate(myBitmap);
         imageView = findViewById(R.id.captured_photo_imageView);
-        imageView.setImageBitmap(rotate(myBitmap));
+        imageView.setImageBitmap(myBitmap);
 
         buttonRecognise.setEnabled(true);
     }
@@ -208,7 +199,7 @@ public class NewImageActivity extends BaseActivity {
     private void startPreprocessing() {
 
         Bitmap b = processor.preProcessing(myBitmap, currentPhotoPath);
-        imageView.setImageBitmap(rotate(b));
+        imageView.setImageBitmap(b);
     }
 
     private Bitmap rotate(Bitmap source) {
@@ -219,6 +210,8 @@ public class NewImageActivity extends BaseActivity {
             Log.e("exif", ex.getLocalizedMessage());
         }
         int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+
+        Log.e("EXIF", String.valueOf(orientation));
 
         Matrix matrix = new Matrix();
         switch (orientation) {

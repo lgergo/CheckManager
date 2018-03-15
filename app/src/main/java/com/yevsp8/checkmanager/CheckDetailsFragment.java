@@ -59,6 +59,10 @@ public class CheckDetailsFragment extends Fragment {
                 .applicationModule(new ApplicationModule(getActivity().getApplication()))
                 .build();
         component.injectCheckViewModel(this);
+
+        Bundle args = getArguments();
+        checkId = args.getString("selected_check_id");
+        recognisedText = args.getStringArray("result_array");
     }
 
     @Override
@@ -76,14 +80,13 @@ public class CheckDetailsFragment extends Fragment {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckViewModel.class);
         viewModel.getCheckById(checkId).observe(this, new Observer<Check>() {
             @Override
-            public void onChanged(@Nullable Check check) {
+            public void onChanged(@Nullable Check checkParam) {
                 if (CheckDetailsFragment.this.check == null) {
-                    setTextViewValues(check);
+                    setTextViewValues(checkParam);
                 }
             }
         });
     }
-
 
     private void setTextViewValues(Check check) {
 
@@ -93,10 +96,7 @@ public class CheckDetailsFragment extends Fragment {
         //TODO google api meghívása
         button_upload = getActivity().findViewById(R.id.button_details_upload);
 
-        Bundle args = getArguments();
-        checkId = args.getString("selected_check_id");
-        recognisedText = args.getStringArray("result_array");
-        if (check == null) {
+        if (checkId == null) {
             //TODO valós adatokkal
             int amountValue;
             try {

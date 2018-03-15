@@ -17,7 +17,7 @@ import com.yevsp8.checkmanager.R;
 
 import javax.inject.Inject;
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
     @Inject
     protected Context context;
@@ -72,8 +72,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected String getValueFromSharedPreferences(String key) {
-        String value = sharedPreferences.getString(key, null);
 
-        return value;
+        return sharedPreferences.getString(key, null);
     }
 }
