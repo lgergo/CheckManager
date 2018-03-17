@@ -1,14 +1,20 @@
 package com.yevsp8.checkmanager.view;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.yevsp8.checkmanager.CheckListFragment;
 import com.yevsp8.checkmanager.GoogleApiActivity;
@@ -21,7 +27,7 @@ import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -50,26 +56,31 @@ public class MainActivity extends BaseActivity {
                 .build();
         component.injectMainActivity(this);
 
+        Toolbar toolbar = findViewById(R.id.toolbar_main);
+        setSupportActionBar(toolbar);
+
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckViewModel.class);
 
-        Date date = Calendar.getInstance().getTime();
-        viewModel.insertCheck(new Check("013018234", date.getTime(), 1250, "Főtáv", date.getTime(), false));
-        viewModel.insertCheck(new Check("471145743", date.getTime(), 1250, "Telekom", date.getTime(), false));
-        viewModel.insertCheck(new Check("963349038", date.getTime(), 8900, "Upc", date.getTime(), false));
-        viewModel.insertCheck(new Check("459231004", date.getTime(), 22340, "Közművek", date.getTime(), false));
+        //TODO demodata
+        long today = Calendar.getInstance().getTime().getTime();
+        String month = Calendar.getInstance().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+        viewModel.insertCheck(new Check("013018234", today, 1250, "Főtáv", month));
+        viewModel.insertCheck(new Check("471145743", today, 1250, "Telekom", month));
+        viewModel.insertCheck(new Check("963349038", today, 8900, "Upc", month));
+        viewModel.insertCheck(new Check("459231004", today, 22340, "Közművek", month));
 
         FragmentManager manager = getSupportFragmentManager();
         fragment = new CheckListFragment();
         replaceFragmentToActivity(manager, fragment, R.id.checklist_fragmentcontainer);
 
         latestSyncTextView = findViewById(R.id.latest_synch);
-        String lastSync = getValueFromSharedPreferences("last_sync");
+        String lastSync = getValueFromSharedPreferences(R.string.last_sync_value, R.string.last_sync_default);
         latestSyncTextView.setText("Legutoljára szinkronizálva: " + lastSync);
 
         newImageButton = findViewById(R.id.newImage_button);
         newImageButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(context, NewImageActivity.class);
+                Intent intent = new Intent(getApplicationContext(), NewImageActivity.class);
                 startActivity(intent);
             }
         });
@@ -91,13 +102,50 @@ public class MainActivity extends BaseActivity {
 //                GoogleApiProviderOld googleApi = GoogleApiProviderOld.getInstance(MainActivity.this);
 //                googleApi.createEmptyCompanyTemplate("újcég");
 
-                Intent intent = new Intent(context, GoogleApiActivity.class);
+                Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
                 startActivity(intent);
             }
         });
+
+        String val = getValueFromSharedPreferences(R.string.first_start_value, R.string.first_start_default);
+        if (val.equals("1")) {
+            showFirstStartAlertDialog();
+        }
     }
 
     public void updateGoogleApiTextView(String result) {
         googleApiResultTextView.setText(result);
+    }
+
+    private void showFirstStartAlertDialog() {
+        saveToSharedPreferences(R.string.sheetId_value, "0");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("CheckManager");
+        builder.setMessage("Hogy ki tudd használni a Google Sheets szinkronizációt, kérlek add meg a dokumentum azonosítóját.");
+        builder.setNegativeButton("Most nem", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast t = Toast.makeText(getApplicationContext(), "Később is lehetőséged lesz megadni a Beállítások menüpont alatt.", Toast.LENGTH_SHORT);
+                t.show();
+            }
+        });
+        builder.setPositiveButton("Megadom", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Intent settings = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(settings);
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 }

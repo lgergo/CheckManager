@@ -29,9 +29,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlaySe
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
@@ -41,6 +39,7 @@ import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.util.Enums.APICallType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ public class GoogleApiActivity extends Activity
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
     private static final String BUTTON_TEXT = "Call Google Sheets API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS};
+    //private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS};
     APICallType type;
     @Inject
     HttpTransport transport;
@@ -78,7 +77,7 @@ public class GoogleApiActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        type = APICallType.Get_data;
+        type = (APICallType) getIntent().getSerializableExtra("CallType");
 
         CheckManagerApplicationComponent component = DaggerCheckManagerApplicationComponent.builder()
                 .contextModule(new ContextModule(this))
@@ -126,10 +125,10 @@ public class GoogleApiActivity extends Activity
 
         setContentView(activityLayout);
 
-        // Initialize credentials and service object.
-        mCredential = GoogleAccountCredential.usingOAuth2(
-                getApplicationContext(), Arrays.asList(SCOPES))
-                .setBackOff(new ExponentialBackOff());
+//        // Initialize credentials and service object.
+//        mCredential = GoogleAccountCredential.usingOAuth2(
+//                getApplicationContext(), Arrays.asList(SCOPES))
+//                .setBackOff(new ExponentialBackOff());
     }
 
     /**
@@ -149,7 +148,6 @@ public class GoogleApiActivity extends Activity
             mOutputText.setText("No network connection available.");
         } else {
             switch (type) {
-
                 case Get_data:
                     new MakeRequestTask(transport, jsonFactory, mCredential).execute();
                     break;
@@ -390,14 +388,10 @@ public class GoogleApiActivity extends Activity
 
     enum MajorDimension {COLUMNS, ROWS}
 
-    public enum APICallType {Get_data, Update_data, CreateSheet}
 
     //region AsyncTasks
 
-    /**
-     * An asynchronous task that handles the Google Sheets API call.
-     * Placing the API calls in their own task ensures the UI stays responsive.
-     */
+
     private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;

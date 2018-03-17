@@ -6,13 +6,12 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
@@ -20,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.yevsp8.checkmanager.HelpFragment;
 import com.yevsp8.checkmanager.ImageProcessor;
 import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.di.ContextModule;
@@ -59,6 +59,10 @@ public class NewImageActivity extends BaseActivity {
                 .build();
 
         component.injectNewImageActivtiy(this);
+
+        FragmentManager manager = getSupportFragmentManager();
+        HelpFragment fragment = new HelpFragment();
+        replaceFragmentToActivity(manager, fragment, R.id.helpText_framgentContainer);
 
         buttonTakePhoto = findViewById(R.id.button_capture_photo);
         buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
@@ -116,6 +120,7 @@ public class NewImageActivity extends BaseActivity {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 //options.inSampleSize = 2;
                 myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                //        myBitmap = processor.rotate(myBitmap,currentPhotoPath);
                 imageView.setImageBitmap(myBitmap);
             }
             buttonRecognise.setEnabled(true);
@@ -183,13 +188,13 @@ public class NewImageActivity extends BaseActivity {
     }
 
     private void loadDemoImage() {
-        String imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
+        String imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/skew.jpg";
         currentPhotoPath = imagePath;
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         //options.inSampleSize = 2;
         myBitmap = BitmapFactory.decodeFile(imagePath, options);
-        myBitmap = rotate(myBitmap);
+        myBitmap = processor.rotate(myBitmap, currentPhotoPath);
         imageView = findViewById(R.id.captured_photo_imageView);
         imageView.setImageBitmap(myBitmap);
 
@@ -197,54 +202,7 @@ public class NewImageActivity extends BaseActivity {
     }
 
     private void startPreprocessing() {
-
         Bitmap b = processor.preProcessing(myBitmap, currentPhotoPath);
         imageView.setImageBitmap(b);
-    }
-
-    private Bitmap rotate(Bitmap source) {
-        ExifInterface exif = null;
-        try {
-            exif = new ExifInterface(currentPhotoPath);
-        } catch (IOException ex) {
-            Log.e("exif", ex.getLocalizedMessage());
-        }
-        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-
-        Log.e("EXIF", String.valueOf(orientation));
-
-        Matrix matrix = new Matrix();
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_NORMAL:
-                return source;
-            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
-                matrix.setScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                matrix.setRotate(180);
-                break;
-            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
-                matrix.setRotate(180);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_TRANSPOSE:
-                matrix.setRotate(90);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                matrix.setRotate(90);
-                break;
-            case ExifInterface.ORIENTATION_TRANSVERSE:
-                matrix.setRotate(-90);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                matrix.setRotate(-90);
-                break;
-            default:
-                return source;
-        }
-        Bitmap result = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-        return result;
     }
 }

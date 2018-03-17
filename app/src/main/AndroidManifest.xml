@@ -20,20 +20,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.MainActivity">
+        <activity
+            android:name=".view.MainActivity"
+            android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".view.CheckDetailsActivity"
-            android:label="@string/title_activity_check_details"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_check_details" />
         <activity android:name=".view.NewImageActivity" />
         <activity android:name=".GoogleApiActivity" />
-        <activity android:name=".view.RecognisedCheckActivity" />
+        <activity
+            android:name=".view.SettingsActivity"
+            android:label="@string/title_activity_settings" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -44,9 +46,5 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <activity android:name=".view.SettingsActivity" />
-        <activity android:name=".view.BaseActivity"></activity>
     </application>
-
 </manifest>

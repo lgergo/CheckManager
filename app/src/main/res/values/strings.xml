@@ -3,6 +3,14 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_check_details">CheckDetailsActivity</string>
-    <string name="sheetId"></string>
-    <string name="last_sync"></string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_main">Dashboard</string>
+    <string name="helpText">Fontos tudnivalók a kép készítése során: </string>
+
+    <string name="last_sync_default">Még nem szinkronizált</string>
+    <string name="last_sync_value">2018.01.01</string>
+    <string name="first_start_default">1</string>
+    <string name="first_start_value">1</string>
+    <string name="sheetId_default">Üres</string>
+    <string name="sheetId_value"></string>
 </resources>

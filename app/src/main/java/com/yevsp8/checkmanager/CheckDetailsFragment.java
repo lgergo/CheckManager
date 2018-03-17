@@ -3,6 +3,7 @@ package com.yevsp8.checkmanager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,7 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.yevsp8.checkmanager.data.Check;
 import com.yevsp8.checkmanager.di.ApplicationModule;
@@ -18,7 +20,11 @@ import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.util.Converter;
+import com.yevsp8.checkmanager.util.Enums;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
+
+import java.util.Calendar;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -32,14 +38,14 @@ public class CheckDetailsFragment extends Fragment {
     String checkId;
     String[] recognisedText;
 
-    TextView id;
-    TextView created;
-    TextView amount;
-    TextView paidto;
-    TextView paiddate;
-    TextView isuploaded;
+    EditText id;
+    EditText created;
+    EditText amount;
+    EditText paidto;
+    EditText paiddate;
 
-    Button button_edit;
+    boolean isSaveEnabled = false;
+    Button button_edit_save;
     Button button_upload;
 
     @Inject
@@ -59,10 +65,6 @@ public class CheckDetailsFragment extends Fragment {
                 .applicationModule(new ApplicationModule(getActivity().getApplication()))
                 .build();
         component.injectCheckViewModel(this);
-
-        Bundle args = getArguments();
-        checkId = args.getString("selected_check_id");
-        recognisedText = args.getStringArray("result_array");
     }
 
     @Override
@@ -70,6 +72,29 @@ public class CheckDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_check_details, container, false);
+
+        Bundle args = getArguments();
+        checkId = args.getString("selected_check_id");
+        recognisedText = args.getStringArray("result_array");
+
+        button_edit_save = rootView.findViewById(R.id.button_details_edit_save);
+        button_edit_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isSaveEnabled = !isSaveEnabled;
+                setEditingTo();
+            }
+        });
+
+
+        button_upload = rootView.findViewById(R.id.button_details_upload);
+        button_upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkBeforeUpload();
+            }
+        });
+
         return rootView;
     }
 
@@ -92,19 +117,17 @@ public class CheckDetailsFragment extends Fragment {
 
         CheckDetailsFragment.this.check = check;
 
-        button_edit = getActivity().findViewById(R.id.button_details_edit);
-        //TODO google api meghívása
-        button_upload = getActivity().findViewById(R.id.button_details_upload);
-
         if (checkId == null) {
-            //TODO valós adatokkal
             int amountValue;
+            String trimmed = recognisedText[1].replaceAll("(\\*| )", "");
             try {
-                amountValue = Integer.getInteger(recognisedText[1]);
+                amountValue = Integer.getInteger(trimmed);
             } catch (Exception ex) {
                 amountValue = 0;
             }
-            check = new Check(recognisedText[0], 20180303, amountValue, recognisedText[2], 20180303, false);
+            long today = Calendar.getInstance().getTime().getTime();
+            String month = Calendar.getInstance().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+            check = new Check(recognisedText[0], today, amountValue, recognisedText[2], month);
         }
 
         id = rootView.findViewById(R.id.check_details_id);
@@ -112,13 +135,35 @@ public class CheckDetailsFragment extends Fragment {
         amount = rootView.findViewById(R.id.check_details_amount);
         paidto = rootView.findViewById(R.id.check_details_paidto);
         paiddate = rootView.findViewById(R.id.check_details_paiddate);
-        isuploaded = rootView.findViewById(R.id.check_details_isUploaded);
 
         id.setText(check.getCheckId());
         created.setText(Converter.longDateToString(check.getCreationDate()));
         amount.setText(String.valueOf(check.getAmount()));
         paidto.setText(check.getPaidTo());
-        paiddate.setText(Converter.longDateToString(check.getPaidDate()));
-        isuploaded.setText(check.getIsUploaded() ? "igen" : "nem");
+        paiddate.setText(check.getPaidDate());
+    }
+
+    private void setEditingTo() {
+        id.setEnabled(isSaveEnabled);
+        amount.setEnabled(isSaveEnabled);
+        paidto.setEnabled(isSaveEnabled);
+        paiddate.setEnabled(isSaveEnabled);
+        button_upload.setEnabled(!isSaveEnabled);
+        if (isSaveEnabled) {
+            button_edit_save.setText("Save");
+        } else {
+            button_edit_save.setText("Edit");
+        }
+    }
+
+    private void checkBeforeUpload() {
+        if (id.getText().length() > 0 && amount.getText().length() > 0 && paidto.getText().length() > 0 && paiddate.getText().length() > 0) {
+            Intent intent = new Intent(getContext(), GoogleApiActivity.class);
+            intent.putExtra("callType", Enums.APICallType.Update_data);
+            startActivity(intent);
+        } else {
+            Toast t = Toast.makeText(getContext(), "Üres mezővel nem lehetséges a feltöltés!", Toast.LENGTH_LONG);
+            t.show();
+        }
     }
 }

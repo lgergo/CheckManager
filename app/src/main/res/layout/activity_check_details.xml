@@ -4,9 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <include
+        android:id="@+id/toolbar_checkDetails"
+        layout="@layout/toolbar_base"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <FrameLayout
         android:id="@+id/checkdetails_fragmentcontainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_checkDetails" />
 
 </RelativeLayout>

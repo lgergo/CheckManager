@@ -8,7 +8,7 @@
 
 
     <FrameLayout
-        android:id="@+id/fragmentContainer_checkDetails"
+        android:id="@+id/helpText_framgentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -2,6 +2,8 @@ package com.yevsp8.checkmanager;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.util.Log;
 
 import com.yevsp8.checkmanager.di.ContextModule;
@@ -27,6 +29,8 @@ import org.opencv.utils.Converters;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -37,6 +41,9 @@ import javax.inject.Inject;
 
 public class ImageProcessor {
 
+
+    //TODO tesseract függőség a newImageActivtiy-be
+
     @Inject
     TessTwoApi tessTwoApi;
     String checkIdResult;
@@ -44,6 +51,7 @@ public class ImageProcessor {
     String paidToResult;
     String imagePath;
     Bitmap bitmap;
+    Bitmap toTestOnly;
     Mat src;
     Mat corrected;
     Mat dest;
@@ -80,48 +88,59 @@ public class ImageProcessor {
         Mat contoured = drawContours(src);
         Mat cornersOfContour = correctPerspective(contoured);
         corrected = warp(src, cornersOfContour);
+        //corrected=contoured;
 
         Bitmap output = Bitmap.createBitmap(corrected.cols(), corrected.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(corrected, output);
 
+
         //---------------------
 
-        //Mat rect = getRectOfPaidTo(corrected);
-//        Core.bitwise_not(rect,rect);
-//        Mat erode=Mat.zeros(new Size(3,3),Imgproc.MORPH_RECT);
-//        Imgproc.erode(rect,rect,erode);
-//        Mat dilate=Mat.ones(new Size(3,3),Imgproc.MORPH_RECT);
-//        Imgproc.dilate(rect,rect,dilate);
+//        Mat rect = getRectOfAmount(corrected);
+//         preprocessForRectImages(rect,1,1);
+//
 //        Bitmap output = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
 //        Utils.matToBitmap(rect, output);
+//
+//        toTestOnly=output;
 
         Log.e("Preprocess", "PREPROCESSING ENDED");
         return output;
     }
 
     public String[] recognition() {
-//
-//        String reuslt = tessTwoApi.startRecognition(toTestOnly);
+
+//        String reuslt = tessTwoApi.startRecognition(toTestOnly,"0123456789*");
 //        return new String[]{reuslt, "-", "-"};
 
-//        //TODO külön szálon fusson
+        //TODO külön szálon fusson
         Mat rect = getRectOfCheckId(corrected);
-        adaptiveThreshold(rect, rect);
+        preprocessForRectImages(rect, 5, 3);
         Bitmap rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rect, rectBitmapTemp);
         checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789");
 
         rect = getRectOfAmount(corrected);
+        preprocessForRectImages(rect, 1, 1);
         rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rect, rectBitmapTemp);
-        amountResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789*<>");
+        amountResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789*");
 
         rect = getRectOfPaidTo(corrected);
+        preprocessForRectImages(rect, 5, 3);
         rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rect, rectBitmapTemp);
         paidToResult = tessTwoApi.startRecognition(rectBitmapTemp, null);
 
         return new String[]{checkIdResult, amountResult, paidToResult};
+    }
+
+    private void preprocessForRectImages(Mat rect, int erodeSize, int dilateSize) {
+        Core.bitwise_not(rect, rect);
+        Mat erode = Mat.ones(new Size(erodeSize, erodeSize), Imgproc.MORPH_RECT);
+        Imgproc.erode(rect, rect, erode);
+        Mat dilate = Mat.zeros(new Size(dilateSize, dilateSize), Imgproc.MORPH_RECT);
+        Imgproc.dilate(rect, rect, dilate);
     }
 
     private void gammaCorrection(Mat source, Mat destination) {
@@ -142,18 +161,6 @@ public class ImageProcessor {
         return contoured;
     }
 
-    private void adaptiveThreshold(Mat source, Mat destination) {
-        Imgproc.adaptiveThreshold(source, destination, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.ADAPTIVE_THRESH_MEAN_C, 207, 3);
-    }
-
-    private void canny(Mat source) {
-        double mean = getMatMean(source);
-        double sigma = 0.33;
-        int lowThreshold = (int) Math.max(0, (1.0 - sigma) * mean);
-        int highThreshold = (int) Math.max(255, (1.0 + sigma) * mean);
-        Imgproc.Canny(source, source, lowThreshold, highThreshold);
-    }
-
     private double getMatMean(Mat meanToGet) {
         Scalar meanScalar = Core.mean(meanToGet);
         return meanScalar.val[0];
@@ -167,7 +174,7 @@ public class ImageProcessor {
         Imgproc.findContours(tempSrc, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
         double maxArea = -1;
-        MatOfPoint temp_contour = contours.get(0); // the largest is at the index 0 for starting point
+        MatOfPoint temp_contour = contours.get(0);
         MatOfPoint2f approxCurve = new MatOfPoint2f();
 
         for (int idx = 0; idx < contours.size(); idx++) {
@@ -201,8 +208,19 @@ public class ImageProcessor {
         source.add(p2);
         source.add(p3);
         source.add(p4);
+        reorderRectClockwise(source);
 
         return Converters.vector_Point2f_to_Mat(source);
+    }
+
+    private void reorderRectClockwise(List<Point> points) {
+        Collections.sort(points, new Comparator<Point>() {
+
+            public int compare(Point p1, Point p2) {
+                return Double.compare(p1.x + p1.y, p2.x + p2.y);
+            }
+        });
+        Collections.swap(points, 2, 3);
     }
 
     private Mat warp(Mat inputMat, Mat cornerPoints) {
@@ -214,18 +232,6 @@ public class ImageProcessor {
         Point p2 = new Point(resultWidth, 0);
         Point p3 = new Point(resultWidth, resultHeight);
         Point p4 = new Point(0, resultHeight);
-
-        //más telefonokon?
-//        if (inputMat.height() > inputMat.width()) {
-//            // int temp = resultWidth;
-//            // resultWidth = resultHeight;
-//            // resultHeight = temp;
-//
-//            p3 = new Point(0, 0);
-//            p4 = new Point(0, resultHeight);
-//            p1 = new Point(resultWidth, resultHeight);
-//            p2 = new Point(resultWidth, 0);
-//        }
 
         List<Point> dest = new ArrayList<Point>();
         dest.add(p1);
@@ -258,8 +264,8 @@ public class ImageProcessor {
     }
 
     private Mat getRectOfAmount(Mat image) {
-        Point p1 = new Point(image.cols() * Constants.Check_Amount_Right_DistFrom_Right, image.rows() * Constants.Check_Amount_Top_DistFrom_Top);
-        Point p2 = new Point(image.cols(), image.rows() * Constants.Check_Amount_Bottom_DistFrom_Top);
+        Point p1 = new Point(image.cols() * Constants.Check_Amount_Left_DistFrom_Left, image.rows() * Constants.Check_Amount_Top_DistFrom_Top);
+        Point p2 = new Point(image.cols() * Constants.Check_Amount_Right_DistFrom_Left, image.rows() * Constants.Check_Amount_Bottom_DistFrom_Top);
         return getMatOfRect(image, p1, p2);
     }
 
@@ -292,7 +298,51 @@ public class ImageProcessor {
                 e.printStackTrace();
             }
         }
+    }
 
+    public Bitmap rotate(Bitmap source, String currentPhotoPath) {
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(currentPhotoPath);
+        } catch (IOException ex) {
+            Log.e("exif", ex.getLocalizedMessage());
+        }
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
 
+        Log.e("EXIF", String.valueOf(orientation));
+
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                return source;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.setScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.setRotate(180);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.setRotate(90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return source;
+        }
+        Bitmap result = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+        return result;
     }
 }

@@ -18,16 +18,14 @@ public class Check {
     private long creationDate;
     private int amount;
     private String paidTo;
-    private long paidDate;
-    private boolean isUploaded;
+    private String paidDate;
 
-    public Check(String checkId, long creationDate, int amount, String paidTo, long paidDate, boolean isUploaded) {
+    public Check(String checkId, long creationDate, int amount, String paidTo, String paidDate) {
         this.checkId = checkId;
         this.creationDate = creationDate;
         this.amount = amount;
         this.paidTo = paidTo;
         this.paidDate = paidDate;
-        this.isUploaded = isUploaded;
     }
 
     public String getCheckId() {
@@ -46,12 +44,8 @@ public class Check {
         return paidTo;
     }
 
-    public long getPaidDate() {
+    public String getPaidDate() {
         return paidDate;
-    }
-
-    public boolean getIsUploaded() {
-        return isUploaded;
     }
 }
 

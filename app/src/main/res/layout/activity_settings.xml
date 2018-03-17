@@ -5,10 +5,17 @@
     android:layout_height="match_parent"
     tools:context="com.yevsp8.checkmanager.view.SettingsActivity">
 
+    <include
+        android:id="@+id/toolbar_settings"
+        layout="@layout/toolbar_base"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/textView_sheetId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_settings"
         android:textSize="16sp"
         android:textStyle="bold" />
 

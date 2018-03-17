@@ -1,6 +1,5 @@
 package com.yevsp8.checkmanager.view;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,28 +14,23 @@ import android.view.MenuItem;
 
 import com.yevsp8.checkmanager.R;
 
-import javax.inject.Inject;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    @Inject
-    protected Context context;
-    protected SharedPreferences sharedPreferences;
+    static SharedPreferences sharedPref;
 
     public void replaceFragmentToActivity(FragmentManager manager, Fragment fragment, int frameId) {
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(frameId, fragment);
-        //transaction.addToBackStack(null);
         transaction.commit();
-        //manager.executePendingTransactions();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
-
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
+        sharedPref = getSharedPreferences("App", MODE_PRIVATE);
     }
 
     @Override
@@ -55,24 +49,25 @@ public abstract class BaseActivity extends AppCompatActivity {
 
                 break;
             case R.id.menu_settings:
-                Intent settings = new Intent(context, SettingsActivity.class);
+                Intent settings = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(settings);
                 break;
             case R.id.menu_home:
-                Intent home = new Intent(context, MainActivity.class);
+                Intent home = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(home);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    protected void saveToSharedPreferences(String key, String value) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(key, value);
+    protected void saveToSharedPreferences(int key, String value) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(key), value);
         editor.apply();
     }
 
-    protected String getValueFromSharedPreferences(String key) {
-
-        return sharedPreferences.getString(key, null);
+    protected String getValueFromSharedPreferences(int key, int defaultValue) {
+        boolean i = sharedPref.contains(getString(key));
+        return sharedPref.getString(getString(key), getString(defaultValue));
     }
 }

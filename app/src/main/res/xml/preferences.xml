@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference>
+        android:key="@string/last_sync_value"
+        android:defaultValue="@string/last_sync_default"
+    </Preference>
+    <Preference>
+        android:key="@string/first_start_value"
+        android:defaultValue="@string/first_start_default"
+    </Preference>
+</PreferenceScreen>
