@@ -53,8 +53,8 @@ public class ImageProcessor {
     Bitmap bitmap;
     Bitmap toTestOnly;
     Mat src;
+    Mat checkRect;
     Mat corrected;
-    Mat dest;
 
     public ImageProcessor(Context context) {
         ImageProcessingComponent component = DaggerImageProcessingComponent.builder()
@@ -76,19 +76,35 @@ public class ImageProcessor {
         imagePath = filePath;
 
         src = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
-        corrected = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
-        dest = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
         Utils.bitmapToMat(rawBitmap, src);
-
         Imgproc.cvtColor(src, src, Imgproc.COLOR_BGR2GRAY);
-        gammaCorrection(src, src);
-        Imgproc.equalizeHist(src, src);
-        Imgproc.threshold(src, src, getMatMean(src), 256, Imgproc.THRESH_BINARY);
 
-        Mat contoured = drawContours(src);
-        Mat cornersOfContour = correctPerspective(contoured);
+        checkRect = src.clone();
+        corrected = src.clone();
+        // innentől kétféle kép , egyik a csekk rect megtalálásához
+        // másik pedig majd a szöveg rect-ek felismeréséhez
+//
+        // gammaCorrection(checkRect, checkRect);
+        Imgproc.medianBlur(checkRect, checkRect, 7);
+
+
+        Imgproc.equalizeHist(checkRect, checkRect);
+        //Imgproc.Laplacian(checkRect,checkRect,CvType.CV_8UC1);
+        //Imgproc.adaptiveThreshold(checkRect,checkRect,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,21,2);
+
+//        Mat kernel= Mat.ones(5,5,CvType.CV_8UC1);
+//        Imgproc.morphologyEx(checkRect,checkRect,Imgproc.MORPH_OPEN,kernel);
+
+
+        Imgproc.threshold(checkRect, checkRect, getMatMean(checkRect), 256, Imgproc.THRESH_BINARY);
+
+
+        List<MatOfPoint> contours = new ArrayList<>();
+        findAndSetContoursList(checkRect, contours);
+        Mat contoured = drawContours(checkRect, contours);
+        Mat cornersOfContour = getCorrectedPerspectiveRectPoints(contours);
         corrected = warp(src, cornersOfContour);
-        //corrected=contoured;
+        //corrected=checkRect;
 
         Bitmap output = Bitmap.createBitmap(corrected.cols(), corrected.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(corrected, output);
@@ -115,7 +131,7 @@ public class ImageProcessor {
 
         //TODO külön szálon fusson
         Mat rect = getRectOfCheckId(corrected);
-        preprocessForRectImages(rect, 5, 3);
+        preprocessForRectImages(rect, 3, 3);
         Bitmap rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rect, rectBitmapTemp);
         checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789");
@@ -127,15 +143,18 @@ public class ImageProcessor {
         amountResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789*");
 
         rect = getRectOfPaidTo(corrected);
-        preprocessForRectImages(rect, 5, 3);
+        preprocessForRectImages(rect, 3, 3);
         rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rect, rectBitmapTemp);
-        paidToResult = tessTwoApi.startRecognition(rectBitmapTemp, null);
+        String paidToResultLines = tessTwoApi.startRecognition(rectBitmapTemp, null);
+        String[] resultLines = paidToResultLines.split("\n");
+        paidToResult = resultLines[0];
 
         return new String[]{checkIdResult, amountResult, paidToResult};
     }
 
     private void preprocessForRectImages(Mat rect, int erodeSize, int dilateSize) {
+        Imgproc.threshold(checkRect, checkRect, 0, 256, Imgproc.THRESH_OTSU);
         Core.bitwise_not(rect, rect);
         Mat erode = Mat.ones(new Size(erodeSize, erodeSize), Imgproc.MORPH_RECT);
         Imgproc.erode(rect, rect, erode);
@@ -152,28 +171,28 @@ public class ImageProcessor {
         Core.LUT(source, lut, destination);
     }
 
-    private Mat drawContours(Mat source) {
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat tempSrc = source.clone();
-        Mat contoured = new Mat(tempSrc.rows(), tempSrc.cols(), CvType.CV_8UC1);
-        Imgproc.findContours(tempSrc, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        Imgproc.drawContours(contoured, contours, -1, new Scalar(255), 5);
-        return contoured;
-    }
-
     private double getMatMean(Mat meanToGet) {
         Scalar meanScalar = Core.mean(meanToGet);
         return meanScalar.val[0];
     }
 
-    private Mat correctPerspective(Mat toCorrect) {
+    private void findAndSetContoursList(Mat source, List<MatOfPoint> contours) {
+        Imgproc.findContours(source, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+    }
+
+    private Mat drawContours(Mat source, List<MatOfPoint> contours) {
+        Mat tempSrc = source.clone();
+        Mat contoured = new Mat(tempSrc.rows(), tempSrc.cols(), CvType.CV_8UC1);
+        Imgproc.drawContours(contoured, contours, -1, new Scalar(255), 5);
+        return contoured;
+    }
+
+
+    private Mat getCorrectedPerspectiveRectPoints(List<MatOfPoint> contours) {
 
         double threshold = 0.1;
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat tempSrc = toCorrect.clone();
-        Imgproc.findContours(tempSrc, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        double maxArea = -1;
+        double maxArea = 1;
         MatOfPoint temp_contour = contours.get(0);
         MatOfPoint2f approxCurve = new MatOfPoint2f();
 

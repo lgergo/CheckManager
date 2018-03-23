@@ -41,4 +41,28 @@
         android:layout_below="@id/editText_settings_sheetId"
         android:text="Test your connection" />
 
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/company1_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button_settings_test"
+        android:text="Víz: " />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/company1_fromDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button_settings_test"
+        android:layout_centerHorizontal="true"
+        android:text="dátum" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/company1_toDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/button_settings_test"
+        android:text="dátum" />
+
+
 </RelativeLayout>

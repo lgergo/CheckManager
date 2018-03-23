@@ -1,8 +1,10 @@
 package com.yevsp8.checkmanager;
 
+import android.app.AlertDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -24,37 +26,28 @@ import com.yevsp8.checkmanager.util.Enums;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import java.util.Calendar;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class CheckDetailsFragment extends Fragment {
 
+    static final int UPLOAD_REQUEST_CODE = 2;
     View rootView;
     Check check;
     String checkId;
     String[] recognisedText;
-
     EditText id;
     EditText created;
     EditText amount;
     EditText paidto;
     EditText paiddate;
-
     boolean isSaveEnabled = false;
     Button button_edit_save;
     Button button_upload;
-
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     CheckViewModel viewModel;
-
-
-    public CheckDetailsFragment() {
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,7 +63,6 @@ public class CheckDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_check_details, container, false);
 
         Bundle args = getArguments();
@@ -95,6 +87,12 @@ public class CheckDetailsFragment extends Fragment {
             }
         });
 
+        id = rootView.findViewById(R.id.check_details_id);
+        created = rootView.findViewById(R.id.check_details_create);
+        amount = rootView.findViewById(R.id.check_details_amount);
+        paidto = rootView.findViewById(R.id.check_details_paidto);
+        paiddate = rootView.findViewById(R.id.check_details_paiddate);
+
         return rootView;
     }
 
@@ -108,6 +106,7 @@ public class CheckDetailsFragment extends Fragment {
             public void onChanged(@Nullable Check checkParam) {
                 if (CheckDetailsFragment.this.check == null) {
                     setTextViewValues(checkParam);
+                    //TODO loop ban mindig meghívja
                 }
             }
         });
@@ -118,23 +117,21 @@ public class CheckDetailsFragment extends Fragment {
         CheckDetailsFragment.this.check = check;
 
         if (checkId == null) {
-            int amountValue;
+            int amountValue = 0;
             String trimmed = recognisedText[1].replaceAll("(\\*| )", "");
             try {
-                amountValue = Integer.getInteger(trimmed);
+                amountValue = Integer.parseInt(trimmed);
             } catch (Exception ex) {
-                amountValue = 0;
+                amountValue = -1;
             }
             long today = Calendar.getInstance().getTime().getTime();
-            String month = Calendar.getInstance().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
-            check = new Check(recognisedText[0], today, amountValue, recognisedText[2], month);
+            //String month = Calendar.getInstance().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+            check = new Check(recognisedText[0], today, amountValue, recognisedText[2], Converter.longDateToString(today));
+            //TODO sikertelen isnert
+            viewModel.insertCheck(check);
         }
 
-        id = rootView.findViewById(R.id.check_details_id);
-        created = rootView.findViewById(R.id.check_details_create);
-        amount = rootView.findViewById(R.id.check_details_amount);
-        paidto = rootView.findViewById(R.id.check_details_paidto);
-        paiddate = rootView.findViewById(R.id.check_details_paiddate);
+
 
         id.setText(check.getCheckId());
         created.setText(Converter.longDateToString(check.getCreationDate()));
@@ -153,17 +150,44 @@ public class CheckDetailsFragment extends Fragment {
             button_edit_save.setText("Save");
         } else {
             button_edit_save.setText("Edit");
+            long creationDate = check.getCreationDate();
+            check = new Check(id.getText().toString(), creationDate, Integer.parseInt(amount.getText().toString()), paidto.getText().toString(), paiddate.getText().toString());
         }
     }
 
     private void checkBeforeUpload() {
         if (id.getText().length() > 0 && amount.getText().length() > 0 && paidto.getText().length() > 0 && paiddate.getText().length() > 0) {
+
+            //TODO check null vmiért
             Intent intent = new Intent(getContext(), GoogleApiActivity.class);
             intent.putExtra("callType", Enums.APICallType.Update_data);
-            startActivity(intent);
+            String[] param = viewModel.checkDetailsToGoogleRequestFormat(check);
+            intent.putExtra("result_array", param);
+            startActivityForResult(intent, UPLOAD_REQUEST_CODE);
         } else {
             Toast t = Toast.makeText(getContext(), "Üres mezővel nem lehetséges a feltöltés!", Toast.LENGTH_LONG);
             t.show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == UPLOAD_REQUEST_CODE) {
+            if (resultCode == 1) {
+                //TODO sikertelen törlés
+                viewModel.deleteCheck(check);
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Google");
+            builder.setMessage(data.getStringExtra("result"));
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.cancel();
+                }
+            });
+            builder.show();
         }
     }
 }

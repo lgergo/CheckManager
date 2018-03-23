@@ -26,7 +26,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/check_details_title"
-        android:enabled="false" />
+        android:enabled="false"
+        android:inputType="number" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/check_details_create_label"
@@ -56,7 +57,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/check_details_create"
-        android:enabled="false" />
+        android:enabled="false"
+        android:inputType="number" />
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/check_details_paidto_label"

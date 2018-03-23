@@ -25,6 +25,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         transaction.commit();
     }
 
+    public void removeFragmentFromActivtiy(FragmentManager manager, Fragment fragment) {
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.remove(fragment);
+        transaction.commit();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

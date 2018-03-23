@@ -47,6 +47,8 @@ public class NewImageActivity extends BaseActivity {
     private Bitmap myBitmap;
     private String currentPhotoPath;
 
+    private HelpFragment fragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +63,7 @@ public class NewImageActivity extends BaseActivity {
         component.injectNewImageActivtiy(this);
 
         FragmentManager manager = getSupportFragmentManager();
-        HelpFragment fragment = new HelpFragment();
+        fragment = new HelpFragment();
         replaceFragmentToActivity(manager, fragment, R.id.helpText_framgentContainer);
 
         buttonTakePhoto = findViewById(R.id.button_capture_photo);
@@ -124,6 +126,8 @@ public class NewImageActivity extends BaseActivity {
                 imageView.setImageBitmap(myBitmap);
             }
             buttonRecognise.setEnabled(true);
+            FragmentManager manager = getSupportFragmentManager();
+            removeFragmentFromActivtiy(manager, fragment);
         }
     }
 
@@ -199,6 +203,9 @@ public class NewImageActivity extends BaseActivity {
         imageView.setImageBitmap(myBitmap);
 
         buttonRecognise.setEnabled(true);
+
+        FragmentManager manager = getSupportFragmentManager();
+        removeFragmentFromActivtiy(manager, fragment);
     }
 
     private void startPreprocessing() {

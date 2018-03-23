@@ -2,7 +2,6 @@ package com.yevsp8.checkmanager;
 
 import android.Manifest;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -13,13 +12,11 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -30,8 +27,14 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.model.AddSheetRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
+import com.google.api.services.sheets.v4.model.Request;
+import com.google.api.services.sheets.v4.model.Sheet;
+import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -40,6 +43,7 @@ import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.util.Enums.APICallType;
+import com.yevsp8.checkmanager.view.BaseActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,15 +55,15 @@ import javax.inject.Inject;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class GoogleApiActivity extends Activity
+public class GoogleApiActivity extends BaseActivity
         implements EasyPermissions.PermissionCallbacks {
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
-    private static final String BUTTON_TEXT = "Call Google Sheets API";
+    static final int UPDATED_CELL_COUNT = 3;
+    static final int CREATED_COMPANY_CELL_COUNT = 16;
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    //private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS};
     APICallType type;
     @Inject
     HttpTransport transport;
@@ -69,15 +73,14 @@ public class GoogleApiActivity extends Activity
     GoogleAccountCredential mCredential;
     ProgressDialog mProgress;
     private String spreadsheetId = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
-    private String sheetName = "Cég1!";
     private TextView mOutputText;
-    private Button mCallApiButton;
+    private int requestCode = -1;
+    private String[] checkDetailsdataArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        type = (APICallType) getIntent().getSerializableExtra("CallType");
+        setContentView(R.layout.activity_google_api);
 
         CheckManagerApplicationComponent component = DaggerCheckManagerApplicationComponent.builder()
                 .contextModule(new ContextModule(this))
@@ -85,50 +88,32 @@ public class GoogleApiActivity extends Activity
                 .build();
         component.injectGooglaApiActivity(this);
 
+        type = (APICallType) getIntent().getSerializableExtra("callType");
+        checkDetailsdataArray = getIntent().getStringArrayExtra("result_array");
 
-        LinearLayout activityLayout = new LinearLayout(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        activityLayout.setLayoutParams(lp);
-        activityLayout.setOrientation(LinearLayout.VERTICAL);
-        activityLayout.setPadding(16, 16, 16, 16);
-
-        ViewGroup.LayoutParams tlp = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        mCallApiButton = new Button(this);
-        mCallApiButton.setText(BUTTON_TEXT);
-        mCallApiButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCallApiButton.setEnabled(false);
-                mOutputText.setText("");
-                callGoogleApi(type);
-                mCallApiButton.setEnabled(true);
-            }
-        });
-        activityLayout.addView(mCallApiButton);
-
-        mOutputText = new TextView(this);
-        mOutputText.setLayoutParams(tlp);
-        mOutputText.setPadding(16, 16, 16, 16);
-        mOutputText.setVerticalScrollBarEnabled(true);
-        mOutputText.setMovementMethod(new ScrollingMovementMethod());
-        mOutputText.setText(
-                "Click the \'" + BUTTON_TEXT + "\' button to test the API.");
-        activityLayout.addView(mOutputText);
+        Toolbar toolbar = findViewById(R.id.toolbar_checkDetails);
+        setSupportActionBar(toolbar);
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Sheets API ...");
 
-        setContentView(activityLayout);
+        mOutputText = findViewById(R.id.googleApiResult_textView);
 
-//        // Initialize credentials and service object.
-//        mCredential = GoogleAccountCredential.usingOAuth2(
-//                getApplicationContext(), Arrays.asList(SCOPES))
-//                .setBackOff(new ExponentialBackOff());
+        callGoogleApi(type);
+
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("result", mOutputText.getText());
+        setResult(requestCode);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -149,13 +134,13 @@ public class GoogleApiActivity extends Activity
         } else {
             switch (type) {
                 case Get_data:
-                    new MakeRequestTask(transport, jsonFactory, mCredential).execute();
+                    new GetDataTask(transport, jsonFactory, mCredential).execute();
                     break;
                 case Update_data:
-                    new UpdateRequestTask(transport, jsonFactory, mCredential).execute();
+                    new UpdateRequestTask(transport, jsonFactory, mCredential).execute(checkDetailsdataArray);
                     break;
                 case CreateSheet:
-                    new CreateSheetRequestTask(transport, jsonFactory, mCredential).execute();
+                    //new CreateSheetRequestTask(transport, jsonFactory, mCredential).execute();
             }
         }
     }
@@ -248,42 +233,6 @@ public class GoogleApiActivity extends Activity
                 break;
         }
     }
-
-//    public void getResultsFromApi() {
-//        if (!isGooglePlayServicesAvailable()) {
-//            acquireGooglePlayServices();
-//        } else if (mCredential.getSelectedAccountName() == null) {
-//            chooseAccount();
-//        } else if (!isDeviceOnline()) {
-//            mOutputText.setText("No network connection available.");
-//        } else {
-//            new MakeRequestTask(transport,jsonFactory,mCredential).execute();
-//        }
-//    }
-//
-//    public void updateDataApi() {
-//        if (!isGooglePlayServicesAvailable()) {
-//            acquireGooglePlayServices();
-//        } else if (mCredential.getSelectedAccountName() == null) {
-//            chooseAccount();
-//        } else if (!isDeviceOnline()) {
-//            mOutputText.setText("No network connection available.");
-//        } else {
-//            new UpdateRequestTask(transport,jsonFactory,mCredential).execute();
-//        }
-//    }
-//
-//    public void createSheetApi() {
-//        if (!isGooglePlayServicesAvailable()) {
-//            acquireGooglePlayServices();
-//        } else if (mCredential.getSelectedAccountName() == null) {
-//            chooseAccount();
-//        } else if (!isDeviceOnline()) {
-//            mOutputText.setText("No network connection available.");
-//        } else {
-//            new CreateSheetRequestTask(transport,jsonFactory,mCredential).execute();
-//        }
-//    }
 
     /**
      * Respond to requests for permissions at runtime for API 23 and above.
@@ -386,34 +335,90 @@ public class GoogleApiActivity extends Activity
         dialog.show();
     }
 
-    enum MajorDimension {COLUMNS, ROWS}
+    private boolean createompanyTemplateToSheet(String companName, com.google.api.services.sheets.v4.Sheets mService) {
+        if (companName != null) {
+            try {
+                BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
+                List<Request> requests = new ArrayList<>();
+
+                //create sheet
+                Request addSheetRequest = new Request();
+                AddSheetRequest addSheet = new AddSheetRequest();
+                SheetProperties prop = new SheetProperties();
+                prop.setTitle(companName);
+                addSheet.setProperties(prop);
+                addSheetRequest.setAddSheet(addSheet);
+                requests.add(addSheetRequest);
+
+                batchUpdateSpreadsheetRequest.setRequests(requests);
+                Sheets.Spreadsheets.BatchUpdate createSheetRequest = mService.spreadsheets().batchUpdate(spreadsheetId, batchUpdateSpreadsheetRequest);
+                BatchUpdateSpreadsheetResponse createSheetResponse = createSheetRequest.execute();
+                if (createSheetResponse.getReplies().size() < 1) {
+                    return false;
+                }
+
+                //update with template
+                String range = companName + "!A1:D1";
+                ValueRange valueRange = new ValueRange();
+                valueRange.setMajorDimension(MajorDimension.ROWS.toString());
+                valueRange.setRange(range);
+                valueRange.setValues(
+                        Arrays.asList(
+                                Arrays.asList((Object) "hónap", "csekk sorszám", "összeg", "befizetés dátuma")
+                        ));
+
+
+                String range2 = companName + "!A2:A14";
+                ValueRange valueRange2 = new ValueRange();
+                valueRange2.setMajorDimension(MajorDimension.COLUMNS.toString());
+                valueRange2.setRange(range2);
+                valueRange2.setValues(
+                        Arrays.asList(
+                                Arrays.asList((Object) "január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december")
+                        ));
+
+                List<ValueRange> data = new ArrayList<>();
+                data.add(valueRange);
+                data.add(valueRange2);
+
+                BatchUpdateValuesRequest updateRequestBody = new BatchUpdateValuesRequest();
+                updateRequestBody.setValueInputOption("RAW");
+                updateRequestBody.setData(data);
+
+                Sheets.Spreadsheets.Values.BatchUpdate batchUpdateRequest = mService.spreadsheets().values().batchUpdate(spreadsheetId, updateRequestBody);
+                BatchUpdateValuesResponse updateValueResponse = batchUpdateRequest.execute();
+                return updateValueResponse.getTotalUpdatedCells() == CREATED_COMPANY_CELL_COUNT;
+
+            } catch (UserRecoverableAuthIOException e) {
+                startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+            } catch (Exception ex) {
+                Log.e("credentials", ex.getMessage());
+            }
+        }
+        return false;
+    }
 
 
     //region AsyncTasks
 
 
-    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
+    enum MajorDimension {COLUMNS, ROWS}
+
+    private class GetDataTask extends AsyncTask<String, Void, List<String>> {
         com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
-        MakeRequestTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
-//            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-//            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        GetDataTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
             mService = new com.google.api.services.sheets.v4.Sheets.Builder(
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Sheets API Android Quickstart")
                     .build();
         }
 
-        /**
-         * Background task to call Google Sheets API.
-         *
-         * @param params no parameters needed for this task.
-         */
         @Override
-        protected List<String> doInBackground(Void... params) {
+        protected List<String> doInBackground(String... params) {
             try {
-                return getDataFromApi();
+                return getDataFromApi(params[0]);
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
@@ -421,15 +426,8 @@ public class GoogleApiActivity extends Activity
             }
         }
 
-        /**
-         * Fetch a list of names and majors of students in a sample spreadsheet:
-         * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-         *
-         * @return List of names and majors
-         * @throws IOException
-         */
-        private List<String> getDataFromApi() throws IOException {
-            String range = sheetName + "F1:H4";
+        private List<String> getDataFromApi(String name) throws IOException {
+            String range = name + "F1:H4";
             String majorDim = MajorDimension.COLUMNS.toString();
             List<String> results = new ArrayList<String>();
             ValueRange response = this.mService.spreadsheets().values()
@@ -449,24 +447,23 @@ public class GoogleApiActivity extends Activity
         @Override
         protected void onPreExecute() {
             mOutputText.setText("");
-            mProgress.show();
+            requestCode = -1;
         }
 
         @Override
         protected void onPostExecute(List<String> output) {
-            mProgress.hide();
             if (output == null || output.size() == 0) {
                 mOutputText.setText("No results returned.");
+                requestCode = 1;
             } else {
                 output.add(0, "Data retrieved using the Google Sheets API:");
                 mOutputText.setText(TextUtils.join("\n", output));
+                requestCode = 1;
             }
-            mProgress.dismiss();
         }
 
         @Override
         protected void onCancelled() {
-            mProgress.hide();
             if (mLastError != null) {
                 if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
                     showGooglePlayServicesAvailabilityErrorDialog(
@@ -479,35 +476,30 @@ public class GoogleApiActivity extends Activity
                 } else {
                     mOutputText.setText("The following error occurred:\n"
                             + mLastError.getMessage());
+                    requestCode = 1;
                 }
             } else {
                 mOutputText.setText("Request cancelled.");
+                requestCode = 1;
             }
         }
     }
 
-    private class UpdateRequestTask extends AsyncTask<Void, Void, Boolean> {
+    private class UpdateRequestTask extends AsyncTask<String[], Void, Boolean> {
         private com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
         UpdateRequestTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
-//            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-//            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             mService = new com.google.api.services.sheets.v4.Sheets.Builder(
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Sheets API Update")
                     .build();
         }
 
-        /**
-         * Background task to call Google Sheets API.
-         *
-         * @param params no parameters needed for this task.
-         */
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected Boolean doInBackground(String[]... params) {
             try {
-                return updateDataApi();
+                return updateDataApi(params[0]);
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
@@ -515,32 +507,50 @@ public class GoogleApiActivity extends Activity
             }
         }
 
-        /**
-         * Fetch a list of names and majors of students in a sample spreadsheet:
-         * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-         *
-         * @return List of names and majors
-         * @throws IOException
-         */
-        private Boolean updateDataApi() {
-            //TODO vhonnan az eredetit
-            Object a1 = "Test Rowww 1 Column A";
-            Object b1 = "Test Rowww 1 Column B";
+        private Boolean updateDataApi(String[] checkDetails) throws IOException {
+            //TODO 3 megy fel de 4 elem kell h eldöntsük melyik sorra + melyik munkalapra paidto alapján
+            //id,amount,paid date, paid to,hónap
+            Object a1 = checkDetails[0];
+            Object a2 = checkDetails[1];
+            Object a3 = checkDetails[2];
 
-            String range = sheetName + "F1:G1";
+            String title = "";
+            String dataRange = "";
+
+            // lekédezni a megévő munkalapokat, majd ha van köztük paidto val megegyező akkor abba mentünk
+            // ha nincs akkor paid to-val meg kell hívni a create sheed asyc task-ot
+
+            Spreadsheet spreadsheet = this.mService.spreadsheets().get(spreadsheetId).execute();
+            //List<String> sheetNames=new ArrayList<>();
+            List<Sheet> sheets = spreadsheet.getSheets();
+            int i = 0;
+            while (i < sheets.size() && !sheets.get(i).getProperties().getTitle().equals(checkDetails[3])) {
+                i++;
+            }
+            if (i == sheets.size()) {
+                if (!createompanyTemplateToSheet(checkDetails[3], this.mService)) {
+                    return false;
+                }
+                //TODO check konvertálása a google apinak megfelelő formátumba, külön osztállyal?
+            }
+
+            dataRange = "B" + checkDetails[4] + ":D" + checkDetails[4];                 //TODO új év esetén range ??
+            title = checkDetails[3] + "!"; //TODO közelítő szöveg egyezés ???
+
+            String range = title + dataRange;
             String majorDim = MajorDimension.ROWS.toString();
             ValueRange valueRange = new ValueRange();
             valueRange.setMajorDimension(majorDim);
             valueRange.setRange(range);
             valueRange.setValues(
                     Arrays.asList(
-                            Arrays.asList(a1, b1)
+                            Arrays.asList(a1, a2, a3)
                     ));
             try {
                 UpdateValuesResponse response = this.mService.spreadsheets().values()
                         .update(spreadsheetId, range, valueRange).setValueInputOption("RAW")
                         .execute();
-                return response.getUpdatedCells() == 2;
+                return response.getUpdatedCells() == UPDATED_CELL_COUNT;
             } catch (UserRecoverableAuthIOException e) {
                 startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
             } catch (Exception ex) {
@@ -552,18 +562,18 @@ public class GoogleApiActivity extends Activity
         @Override
         protected void onPreExecute() {
             mOutputText.setText("");
-            mProgress.show();
+            requestCode = -1;
         }
 
         @Override
         protected void onPostExecute(Boolean output) {
-            mProgress.hide();
             if (output) {
                 mOutputText.setText("Update was successful");
+                requestCode = 0;
             } else {
                 mOutputText.setText("Unsuccesful update");
+                requestCode = 1;
             }
-            mProgress.dismiss();
         }
 
         @Override
@@ -581,141 +591,12 @@ public class GoogleApiActivity extends Activity
                 } else {
                     mOutputText.setText("The following error occurred:\n"
                             + mLastError.getMessage());
+                    requestCode = 1;
                 }
             } else {
                 mOutputText.setText("Request cancelled.");
+                requestCode = 1;
             }
         }
     }
-
-    private class CreateSheetRequestTask extends AsyncTask<Void, Void, Boolean> {
-        private com.google.api.services.sheets.v4.Sheets mService = null;
-        private Exception mLastError = null;
-
-        CreateSheetRequestTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
-//            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-//            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mService = new com.google.api.services.sheets.v4.Sheets.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Google Sheets API Create Sheet")
-                    .build();
-        }
-
-        /**
-         * Background task to call Google Sheets API.
-         *
-         * @param params no parameters needed for this task.
-         */
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            try {
-                return createEmptyCompanyTemplate();
-            } catch (Exception e) {
-                mLastError = e;
-                cancel(true);
-                return false;
-            }
-        }
-
-        /**
-         * Fetch a list of names and majors of students in a sample spreadsheet:
-         * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-         *
-         * @return List of names and majors
-         * @throws IOException
-         */
-        private boolean createEmptyCompanyTemplate() {
-            String paidTo = "ÚjCég";
-            if (paidTo != null) {
-                Spreadsheet requestBody = new Spreadsheet();
-                try {
-                    Sheets.Spreadsheets.Create request = this.mService.spreadsheets().create(requestBody);
-
-                    Spreadsheet response = request.execute();
-
-                    //TODO sheet létezésének ellenőrzése
-
-                    if (response != null) {
-                        String range = sheetName + "A15:D15";
-                        ValueRange valueRange = new ValueRange();
-                        valueRange.setMajorDimension(MajorDimension.ROWS.toString());
-                        valueRange.setRange(range);
-                        valueRange.setValues(
-                                Arrays.asList(
-                                        Arrays.asList((Object) "hónap", "csekk sorszám", "összeg", "befizetés dátuma")
-                                ));
-
-
-                        String range2 = sheetName + "A16:A28";
-                        ValueRange valueRange2 = new ValueRange();
-                        valueRange2.setMajorDimension(MajorDimension.COLUMNS.toString());
-                        valueRange2.setRange(range2);
-                        valueRange2.setValues(
-                                Arrays.asList(
-                                        Arrays.asList((Object) "január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december")
-                                ));
-
-                        List<ValueRange> data = new ArrayList<>();
-                        data.add(valueRange);
-                        data.add(valueRange2);
-
-                        BatchUpdateValuesRequest updateRequestBody = new BatchUpdateValuesRequest();
-                        updateRequestBody.setValueInputOption("RAW");
-                        updateRequestBody.setData(data);
-
-                        Sheets.Spreadsheets.Values.BatchUpdate batchUpdateRequest = mService.spreadsheets().values().batchUpdate(spreadsheetId, updateRequestBody);
-                        BatchUpdateValuesResponse updateValueResponse = batchUpdateRequest.execute();
-
-                        return updateValueResponse.getTotalUpdatedCells() == 16;
-                    }
-
-                } catch (UserRecoverableAuthIOException e) {
-                    startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
-                } catch (Exception ex) {
-                    Log.e("credentials", ex.getMessage());
-                }
-            }
-            return false;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            mOutputText.setText("");
-            mProgress.show();
-        }
-
-        @Override
-        protected void onPostExecute(Boolean output) {
-            mProgress.hide();
-            if (output) {
-                mOutputText.setText("Creation was successful");
-            } else {
-                mOutputText.setText("Unsuccesful creation");
-            }
-            mProgress.dismiss();
-        }
-
-        @Override
-        protected void onCancelled() {
-            mProgress.hide();
-            if (mLastError != null) {
-                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());
-                } else if (mLastError instanceof UserRecoverableAuthIOException) {
-                    startActivityForResult(
-                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            GoogleApiActivity.REQUEST_AUTHORIZATION);
-                } else {
-                    mOutputText.setText("The following error occurred:\n"
-                            + mLastError.getMessage());
-                }
-            } else {
-                mOutputText.setText("Request cancelled.");
-            }
-        }
-    }
-
-    //endregion
 }

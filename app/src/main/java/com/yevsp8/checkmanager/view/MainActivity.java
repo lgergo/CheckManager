@@ -1,6 +1,8 @@
 package com.yevsp8.checkmanager.view;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
@@ -17,9 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yevsp8.checkmanager.CheckListFragment;
-import com.yevsp8.checkmanager.GoogleApiActivity;
+import com.yevsp8.checkmanager.NotificationReceiver;
 import com.yevsp8.checkmanager.R;
-import com.yevsp8.checkmanager.data.Check;
 import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
@@ -27,9 +28,10 @@ import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import java.util.Calendar;
-import java.util.Locale;
 
 import javax.inject.Inject;
+
+import static com.yevsp8.checkmanager.util.Constants.NotificationRequestCode;
 
 public class MainActivity extends BaseActivity {
 
@@ -62,12 +64,12 @@ public class MainActivity extends BaseActivity {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckViewModel.class);
 
         //TODO demodata
-        long today = Calendar.getInstance().getTime().getTime();
-        String month = Calendar.getInstance().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
-        viewModel.insertCheck(new Check("013018234", today, 1250, "Főtáv", month));
-        viewModel.insertCheck(new Check("471145743", today, 1250, "Telekom", month));
-        viewModel.insertCheck(new Check("963349038", today, 8900, "Upc", month));
-        viewModel.insertCheck(new Check("459231004", today, 22340, "Közművek", month));
+//        long today = Calendar.getInstance().getTime().getTime();
+//        String month = Calendar.getInstance().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+//        viewModel.insertCheck(new Check("013018234", today, 1250, "Főtáv", month));
+//        viewModel.insertCheck(new Check("471145743", today, 1250, "Telekom", month));
+//        viewModel.insertCheck(new Check("963349038", today, 8900, "Upc", month));
+//        viewModel.insertCheck(new Check("459231004", today, 22340, "Közművek", month));
 
         FragmentManager manager = getSupportFragmentManager();
         fragment = new CheckListFragment();
@@ -102,8 +104,9 @@ public class MainActivity extends BaseActivity {
 //                GoogleApiProviderOld googleApi = GoogleApiProviderOld.getInstance(MainActivity.this);
 //                googleApi.createEmptyCompanyTemplate("újcég");
 
-                Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
+//                startActivity(intent);
+                demoNitification();
             }
         });
 
@@ -137,6 +140,18 @@ public class MainActivity extends BaseActivity {
             }
         });
         builder.show();
+    }
+
+    private void demoNitification() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 11);
+        cal.set(Calendar.MINUTE, 13);
+
+        Intent intent = new Intent(this, NotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), NotificationRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
     @Override

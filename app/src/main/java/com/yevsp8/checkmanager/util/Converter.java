@@ -27,5 +27,4 @@ public class Converter {
         Date result = new Date(dateValue);
         return dateToStringFormatted(result);
     }
-
 }

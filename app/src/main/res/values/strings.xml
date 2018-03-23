@@ -5,7 +5,16 @@
     <string name="title_activity_check_details">CheckDetailsActivity</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_main">Dashboard</string>
-    <string name="helpText">Fontos tudnivalók a kép készítése során: </string>
+    <string name="helpText">
+        Fontos ajánlások a programmal kapcsolatban:
+A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. Az beállításoknál megadhatjuk, hogy az adatokainkat melyik Google Sheets munkafüzetbe szeretnénk tárolni. Ha nem rendelkezünk még vele, akkor generáltathatunk egyet az applikációval a Beállítások menüpontban.
+Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. Lényeges funkció, hogy figyelmeztetést kapunk ha az adott hónapban még nem történt bejegyzés a csekkhez a megadott időszakban. Ebből feltételezhető hogy még a csekk nem került befizetésre, vagy csak még nem töltötük fel. Az értesítések időszakra vonatkozó beállításait a Beállítások menüpontban adhatja meg.
+Fontos ajánlások a kép készítésére vonatkozóan:
+A képet próbáljuk világos helyen elkészíteni. A csekk háttere lehetőleg egyszínű, a csekkt színétől nagyban eltérő legyen. Próbáljuk a kezünkkel vagy a telefonunkkal nem beárnyékolni a készülő képet, illetve hogy a kép éles legyen.
+Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és segít teljesen kihasználni az applikációban rejlő lehetőségeket !
+
+
+    </string>
 
     <string name="last_sync_default">Még nem szinkronizált</string>
     <string name="last_sync_value">2018.01.01</string>
