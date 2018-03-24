@@ -1,10 +1,8 @@
 package com.yevsp8.checkmanager;
 
-import android.app.AlertDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -78,7 +76,6 @@ public class CheckDetailsFragment extends Fragment {
             }
         });
 
-
         button_upload = rootView.findViewById(R.id.button_details_upload);
         button_upload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,8 +128,6 @@ public class CheckDetailsFragment extends Fragment {
             viewModel.insertCheck(check);
         }
 
-
-
         id.setText(check.getCheckId());
         created.setText(Converter.longDateToString(check.getCreationDate()));
         amount.setText(String.valueOf(check.getAmount()));
@@ -163,31 +158,50 @@ public class CheckDetailsFragment extends Fragment {
             intent.putExtra("callType", Enums.APICallType.Update_data);
             String[] param = viewModel.checkDetailsToGoogleRequestFormat(check);
             intent.putExtra("result_array", param);
-            startActivityForResult(intent, UPLOAD_REQUEST_CODE);
+            //startActivityForResult(intent, UPLOAD_REQUEST_CODE);
+            startActivity(intent);
         } else {
             Toast t = Toast.makeText(getContext(), "Üres mezővel nem lehetséges a feltöltés!", Toast.LENGTH_LONG);
             t.show();
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == UPLOAD_REQUEST_CODE) {
-            if (resultCode == 1) {
-                //TODO sikertelen törlés
-                viewModel.deleteCheck(check);
-            }
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Google");
-            builder.setMessage(data.getStringExtra("result"));
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.cancel();
-                }
-            });
-            builder.show();
-        }
-    }
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//
+//        if (requestCode == UPLOAD_REQUEST_CODE) {
+//            if (resultCode == 1) {
+//                //TODO sikertelen törlés
+//                viewModel.deleteCheck(check);
+//            }
+//            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//            builder.setTitle("Google");
+//           // builder.setMessage(data.getStringExtra("result"));
+//            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialogInterface, int i) {
+//                    dialogInterface.cancel();
+//                }
+//            });
+//            builder.show();
+//        }
+//    }
+//
+//    @Override
+//    public void onTaskCompleted(int result) {
+//        if (result == 1) {
+//        //TODO sikertelen törlés
+//            viewModel.deleteCheck(check);
+//        }
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//        builder.setTitle("Google");
+//       // builder.setMessage(data.getStringExtra("result"));
+//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i) {
+//                dialogInterface.cancel();
+//            }
+//        });
+//        builder.show();
+//    }
 }

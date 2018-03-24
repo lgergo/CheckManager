@@ -4,8 +4,6 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,55 +19,27 @@ import android.widget.Toast;
 import com.yevsp8.checkmanager.CheckListFragment;
 import com.yevsp8.checkmanager.NotificationReceiver;
 import com.yevsp8.checkmanager.R;
-import com.yevsp8.checkmanager.di.ApplicationModule;
-import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
-import com.yevsp8.checkmanager.di.ContextModule;
-import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
-import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import java.util.Calendar;
-
-import javax.inject.Inject;
 
 import static com.yevsp8.checkmanager.util.Constants.NotificationRequestCode;
 
 public class MainActivity extends BaseActivity {
 
-    public ProgressDialog updateProgressBar;
-    CheckListFragment fragment;
-    TextView latestSyncTextView;
-    FloatingActionButton newImageButton;
-    FloatingActionButton testApiButton;
-    TextView googleApiResultTextView;
+    private ProgressDialog updateProgressBar;
+    private CheckListFragment fragment;
+    private TextView latestSyncTextView;
+    private FloatingActionButton newImageButton;
+    private FloatingActionButton testApiButton;
 
-    //TODO csak a demo data miatt
-    CheckViewModel viewModel;
-    @Inject
-    ViewModelProvider.Factory viewModelFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        CheckManagerApplicationComponent component = DaggerCheckManagerApplicationComponent.builder()
-                .contextModule(new ContextModule(this))
-                .applicationModule(new ApplicationModule(getApplication()))
-                .build();
-        component.injectMainActivity(this);
-
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckViewModel.class);
-
-        //TODO demodata
-//        long today = Calendar.getInstance().getTime().getTime();
-//        String month = Calendar.getInstance().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
-//        viewModel.insertCheck(new Check("013018234", today, 1250, "Főtáv", month));
-//        viewModel.insertCheck(new Check("471145743", today, 1250, "Telekom", month));
-//        viewModel.insertCheck(new Check("963349038", today, 8900, "Upc", month));
-//        viewModel.insertCheck(new Check("459231004", today, 22340, "Közművek", month));
 
         FragmentManager manager = getSupportFragmentManager();
         fragment = new CheckListFragment();
@@ -87,25 +57,13 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        googleApiResultTextView = findViewById(R.id.googleApiResult_textView);
-
         updateProgressBar = new ProgressDialog(this);
-        updateProgressBar.setMessage("Updating cell values ...");
+        updateProgressBar.setMessage("Cella értékek frissítése...");
 
         testApiButton = findViewById(R.id.testGoogleApi_button);
         testApiButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                GoogleApiProviderOld googleApi=GoogleApiProviderOld.getInstance(MainActivity.this);
-//                googleApi.getResultsFromApi();
 
-//                GoogleApiProviderOld googleApi = GoogleApiProviderOld.getInstance(MainActivity.this);
-//                googleApi.insertData("010101", "11300", "Valaki", "2017.01.01");
-
-//                GoogleApiProviderOld googleApi = GoogleApiProviderOld.getInstance(MainActivity.this);
-//                googleApi.createEmptyCompanyTemplate("újcég");
-
-//                Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
-//                startActivity(intent);
                 demoNitification();
             }
         });
@@ -116,12 +74,8 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    public void updateGoogleApiTextView(String result) {
-        googleApiResultTextView.setText(result);
-    }
-
     private void showFirstStartAlertDialog() {
-        saveToSharedPreferences(R.string.sheetId_value, "0");
+        saveToSharedPreferences(R.string.first_start_value, "0");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("CheckManager");
         builder.setMessage("Hogy ki tudd használni a Google Sheets szinkronizációt, kérlek add meg a dokumentum azonosítóját.");
@@ -151,7 +105,9 @@ public class MainActivity extends BaseActivity {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), NotificationRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        if (manager != null) {
+            manager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        }
     }
 
     @Override

@@ -10,25 +10,18 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 /**
- * Created by Gergo on 2018. 02. 25..
+ * Created by Gergo on 2018. 03. 23..
  */
 
 @Dao
-public interface CheckDAO {
+public interface NotificationDAO {
 
-    @Query("SELECT * FROM `Check`")
-    LiveData<List<Check>> getCheckList();
-
-    @Query("SELECT * FROM `CHECK` WHERE checkId = :id")
-    LiveData<Check> getCheckById(String id);
+    @Query("SELECT * FROM NOTIFICATION")
+    LiveData<List<Notification>> getNotificationList();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertCheck(Check item);
+    void insertNotification(Notification notification);
 
     @Delete
-    void deleteCheck(Check check);
-
-    @Query("DELETE FROM `Check` WHERE checkId = :id")
-    void deleteCheckById(String id);
-
+    void deleteNotification(Notification notification);
 }

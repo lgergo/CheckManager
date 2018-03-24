@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="ToolbarActivityStyle"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    tools:context="com.yevsp8.checkmanager.view.CreateNotificationActivity">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/create_notification_title"
+        style="@style/TextTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Adja meg az értesítés nevét és intervallumát" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/create_notification_title"
+        android:text="Értesítés címe: " />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/company1_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/create_notification_title"
+        android:hint="Cég neve" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/company1_title"
+        android:text="Szöveg: " />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/company1_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/company1_title"
+        android:hint="Értesítés üzenete" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/company1_message"
+        android:text="Értesítés kezdete: " />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/company1_fromDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/company1_message"
+        android:text="dátum" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/company1_fromDate"
+        android:text="Értesítés vége: " />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/company1_toDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/company1_fromDate"
+        android:text="dátum" />
+
+    <Button
+        android:id="@+id/create_notification_saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Mentés" />
+
+</RelativeLayout>

@@ -34,9 +34,13 @@ public class CheckViewModel extends ViewModel {
         task.execute(check);
     }
 
+    public void deleteCheckById(String id) {
+        DeleteCheckById task = new DeleteCheckById();
+        task.execute(id);
+    }
+
 
     public String[] checkDetailsToGoogleRequestFormat(Check check) {
-        //created,id,amount,paid date, paid to
         String[] date = Converter.longDateToString(check.getCreationDate()).split("/");
         int d = Integer.parseInt(date[1]) + 1;
         return new String[]
@@ -59,10 +63,17 @@ public class CheckViewModel extends ViewModel {
     }
 
     private class DeleteCheckTask extends AsyncTask<Check, Void, Void> {
-
         @Override
         protected Void doInBackground(Check... checks) {
             repo.deleteCheck(checks[0]);
+            return null;
+        }
+    }
+
+    private class DeleteCheckById extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... strings) {
+            repo.deleteCheckById(strings[0]);
             return null;
         }
     }

@@ -8,5 +8,5 @@ public class Enums {
 
     //TODO enumok kiemelése ha van közös használatú
 
-    public enum APICallType {Get_data, Update_data, CreateSheet, ConnectionTest}
+    public enum APICallType {Get_data, Update_data, ConnectionTest}
 }

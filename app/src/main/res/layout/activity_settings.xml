@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
     tools:context="com.yevsp8.checkmanager.view.SettingsActivity">
 
     <include
@@ -11,58 +12,47 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/textView_sheetId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar_settings"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <android.support.v7.widget.AppCompatEditText
-        android:id="@+id/editText_settings_sheetId"
+    <RelativeLayout
+        style="ToolbarActivityStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textView_sheetId"
-        android:maxLines="1" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_settings">
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/button_settings_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/editText_settings_sheetId"
-        android:text="Save" />
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/textView_sheetId"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sheetId_text" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/button_settings_test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/editText_settings_sheetId"
-        android:text="Test your connection" />
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/editText_settings_sheetId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_sheetId"
+            android:maxLines="2" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/company1_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/button_settings_test"
-        android:text="Víz: " />
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_settings_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editText_settings_sheetId"
+            android:text="@string/save" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/company1_fromDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/button_settings_test"
-        android:layout_centerHorizontal="true"
-        android:text="dátum" />
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_settings_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/editText_settings_sheetId"
+            android:text="Test your connection" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/company1_toDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/button_settings_test"
-        android:text="dátum" />
+        <FrameLayout
+            android:id="@+id/notificationlist_fragmentcontainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/button_settings_test"
+            android:padding="10dp" />
 
-
+    </RelativeLayout>
 </RelativeLayout>

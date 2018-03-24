@@ -20,6 +20,37 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="last_sync_value">2018.01.01</string>
     <string name="first_start_default">1</string>
     <string name="first_start_value">1</string>
-    <string name="sheetId_default">Üres</string>
+    <string name="sheetId_default"></string>
     <string name="sheetId_value"></string>
+    <string name="succesful_update">Sikeres feltöltés.</string>
+    <string name="unsuccesful_update">Sikertelen feltöltés!</string>
+    <string name="universal_error">Hiba:</string>
+    <string name="request_cancelled">A kérés törölve.</string>
+    <string name="no_results">No results returned.</string>
+    <string name="googlePlay_install">This app requires Google Play Services. Please install Google Play Services on your device and relaunch this app.</string>
+    <string name="request_contactAccess">This app needs to access your Google account (via Contacts).</string>
+    <string name="no_network">No network connection available.</string>
+    <string name="progress_dialog_upload">Feltöltés folyamatban...</string>
+    <string name="save">Mentés</string>
+    <string name="sheetId_text">Google Sheets azonosító:</string>
+    <string-array name="months">
+        <item>Január</item>
+        <item>Február</item>
+        <item>Március</item>
+        <item>Április</item>
+        <item>Május</item>
+        <item>Június</item>
+        <item>Július</item>
+        <item>Augusztus</item>
+        <item>Szeptember</item>
+        <item>Október</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <string-array name="headers">
+        <item>Hónap</item>
+        <item>Csekk azonosító</item>
+        <item>Összeg</item>
+        <item>Befizetés dátuma</item>
+    </string-array>
 </resources>

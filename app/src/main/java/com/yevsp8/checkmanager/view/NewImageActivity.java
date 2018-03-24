@@ -40,6 +40,7 @@ public class NewImageActivity extends BaseActivity {
     private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     @Inject
     ImageProcessor processor;
+
     private Button buttonTakePhoto;
     private Button buttonRecognise;
     private Button buttonDemo;

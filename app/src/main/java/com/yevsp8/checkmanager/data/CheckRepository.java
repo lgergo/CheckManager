@@ -34,4 +34,8 @@ public class CheckRepository {
     public void insertCheck(Check check) {
         checkDao.insertCheck(check);
     }
+
+    public void deleteCheckById(String id) {
+        checkDao.deleteCheckById(id);
+    }
 }

@@ -26,6 +26,7 @@
             android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -37,6 +38,7 @@
         <activity
             android:name=".view.SettingsActivity"
             android:label="@string/title_activity_settings" />
+        <activity android:name=".view.CreateNotificationActivity"></activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -47,6 +49,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
         <receiver android:name=".NotificationReceiver" />
+
     </application>
+
 </manifest>

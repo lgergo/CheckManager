@@ -72,8 +72,8 @@ public class CheckListFragment extends Fragment {
         });
     }
 
-    void setListData(List<Check> checks) {
-        CheckListFragment.this.checkList = checks;
+    private void setListData(List<Check> checks) {
+        checkList = checks;
 
         final CheckAdapter adapter = new CheckAdapter(checkList);
         ListView listView = rootView.findViewById(R.id.listview_check);
@@ -83,7 +83,6 @@ public class CheckListFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Check selected = adapter.getItem(i);
 
-                //TODO DI for details fragment
                 Intent intent = new Intent(getContext(), CheckDetailsActivity.class);
                 intent.putExtra("selected_check_id", selected.getCheckId());
                 startActivity(intent);

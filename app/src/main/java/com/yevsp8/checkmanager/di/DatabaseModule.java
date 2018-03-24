@@ -7,6 +7,9 @@ import android.arch.persistence.room.Room;
 import com.yevsp8.checkmanager.data.CheckDAO;
 import com.yevsp8.checkmanager.data.CheckDatabase;
 import com.yevsp8.checkmanager.data.CheckRepository;
+import com.yevsp8.checkmanager.data.NotificationDAO;
+import com.yevsp8.checkmanager.data.NotificationDatabase;
+import com.yevsp8.checkmanager.data.NotificationRepository;
 import com.yevsp8.checkmanager.viewModel.CustomViewModelFactory;
 
 import dagger.Module;
@@ -41,10 +44,31 @@ public class DatabaseModule {
         return database.checkDAO();
     }
 
+    @Provides
+    @CustomScope
+    ViewModelProvider.Factory provideViewModelFactory(CheckRepository checkRepository, NotificationRepository notificationRepository) {
+        return new CustomViewModelFactory(checkRepository, notificationRepository);
+    }
 
     @Provides
     @CustomScope
-    ViewModelProvider.Factory provideViewModelFactory(CheckRepository repository) {
-        return new CustomViewModelFactory(repository);
+    public NotificationDatabase provideNotificationDatabase(Application application) {
+        return Room.databaseBuilder(
+                application,
+                NotificationDatabase.class,
+                "Notification.db"
+        ).build();
+    }
+
+    @Provides
+    @CustomScope
+    NotificationRepository provideNotificationRepository(NotificationDAO notificationDAO) {
+        return new NotificationRepository(notificationDAO);
+    }
+
+    @Provides
+    @CustomScope
+    NotificationDAO provideNotificationDao(NotificationDatabase database) {
+        return database.notificationDAO();
     }
 }
