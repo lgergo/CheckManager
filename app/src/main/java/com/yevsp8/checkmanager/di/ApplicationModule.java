@@ -1,8 +1,6 @@
 package com.yevsp8.checkmanager.di;
 
 import android.app.Application;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import dagger.Module;
 import dagger.Provides;
@@ -24,11 +22,5 @@ public class ApplicationModule {
     @CustomScope
     Application provideApplication() {
         return application;
-    }
-
-    @Provides
-    @CustomScope
-    SharedPreferences provideSharedPreferences(Application application) {
-        return PreferenceManager.getDefaultSharedPreferences(application);
     }
 }

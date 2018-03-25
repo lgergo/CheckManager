@@ -3,7 +3,6 @@ package com.yevsp8.checkmanager.view;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import static com.yevsp8.checkmanager.util.Constants.NotificationRequestCode;
 
 public class MainActivity extends BaseActivity {
 
-    private ProgressDialog updateProgressBar;
     private CheckListFragment fragment;
     private TextView latestSyncTextView;
     private FloatingActionButton newImageButton;
@@ -56,9 +54,6 @@ public class MainActivity extends BaseActivity {
                 startActivity(intent);
             }
         });
-
-        updateProgressBar = new ProgressDialog(this);
-        updateProgressBar.setMessage("Cella értékek frissítése...");
 
         testApiButton = findViewById(R.id.testGoogleApi_button);
         testApiButton.setOnClickListener(new View.OnClickListener() {

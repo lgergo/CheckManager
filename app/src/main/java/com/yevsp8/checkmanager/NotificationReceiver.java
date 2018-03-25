@@ -27,8 +27,8 @@ public class NotificationReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setContentIntent(pending)
                 .setSmallIcon(R.drawable.ic_home_24dp)
-                .setContentTitle("Checkmanager")
-                .setContentText("Be nem fizetett csekkjei vannak erre a hónapra")
+                .setContentTitle(intent.getExtras().getString("title"))
+                .setContentText(intent.getExtras().getString("message"))
                 .setAutoCancel(true);
 
         manager.notify(NotificationRequestCode, builder.build());

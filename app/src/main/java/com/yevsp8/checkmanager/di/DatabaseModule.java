@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.persistence.room.Room;
 
+import com.yevsp8.checkmanager.CustomNotificationManager;
 import com.yevsp8.checkmanager.data.CheckDAO;
 import com.yevsp8.checkmanager.data.CheckDatabase;
 import com.yevsp8.checkmanager.data.CheckRepository;
@@ -70,5 +71,11 @@ public class DatabaseModule {
     @CustomScope
     NotificationDAO provideNotificationDao(NotificationDatabase database) {
         return database.notificationDAO();
+    }
+
+    @Provides
+    @CustomScope
+    CustomNotificationManager provideCustomNotificationManager() {
+        return new CustomNotificationManager();
     }
 }

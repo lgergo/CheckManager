@@ -33,6 +33,7 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="progress_dialog_upload">Feltöltés folyamatban...</string>
     <string name="save">Mentés</string>
     <string name="sheetId_text">Google Sheets azonosító:</string>
+    <string name="active_notifications_title">Aktív értesítések</string>
     <string-array name="months">
         <item>Január</item>
         <item>Február</item>

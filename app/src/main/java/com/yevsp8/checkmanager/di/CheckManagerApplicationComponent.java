@@ -18,8 +18,6 @@ public interface CheckManagerApplicationComponent {
 
     void injectApplication(CheckManagerApplication app);
 
-    // void injectMainActivity(MainActivity mainActivity);
-
     void injectCheckListViewModel(CheckListFragment checkListFragment);
 
     void injectCheckViewModel(CheckDetailsFragment checkDetailsFragment);

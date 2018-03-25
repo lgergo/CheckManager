@@ -50,7 +50,7 @@
         <FrameLayout
             android:id="@+id/notificationlist_fragmentcontainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@id/button_settings_test"
             android:padding="10dp" />
 

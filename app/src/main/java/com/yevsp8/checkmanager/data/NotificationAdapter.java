@@ -3,8 +3,10 @@ package com.yevsp8.checkmanager.data;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 import com.yevsp8.checkmanager.R;
+import com.yevsp8.checkmanager.util.Converter;
 
 import java.util.List;
 
@@ -49,6 +51,13 @@ public class NotificationAdapter extends BaseAdapter {
         }
 
         Notification notification = getItem(i);
+        TextView title = newView.findViewById(R.id.company1_title);
+        TextView fromDate = newView.findViewById(R.id.company1_fromDate);
+        TextView toDate = newView.findViewById(R.id.company1_toDate);
+
+        title.setText(notification.getTitle());
+        fromDate.setText(Converter.longDateToString(notification.getFrom()));
+        toDate.setText(Converter.longDateToString(notification.getTo()));
 
         return newView;
     }

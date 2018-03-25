@@ -14,6 +14,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.yevsp8.checkmanager.CustomNotificationManager;
 import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.data.Notification;
 import com.yevsp8.checkmanager.di.ApplicationModule;
@@ -29,6 +30,8 @@ import javax.inject.Inject;
 
 public class CreateNotificationActivity extends AppCompatActivity {
 
+    @Inject
+    CustomNotificationManager notManager;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -72,7 +75,7 @@ public class CreateNotificationActivity extends AppCompatActivity {
         });
         fromDateListener = new DatePickerDialog.OnDateSetListener() {
             @Override
-            public void onDateSet(DatePicker datePicker, int year, int day, int month) {
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                 String date = year + "/" + month + "/" + day;
                 fromDate.setText(date);
             }
@@ -87,7 +90,7 @@ public class CreateNotificationActivity extends AppCompatActivity {
         });
         toDateListener = new DatePickerDialog.OnDateSetListener() {
             @Override
-            public void onDateSet(DatePicker datePicker, int year, int day, int month) {
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                 String date = year + "/" + month + "/" + day;
                 toDate.setText(date);
             }
@@ -118,6 +121,7 @@ public class CreateNotificationActivity extends AppCompatActivity {
                     Converter.stringDateToLong(toDate.getText().toString())
             );
             viewModel.insertNotification(toInsert);
+            notManager.createNotification(this, toInsert.getTitle(), toInsert.getMessage(), fromDate.getText().toString(), fromDate.getText().toString());
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
         } else {

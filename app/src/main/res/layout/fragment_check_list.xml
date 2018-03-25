@@ -6,12 +6,11 @@
     tools:context="com.yevsp8.checkmanager.CheckListFragment">
 
     <android.support.v7.widget.AppCompatTextView
+        style="@style/TextTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
-        android:text="Nem szinkronizált csekkek"
-        android:textSize="20dp"
-        android:textStyle="bold" />
+        android:text="Nem szinkronizált csekkek" />
 
     <ListView
         android:id="@+id/listview_check"
