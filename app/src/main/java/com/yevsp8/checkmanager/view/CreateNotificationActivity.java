@@ -7,7 +7,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -28,7 +27,7 @@ import java.util.Calendar;
 
 import javax.inject.Inject;
 
-public class CreateNotificationActivity extends AppCompatActivity {
+public class CreateNotificationActivity extends BaseActivity {
 
     @Inject
     CustomNotificationManager notManager;
@@ -121,7 +120,7 @@ public class CreateNotificationActivity extends AppCompatActivity {
                     Converter.stringDateToLong(toDate.getText().toString())
             );
             viewModel.insertNotification(toInsert);
-            notManager.createNotification(this, toInsert.getTitle(), toInsert.getMessage(), fromDate.getText().toString(), fromDate.getText().toString());
+            //notManager.createNotification(this);
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
         } else {

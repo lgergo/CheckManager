@@ -152,8 +152,6 @@ public class CheckDetailsFragment extends Fragment {
 
     private void checkBeforeUpload() {
         if (id.getText().length() > 0 && amount.getText().length() > 0 && paidto.getText().length() > 0 && paiddate.getText().length() > 0) {
-
-            //TODO check null vmiért
             Intent intent = new Intent(getContext(), GoogleApiActivity.class);
             intent.putExtra("callType", Enums.APICallType.Update_data);
             String[] param = viewModel.checkDetailsToGoogleRequestFormat(check);
@@ -165,43 +163,4 @@ public class CheckDetailsFragment extends Fragment {
             t.show();
         }
     }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//
-//        if (requestCode == UPLOAD_REQUEST_CODE) {
-//            if (resultCode == 1) {
-//                //TODO sikertelen törlés
-//                viewModel.deleteCheck(check);
-//            }
-//            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//            builder.setTitle("Google");
-//           // builder.setMessage(data.getStringExtra("result"));
-//            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialogInterface, int i) {
-//                    dialogInterface.cancel();
-//                }
-//            });
-//            builder.show();
-//        }
-//    }
-//
-//    @Override
-//    public void onTaskCompleted(int result) {
-//        if (result == 1) {
-//        //TODO sikertelen törlés
-//            viewModel.deleteCheck(check);
-//        }
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//        builder.setTitle("Google");
-//       // builder.setMessage(data.getStringExtra("result"));
-//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                dialogInterface.cancel();
-//            }
-//        });
-//        builder.show();
-//    }
 }

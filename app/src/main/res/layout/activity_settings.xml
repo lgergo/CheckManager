@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:focusableInTouchMode="true"
     tools:context="com.yevsp8.checkmanager.view.SettingsActivity">
 
     <include
@@ -12,47 +11,62 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <RelativeLayout
-        style="ToolbarActivityStyle"
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/textView_sheetId"
+        style="@style/TextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_settings"
+        android:text="@string/sheetId_text" />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/editText_settings_sheetId"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_settings">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView_sheetId"
+        android:maxLines="2" />
 
-        <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/textView_sheetId"
-            style="@style/TextTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sheetId_text" />
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/button_settings_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/editText_settings_sheetId"
+        android:text="Test your connection" />
 
-        <android.support.v7.widget.AppCompatEditText
-            android:id="@+id/editText_settings_sheetId"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/textView_sheetId"
-            android:maxLines="2" />
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/notification_interval_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button_settings_test"
+        android:text="Hány naponta szeretne értesítéseket?" />
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/button_settings_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/editText_settings_sheetId"
-            android:text="@string/save" />
+    <SeekBar
+        android:id="@+id/seekBar_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/notification_interval_label" />
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/button_settings_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@id/editText_settings_sheetId"
-            android:text="Test your connection" />
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/seekBar_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seekBar_settings" />
 
-        <FrameLayout
-            android:id="@+id/notificationlist_fragmentcontainer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/button_settings_test"
-            android:padding="10dp" />
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/button_settings_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/seekBar_value"
 
-    </RelativeLayout>
+        android:text="@string/save" />
+
+    <!--<FrameLayout-->
+    <!--android:id="@+id/notificationlist_fragmentcontainer"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_below="@id/button_settings_test"-->
+    <!--android:padding="10dp" />-->
+
 </RelativeLayout>

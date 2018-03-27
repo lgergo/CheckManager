@@ -22,6 +22,9 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="first_start_value">1</string>
     <string name="sheetId_default"></string>
     <string name="sheetId_value"></string>
+    <string name="notification_interval_default">7</string>
+    <string name="notification_interval_value">7</string>
+
     <string name="succesful_update">Sikeres feltöltés.</string>
     <string name="unsuccesful_update">Sikertelen feltöltés!</string>
     <string name="universal_error">Hiba:</string>
@@ -34,6 +37,9 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="save">Mentés</string>
     <string name="sheetId_text">Google Sheets azonosító:</string>
     <string name="active_notifications_title">Aktív értesítések</string>
+    <string name="connection_test_successful">A megadott azonosító megfelelő.</string>
+    <string name="connection_test_unsuccesful">A megadott azonosító hibás!</string>
+
     <string-array name="months">
         <item>Január</item>
         <item>Február</item>

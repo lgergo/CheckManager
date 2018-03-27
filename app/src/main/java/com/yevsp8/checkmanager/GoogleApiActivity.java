@@ -79,7 +79,6 @@ public class GoogleApiActivity extends BaseActivity
     ProgressDialog progress;
     private String spreadsheetId;// = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
     private TextView mOutputText;
-    private int requestCode = -1;
     private String[] checkDetailsdataArray;
 
     @Override
@@ -144,6 +143,9 @@ public class GoogleApiActivity extends BaseActivity
                     break;
                 case Update_data:
                     new UpdateRequestTask(transport, jsonFactory, mCredential).execute(checkDetailsdataArray);
+                    break;
+                case ConnectionTest:
+                    new ConnectionTestTask(transport, jsonFactory, mCredential).execute();
                     break;
             }
         }
@@ -440,7 +442,6 @@ public class GoogleApiActivity extends BaseActivity
         @Override
         protected void onPreExecute() {
             mOutputText.setText("");
-            requestCode = -1;
             progress = new ProgressDialog(GoogleApiActivity.this);
             progress.setMessage("Feltöltés folyamatban...");
             progress.show();
@@ -450,11 +451,9 @@ public class GoogleApiActivity extends BaseActivity
         protected void onPostExecute(List<String> output) {
             if (output == null || output.size() == 0) {
                 mOutputText.setText(R.string.no_results);
-                requestCode = 1;
             } else {
                 output.add(0, "Data retrieved using the Google Sheets API:");
                 mOutputText.setText(TextUtils.join("\n", output));
-                requestCode = 1;
             }
             progress.dismiss();
         }
@@ -473,11 +472,78 @@ public class GoogleApiActivity extends BaseActivity
                 } else {
                     mOutputText.setText(R.string.universal_error
                             + mLastError.getMessage());
-                    requestCode = 1;
                 }
             } else {
                 mOutputText.setText(R.string.request_cancelled);
-                requestCode = 1;
+            }
+            progress.dismiss();
+        }
+    }
+
+    private class ConnectionTestTask extends AsyncTask<Void, Void, Boolean> {
+        com.google.api.services.sheets.v4.Sheets mService = null;
+        private Exception mLastError = null;
+
+        ConnectionTestTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
+            mService = new com.google.api.services.sheets.v4.Sheets.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("Google Sheets API Test")
+                    .build();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                return testConnection();
+            } catch (Exception e) {
+                mLastError = e;
+                cancel(true);
+                return null;
+            }
+        }
+
+        private Boolean testConnection() throws Exception {
+            Spreadsheet spreadsheet = this.mService.spreadsheets().get(spreadsheetId).execute();
+            List<Sheet> sheets = spreadsheet.getSheets();
+            return sheets.size() > 0;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mOutputText.setText("");
+            progress = new ProgressDialog(GoogleApiActivity.this);
+            progress.setMessage("Tesztelés folyamatban...");
+            progress.show();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean output) {
+            if (output) {
+                mOutputText.setText(R.string.connection_test_successful);
+            } else {
+                mOutputText.setText(R.string.connection_test_unsuccesful);
+            }
+            progress.dismiss();
+        }
+
+        @Override
+        protected void onCancelled() {
+            if (mLastError != null) {
+                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+                    showGooglePlayServicesAvailabilityErrorDialog(
+                            ((GooglePlayServicesAvailabilityIOException) mLastError)
+                                    .getConnectionStatusCode());
+                } else if (mLastError instanceof UserRecoverableAuthIOException) {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            GoogleApiActivity.REQUEST_AUTHORIZATION);
+                } else {
+//                    mOutputText.setText(R.string.universal_error
+//                            + mLastError.getMessage());
+                    mOutputText.setText(R.string.connection_test_unsuccesful);
+                }
+            } else {
+                mOutputText.setText(R.string.request_cancelled);
             }
             progress.dismiss();
         }
@@ -551,7 +617,6 @@ public class GoogleApiActivity extends BaseActivity
         @Override
         protected void onPreExecute() {
             mOutputText.setText("");
-            requestCode = -1;
             progress = new ProgressDialog(GoogleApiActivity.this);
             progress.setMessage(getString(R.string.progress_dialog_upload));
             progress.show();
@@ -561,10 +626,8 @@ public class GoogleApiActivity extends BaseActivity
         protected void onPostExecute(Boolean output) {
             if (output) {
                 mOutputText.setText(R.string.succesful_update);
-                requestCode = 0;
             } else {
                 mOutputText.setText(R.string.unsuccesful_update);
-                requestCode = 1;
             }
             viewModel.deleteCheckById(checkDetailsdataArray[0]);
             progress.dismiss();
@@ -582,13 +645,12 @@ public class GoogleApiActivity extends BaseActivity
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             GoogleApiActivity.REQUEST_AUTHORIZATION);
                 } else {
-                    mOutputText.setText(getString(R.string.universal_error)
-                            + mLastError.getMessage());
-                    requestCode = 1;
+//                    mOutputText.setText(getString(R.string.universal_error)
+//                            + mLastError.getMessage());
+                    mOutputText.setText(R.string.unsuccesful_update);
                 }
             } else {
                 mOutputText.setText(R.string.request_cancelled);
-                requestCode = 1;
             }
             progress.dismiss();
         }

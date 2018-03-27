@@ -17,7 +17,7 @@ import static com.yevsp8.checkmanager.util.Constants.NotificationRequestCode;
 
 public class CustomNotificationManager {
 
-    public void createNotification(Context context, String title, String message, String from, String to) {
+    public void createNotification(Context context, int interval) {
 //
         Calendar cal = Calendar.getInstance(TimeZone.getDefault());
         cal.set(Calendar.HOUR_OF_DAY, 15);
@@ -30,7 +30,7 @@ public class CustomNotificationManager {
 
         AlarmManager manager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         if (manager != null) {
-            manager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+            manager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY * interval, pendingIntent);
         }
     }
 
