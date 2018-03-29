@@ -47,6 +47,8 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="successful_save">Sikeres mentés.</string>
     <string name="notification_interval_question">Hány naponta szeretne értesítéseket?</string>
     <string name="button_delete">Törlés</string>
+    <string name="notification_title">Checkmanager</string>
+    <string name="notification_message_text">Befizetted már a számláidat?</string>
 
     <string-array name="months">
         <item>Január</item>

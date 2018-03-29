@@ -15,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yevsp8.checkmanager.CustomNotificationManager;
-import com.yevsp8.checkmanager.GoogleApiActivity;
 import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;

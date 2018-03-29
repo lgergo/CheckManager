@@ -1,11 +1,9 @@
 package com.yevsp8.checkmanager.di;
 
-import com.yevsp8.checkmanager.CheckDetailsFragment;
-import com.yevsp8.checkmanager.CheckListFragment;
 import com.yevsp8.checkmanager.CheckManagerApplication;
-import com.yevsp8.checkmanager.GoogleApiActivity;
-import com.yevsp8.checkmanager.NotificationListFragment;
-import com.yevsp8.checkmanager.view.CreateNotificationActivity;
+import com.yevsp8.checkmanager.view.CheckDetailsFragment;
+import com.yevsp8.checkmanager.view.CheckListFragment;
+import com.yevsp8.checkmanager.view.GoogleApiActivity;
 import com.yevsp8.checkmanager.view.SettingsActivity;
 
 import dagger.Component;
@@ -23,11 +21,7 @@ public interface CheckManagerApplicationComponent {
 
     void injectCheckViewModel(CheckDetailsFragment checkDetailsFragment);
 
-    void injectNotificationListViewmodel(NotificationListFragment notificationListFragment);
-
     void injectGooglaApiActivity(GoogleApiActivity googleApiActivity);
-
-    void injectCreateNotificationActivity(CreateNotificationActivity createNotificationActivity);
 
     void injectSettingsActivity(SettingsActivity createSettingsActivity);
 }

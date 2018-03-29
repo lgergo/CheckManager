@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yevsp8.checkmanager.GoogleApiActivity">
+    tools:context="com.yevsp8.checkmanager.view.GoogleApiActivity">
 
     <include
         android:id="@+id/toolbar_checkDetails"

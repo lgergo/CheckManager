@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.data.Check;
 import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
@@ -21,7 +22,6 @@ import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.util.Converter;
 import com.yevsp8.checkmanager.util.Enums;
-import com.yevsp8.checkmanager.view.MainActivity;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import java.util.Calendar;

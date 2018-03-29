@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProvider;
@@ -13,13 +13,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.data.Check;
 import com.yevsp8.checkmanager.data.CheckAdapter;
 import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
-import com.yevsp8.checkmanager.view.CheckDetailsActivity;
 import com.yevsp8.checkmanager.viewModel.CheckListViewModel;
 
 import java.util.List;

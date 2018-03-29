@@ -19,7 +19,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.yevsp8.checkmanager.HelpFragment;
 import com.yevsp8.checkmanager.ImageProcessor;
 import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.di.ContextModule;

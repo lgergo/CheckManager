@@ -36,11 +36,10 @@
             android:name=".view.CheckDetailsActivity"
             android:label="@string/title_activity_check_details" />
         <activity android:name=".view.NewImageActivity" />
-        <activity android:name=".GoogleApiActivity" />
+        <activity android:name=".view.GoogleApiActivity" />
         <activity
             android:name=".view.SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity android:name=".view.CreateNotificationActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.view;
 
 import android.Manifest;
 import android.accounts.AccountManager;
@@ -41,13 +41,13 @@ import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
 import com.google.api.services.sheets.v4.model.UpdateSpreadsheetPropertiesRequest;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.util.Converter;
 import com.yevsp8.checkmanager.util.Enums.APICallType;
-import com.yevsp8.checkmanager.view.BaseActivity;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import java.util.ArrayList;

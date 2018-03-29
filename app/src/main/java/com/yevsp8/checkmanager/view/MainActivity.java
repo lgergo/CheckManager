@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.yevsp8.checkmanager.CheckListFragment;
 import com.yevsp8.checkmanager.R;
 
 public class MainActivity extends BaseActivity {
