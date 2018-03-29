@@ -41,9 +41,7 @@ public class NewImageActivity extends BaseActivity {
     @Inject
     ImageProcessor processor;
 
-    private Button buttonTakePhoto;
     private Button buttonRecognise;
-    private Button buttonDemo;
     private ImageView imageView;
     private Bitmap myBitmap;
     private String currentPhotoPath;
@@ -67,7 +65,7 @@ public class NewImageActivity extends BaseActivity {
         fragment = new HelpFragment();
         replaceFragmentToActivity(manager, fragment, R.id.helpText_framgentContainer);
 
-        buttonTakePhoto = findViewById(R.id.button_capture_photo);
+        Button buttonTakePhoto = findViewById(R.id.button_capture_photo);
         buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dispatchTakePictureIntent();
@@ -82,7 +80,7 @@ public class NewImageActivity extends BaseActivity {
             }
         });
 
-        buttonDemo = findViewById(R.id.button_demoData);
+        Button buttonDemo = findViewById(R.id.button_demoData);
         buttonDemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -187,13 +185,26 @@ public class NewImageActivity extends BaseActivity {
 
     private void startRecognition() {
         String[] recognisedText = processor.recognition();
+        recognisedText = trimRecogniseResults(recognisedText);
         Intent intent = new Intent(this, CheckDetailsActivity.class);
         intent.putExtra("result_array", recognisedText);
         startActivity(intent);
     }
 
+    private String[] trimRecogniseResults(String[] results) {
+        String id = results[0].replaceAll(" ", "");
+        int amountValue;
+        String trimmed = results[1].replaceAll("(\\*| )", "");
+        try {
+            amountValue = Integer.parseInt(trimmed);
+        } catch (Exception ex) {
+            amountValue = -1;
+        }
+        return new String[]{id, String.valueOf(amountValue), results[2]};
+    }
+
     private void loadDemoImage() {
-        String imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/skew.jpg";
+        String imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
         currentPhotoPath = imagePath;
 
         BitmapFactory.Options options = new BitmapFactory.Options();

@@ -46,15 +46,7 @@ public class ImageProcessor {
 
     @Inject
     TessTwoApi tessTwoApi;
-    String checkIdResult;
-    String amountResult;
-    String paidToResult;
-    String imagePath;
-    Bitmap bitmap;
-    Bitmap toTestOnly;
-    Mat src;
-    Mat checkRect;
-    Mat corrected;
+    private Mat corrected;
 
     public ImageProcessor(Context context) {
         ImageProcessingComponent component = DaggerImageProcessingComponent.builder()
@@ -72,36 +64,33 @@ public class ImageProcessor {
 
     public Bitmap preProcessing(Bitmap rawBitmap, String filePath) {
         Log.e("Preprocess", "PREPROCESSING STARTED");
-        bitmap = rawBitmap;
-        imagePath = filePath;
 
-        src = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
+        Mat src = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
         Utils.bitmapToMat(rawBitmap, src);
         Imgproc.cvtColor(src, src, Imgproc.COLOR_BGR2GRAY);
 
-        checkRect = src.clone();
+        Mat checkRect = src.clone();
         corrected = src.clone();
         // innentől kétféle kép , egyik a csekk rect megtalálásához
         // másik pedig majd a szöveg rect-ek felismeréséhez
 //
-        // gammaCorrection(checkRect, checkRect);
-        Imgproc.medianBlur(checkRect, checkRect, 7);
+        gammaCorrection(checkRect, checkRect);
 
-
+        //Imgproc.medianBlur(checkRect, checkRect, 7);
         Imgproc.equalizeHist(checkRect, checkRect);
+
         //Imgproc.Laplacian(checkRect,checkRect,CvType.CV_8UC1);
         //Imgproc.adaptiveThreshold(checkRect,checkRect,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,21,2);
 
-//        Mat kernel= Mat.ones(5,5,CvType.CV_8UC1);
-//        Imgproc.morphologyEx(checkRect,checkRect,Imgproc.MORPH_OPEN,kernel);
-
+        //checkRect=backgroundEqualization(src);
 
         Imgproc.threshold(checkRect, checkRect, getMatMean(checkRect), 256, Imgproc.THRESH_BINARY);
-
+        Mat kernel = Mat.ones(7, 7, CvType.CV_8UC1);
+        Imgproc.morphologyEx(checkRect, checkRect, Imgproc.MORPH_OPEN, kernel);
 
         List<MatOfPoint> contours = new ArrayList<>();
         findAndSetContoursList(checkRect, contours);
-        Mat contoured = drawContours(checkRect, contours);
+        //Mat contoured = drawContours(checkRect, contours);
         Mat cornersOfContour = getCorrectedPerspectiveRectPoints(contours);
         corrected = warp(src, cornersOfContour);
         //corrected=checkRect;
@@ -109,38 +98,24 @@ public class ImageProcessor {
         Bitmap output = Bitmap.createBitmap(corrected.cols(), corrected.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(corrected, output);
 
-
-        //---------------------
-
-//        Mat rect = getRectOfAmount(corrected);
-//         preprocessForRectImages(rect,1,1);
-//
-//        Bitmap output = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
-//        Utils.matToBitmap(rect, output);
-//
-//        toTestOnly=output;
-
         Log.e("Preprocess", "PREPROCESSING ENDED");
         return output;
     }
 
     public String[] recognition() {
 
-//        String reuslt = tessTwoApi.startRecognition(toTestOnly,"0123456789*");
-//        return new String[]{reuslt, "-", "-"};
-
         //TODO külön szálon fusson
         Mat rect = getRectOfCheckId(corrected);
         preprocessForRectImages(rect, 3, 3);
         Bitmap rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rect, rectBitmapTemp);
-        checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789");
+        String checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789");
 
         rect = getRectOfAmount(corrected);
         preprocessForRectImages(rect, 1, 1);
         rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(rect, rectBitmapTemp);
-        amountResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789*");
+        String amountResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789*");
 
         rect = getRectOfPaidTo(corrected);
         preprocessForRectImages(rect, 3, 3);
@@ -148,18 +123,32 @@ public class ImageProcessor {
         Utils.matToBitmap(rect, rectBitmapTemp);
         String paidToResultLines = tessTwoApi.startRecognition(rectBitmapTemp, null);
         String[] resultLines = paidToResultLines.split("\n");
-        paidToResult = resultLines[0];
+        String paidToResult = resultLines[0];
 
         return new String[]{checkIdResult, amountResult, paidToResult};
     }
 
     private void preprocessForRectImages(Mat rect, int erodeSize, int dilateSize) {
-        Imgproc.threshold(checkRect, checkRect, 0, 256, Imgproc.THRESH_OTSU);
+        Imgproc.threshold(rect, rect, 0, 256, Imgproc.THRESH_OTSU);
         Core.bitwise_not(rect, rect);
         Mat erode = Mat.ones(new Size(erodeSize, erodeSize), Imgproc.MORPH_RECT);
         Imgproc.erode(rect, rect, erode);
         Mat dilate = Mat.zeros(new Size(dilateSize, dilateSize), Imgproc.MORPH_RECT);
         Imgproc.dilate(rect, rect, dilate);
+    }
+
+    private Mat backgroundEqualization(Mat source) {
+        Mat blur = source.clone();
+        Mat forReturn = source.clone();
+        Imgproc.GaussianBlur(source, blur, new Size(151, 151), 20);
+        Mat backgroundRemoved = source.clone();
+        Core.divide(source, blur, backgroundRemoved);
+        Mat temp = source.clone();
+        Core.MinMaxLocResult res = Core.minMaxLoc(source);
+        Core.multiply(backgroundRemoved, new Scalar(res.maxVal), backgroundRemoved);
+        Core.MinMaxLocResult res2 = Core.minMaxLoc(temp);
+        Core.divide(temp, new Scalar(res2.maxVal), forReturn);
+        return forReturn;
     }
 
     private void gammaCorrection(Mat source, Mat destination) {
@@ -192,7 +181,7 @@ public class ImageProcessor {
 
         double threshold = 0.1;
 
-        double maxArea = 1;
+        double maxArea = 100;
         MatOfPoint temp_contour = contours.get(0);
         MatOfPoint2f approxCurve = new MatOfPoint2f();
 
@@ -276,7 +265,6 @@ public class ImageProcessor {
     }
 
     private Mat getRectOfCheckId(Mat image) {
-        //rect x=col, y=row, jobb felso sarokbol szamol
         Point p1 = new Point(0, image.rows() * Constants.Check_ID_Top_DistFrom_Top);
         Point p2 = new Point(image.cols(), image.rows() * Constants.Check_ID_Bottom_DistFrom_Top);
         return getMatOfRect(image, p1, p2);
@@ -296,8 +284,7 @@ public class ImageProcessor {
 
     private Mat getMatOfRect(Mat image, Point p1, Point p2) {
         Rect rect = new Rect(p1, p2);
-        Mat result = new Mat(image, rect);
-        return result;
+        return new Mat(image, rect);
     }
 
     private void writeImage(Bitmap bmp) {
@@ -361,7 +348,6 @@ public class ImageProcessor {
             default:
                 return source;
         }
-        Bitmap result = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-        return result;
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 }

@@ -40,7 +40,7 @@
         <activity
             android:name=".view.SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity android:name=".view.CreateNotificationActivity"></activity>
+        <activity android:name=".view.CreateNotificationActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -54,6 +54,7 @@
 
         <receiver android:name=".NotificationReceiver" />
 
+        <activity android:name=".view.HelpActivity"></activity>
     </application>
 
 </manifest>

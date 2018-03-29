@@ -12,8 +12,6 @@ import java.util.Locale;
 
 public class Converter {
 
-    public static final String dateTimePattern = "yyyy/MM/dd";
-
     public static long dateToLong(Date date) {
         return date.getTime();
     }
@@ -23,7 +21,7 @@ public class Converter {
     }
 
     public static String dateToStringFormatted(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateTimePattern, Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(Constants.DateTimePattern, Locale.getDefault());
         return sdf.format(date);
     }
 
@@ -33,7 +31,7 @@ public class Converter {
     }
 
     public static long stringDateToLong(String date) {
-        SimpleDateFormat f = new SimpleDateFormat(dateTimePattern);
+        SimpleDateFormat f = new SimpleDateFormat(Constants.DateTimePattern, Locale.getDefault());
         try {
             Date d = f.parse(date);
             return d.getTime();

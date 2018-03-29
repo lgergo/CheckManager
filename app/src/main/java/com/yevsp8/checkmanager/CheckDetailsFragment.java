@@ -122,16 +122,8 @@ public class CheckDetailsFragment extends Fragment {
         CheckDetailsFragment.this.check = check;
 
         if (checkId == null) {
-            int amountValue;
-            String trimmed = recognisedText[1].replaceAll("(\\*| )", "");
-            try {
-                amountValue = Integer.parseInt(trimmed);
-            } catch (Exception ex) {
-                amountValue = -1;
-            }
             long today = Calendar.getInstance().getTime().getTime();
-            check = new Check(recognisedText[0], today, amountValue, recognisedText[2], Converter.longDateToString(today));
-            //TODO sikertelen insert
+            check = new Check(recognisedText[0], today, Integer.parseInt(recognisedText[1]), recognisedText[2], Converter.longDateToString(today));
             viewModel.insertCheck(check);
         }
 

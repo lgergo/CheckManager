@@ -6,7 +6,5 @@ package com.yevsp8.checkmanager.util;
 
 public class Enums {
 
-    //TODO enumok kiemelése ha van közös használatú
-
     public enum APICallType {Get_data, Update_data, ConnectionTest, CreateSpreadSheet}
 }

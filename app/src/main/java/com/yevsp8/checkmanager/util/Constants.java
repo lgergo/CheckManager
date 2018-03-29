@@ -6,6 +6,7 @@ package com.yevsp8.checkmanager.util;
 
 public class Constants {
 
+    public static final String DateTimePattern = "yyyy/MM/dd";
     public static int NotificationRequestCode = 111;
     public static int Max_Notification_Day_Interval = 30;
     private static double height = 10.6;

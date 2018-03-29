@@ -52,7 +52,8 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         switch (id) {
             case R.id.menu_help:
-                //TODO fragment betöltése valahova
+                Intent help = new Intent(getApplicationContext(), HelpActivity.class);
+                startActivity(help);
                 break;
             case R.id.menu_settings:
                 Intent settings = new Intent(getApplicationContext(), SettingsActivity.class);
