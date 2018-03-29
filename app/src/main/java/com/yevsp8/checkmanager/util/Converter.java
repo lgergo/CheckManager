@@ -2,6 +2,7 @@ package com.yevsp8.checkmanager.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -40,5 +41,10 @@ public class Converter {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public static String getTodayStringFormatted() {
+        Date d = Calendar.getInstance(Locale.getDefault()).getTime();
+        return dateToStringFormatted(d);
     }
 }

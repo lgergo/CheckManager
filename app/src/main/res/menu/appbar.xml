@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_synch"
-        android:icon="@drawable/ic_sync"
+        android:id="@+id/menu_help"
+        android:icon="@drawable/ic_help_24dp"
         android:title="Synch"
         app:showAsAction="ifRoom" />
     <item

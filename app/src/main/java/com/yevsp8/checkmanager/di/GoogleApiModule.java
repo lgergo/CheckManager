@@ -45,7 +45,7 @@ public class GoogleApiModule {
     @CustomScope
     public GoogleAccountCredential provideCredential(Context context, /*String[] SCOPES,*/ ExponentialBackOff exponentialBackOff) {
         return GoogleAccountCredential.usingOAuth2(
-                context, Arrays.asList(SheetsScopes.SPREADSHEETS))
+                context, Arrays.asList(SheetsScopes.SPREADSHEETS, SheetsScopes.DRIVE, SheetsScopes.DRIVE_FILE))
                 .setBackOff(exponentialBackOff);
     }
 

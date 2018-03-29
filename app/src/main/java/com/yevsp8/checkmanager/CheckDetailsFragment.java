@@ -21,6 +21,7 @@ import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.util.Converter;
 import com.yevsp8.checkmanager.util.Enums;
+import com.yevsp8.checkmanager.view.MainActivity;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
 
 import java.util.Calendar;
@@ -30,7 +31,6 @@ import javax.inject.Inject;
 
 public class CheckDetailsFragment extends Fragment {
 
-    static final int UPLOAD_REQUEST_CODE = 2;
     View rootView;
     Check check;
     String checkId;
@@ -43,6 +43,7 @@ public class CheckDetailsFragment extends Fragment {
     boolean isSaveEnabled = false;
     Button button_edit_save;
     Button button_upload;
+    Button button_delete;
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     CheckViewModel viewModel;
@@ -72,7 +73,7 @@ public class CheckDetailsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 isSaveEnabled = !isSaveEnabled;
-                setEditingTo();
+                editSaveClicked();
             }
         });
 
@@ -80,7 +81,15 @@ public class CheckDetailsFragment extends Fragment {
         button_upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkBeforeUpload();
+                uploadClicked();
+            }
+        });
+
+        button_delete = rootView.findViewById(R.id.button_details_delete);
+        button_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteClicked();
             }
         });
 
@@ -103,7 +112,6 @@ public class CheckDetailsFragment extends Fragment {
             public void onChanged(@Nullable Check checkParam) {
                 if (CheckDetailsFragment.this.check == null) {
                     setTextViewValues(checkParam);
-                    //TODO loop ban mindig meghívja
                 }
             }
         });
@@ -114,7 +122,7 @@ public class CheckDetailsFragment extends Fragment {
         CheckDetailsFragment.this.check = check;
 
         if (checkId == null) {
-            int amountValue = 0;
+            int amountValue;
             String trimmed = recognisedText[1].replaceAll("(\\*| )", "");
             try {
                 amountValue = Integer.parseInt(trimmed);
@@ -122,9 +130,8 @@ public class CheckDetailsFragment extends Fragment {
                 amountValue = -1;
             }
             long today = Calendar.getInstance().getTime().getTime();
-            //String month = Calendar.getInstance().getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
             check = new Check(recognisedText[0], today, amountValue, recognisedText[2], Converter.longDateToString(today));
-            //TODO sikertelen isnert
+            //TODO sikertelen insert
             viewModel.insertCheck(check);
         }
 
@@ -135,32 +142,39 @@ public class CheckDetailsFragment extends Fragment {
         paiddate.setText(check.getPaidDate());
     }
 
-    private void setEditingTo() {
+    private void editSaveClicked() {
         id.setEnabled(isSaveEnabled);
         amount.setEnabled(isSaveEnabled);
         paidto.setEnabled(isSaveEnabled);
         paiddate.setEnabled(isSaveEnabled);
         button_upload.setEnabled(!isSaveEnabled);
+        button_delete.setEnabled(!isSaveEnabled);
         if (isSaveEnabled) {
-            button_edit_save.setText("Save");
+            button_edit_save.setText(R.string.button_save);
         } else {
-            button_edit_save.setText("Edit");
+            button_edit_save.setText(R.string.button_edit);
             long creationDate = check.getCreationDate();
             check = new Check(id.getText().toString(), creationDate, Integer.parseInt(amount.getText().toString()), paidto.getText().toString(), paiddate.getText().toString());
+            viewModel.insertCheck(check);
         }
     }
 
-    private void checkBeforeUpload() {
+    private void uploadClicked() {
         if (id.getText().length() > 0 && amount.getText().length() > 0 && paidto.getText().length() > 0 && paiddate.getText().length() > 0) {
             Intent intent = new Intent(getContext(), GoogleApiActivity.class);
             intent.putExtra("callType", Enums.APICallType.Update_data);
             String[] param = viewModel.checkDetailsToGoogleRequestFormat(check);
             intent.putExtra("result_array", param);
-            //startActivityForResult(intent, UPLOAD_REQUEST_CODE);
             startActivity(intent);
         } else {
-            Toast t = Toast.makeText(getContext(), "Üres mezővel nem lehetséges a feltöltés!", Toast.LENGTH_LONG);
+            Toast t = Toast.makeText(getContext(), R.string.upload_emptyField, Toast.LENGTH_LONG);
             t.show();
         }
+    }
+
+    private void deleteClicked() {
+        viewModel.deleteCheck(check);
+        Intent intent = new Intent(getContext(), MainActivity.class);
+        startActivity(intent);
     }
 }

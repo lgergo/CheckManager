@@ -37,12 +37,15 @@ import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
+import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
+import com.google.api.services.sheets.v4.model.UpdateSpreadsheetPropertiesRequest;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.util.Converter;
 import com.yevsp8.checkmanager.util.Enums.APICallType;
 import com.yevsp8.checkmanager.view.BaseActivity;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
@@ -104,11 +107,6 @@ public class GoogleApiActivity extends BaseActivity
         mOutputText = findViewById(R.id.googleApiResult_textView);
 
         callGoogleApi(type);
-
-//      Intent resultIntent = new Intent();
-        //resultIntent.putExtra("result", mOutputText.getText());
-//        setResult(requestCode);
-//        finish();
     }
 
     @Override
@@ -147,6 +145,8 @@ public class GoogleApiActivity extends BaseActivity
                 case ConnectionTest:
                     new ConnectionTestTask(transport, jsonFactory, mCredential).execute();
                     break;
+                case CreateSpreadSheet:
+                    new CreateSpreadSheetTask(transport, jsonFactory, mCredential).execute();
             }
         }
     }
@@ -512,7 +512,7 @@ public class GoogleApiActivity extends BaseActivity
         protected void onPreExecute() {
             mOutputText.setText("");
             progress = new ProgressDialog(GoogleApiActivity.this);
-            progress.setMessage("Tesztelés folyamatban...");
+            progress.setMessage("Kapcsolódás...");
             progress.show();
         }
 
@@ -544,6 +544,89 @@ public class GoogleApiActivity extends BaseActivity
                 }
             } else {
                 mOutputText.setText(R.string.request_cancelled);
+            }
+            progress.dismiss();
+        }
+    }
+
+    private class CreateSpreadSheetTask extends AsyncTask<Void, Void, Boolean> {
+        com.google.api.services.sheets.v4.Sheets mService = null;
+        private Exception mLastError = null;
+        private String tempSpreadSheetId;
+
+        CreateSpreadSheetTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
+            mService = new com.google.api.services.sheets.v4.Sheets.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("Google Sheets API Create Spreadsheet")
+                    .build();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                return createSpreadSheet();
+            } catch (Exception e) {
+                mLastError = e;
+                cancel(true);
+                return null;
+            }
+        }
+
+        private Boolean createSpreadSheet() throws Exception {
+            Spreadsheet requestBody = new Spreadsheet();
+            Sheets.Spreadsheets.Create request = this.mService.spreadsheets().create(requestBody);
+            Spreadsheet response = request.execute();
+            String sheetId = response.getSpreadsheetId();
+            if (sheetId.length() > 0) {
+                saveToSharedPreferences(R.string.sheetId_value, sheetId);
+                tempSpreadSheetId = sheetId;
+            }
+            List<Request> reqList = new ArrayList<>();
+            reqList.add(new Request().setUpdateSpreadsheetProperties(new UpdateSpreadsheetPropertiesRequest()
+                    .setProperties(new SpreadsheetProperties()
+                            .setTitle("Checkmanager"))
+                    .setFields("title")));
+
+            BatchUpdateSpreadsheetRequest body = new BatchUpdateSpreadsheetRequest().setRequests(reqList);
+            BatchUpdateSpreadsheetResponse batchResponse = this.mService.spreadsheets().batchUpdate(tempSpreadSheetId, body).execute();
+            return batchResponse.getReplies().size() > 0;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mOutputText.setText("");
+            progress = new ProgressDialog(GoogleApiActivity.this);
+            progress.setMessage("Táblázat generálása...");
+            progress.show();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean output) {
+            if (output) {
+                mOutputText.setText(R.string.create_spreadsheet_successful);
+                spreadsheetId = tempSpreadSheetId;
+            } else {
+                mOutputText.setText(R.string.create_spreadsheet_unsuccessful);
+            }
+            progress.dismiss();
+        }
+
+        @Override
+        protected void onCancelled() {
+            if (mLastError != null) {
+                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+                    showGooglePlayServicesAvailabilityErrorDialog(
+                            ((GooglePlayServicesAvailabilityIOException) mLastError)
+                                    .getConnectionStatusCode());
+                } else if (mLastError instanceof UserRecoverableAuthIOException) {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
+                            GoogleApiActivity.REQUEST_AUTHORIZATION);
+                } else {
+                    mOutputText.setText(R.string.connection_test_unsuccesful);
+                }
+            } else {
+                mOutputText.setText(R.string.create_spreadsheet_unsuccessful);
             }
             progress.dismiss();
         }
@@ -630,6 +713,7 @@ public class GoogleApiActivity extends BaseActivity
                 mOutputText.setText(R.string.unsuccesful_update);
             }
             viewModel.deleteCheckById(checkDetailsdataArray[0]);
+            saveToSharedPreferences(R.string.last_sync_value, Converter.getTodayStringFormatted());
             progress.dismiss();
         }
 
@@ -645,9 +729,9 @@ public class GoogleApiActivity extends BaseActivity
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             GoogleApiActivity.REQUEST_AUTHORIZATION);
                 } else {
-//                    mOutputText.setText(getString(R.string.universal_error)
-//                            + mLastError.getMessage());
-                    mOutputText.setText(R.string.unsuccesful_update);
+                    mOutputText.setText(getString(R.string.universal_error)
+                            + mLastError.getMessage());
+                    //mOutputText.setText(R.string.unsuccesful_update);
                 }
             } else {
                 mOutputText.setText(R.string.request_cancelled);

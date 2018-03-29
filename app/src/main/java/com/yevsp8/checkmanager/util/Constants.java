@@ -7,6 +7,7 @@ package com.yevsp8.checkmanager.util;
 public class Constants {
 
     public static int NotificationRequestCode = 111;
+    public static int Max_Notification_Day_Interval = 30;
     private static double height = 10.6;
     public static double Check_ID_Top_DistFrom_Top = 9.65 / height;
     public static double Check_ID_Bottom_DistFrom_Top = 10.3 / height;

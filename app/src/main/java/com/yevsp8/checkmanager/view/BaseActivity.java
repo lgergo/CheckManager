@@ -17,7 +17,7 @@ import com.yevsp8.checkmanager.R;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    static SharedPreferences sharedPref;
+    private SharedPreferences sharedPref;
 
     public void replaceFragmentToActivity(FragmentManager manager, Fragment fragment, int frameId) {
         FragmentTransaction transaction = manager.beginTransaction();
@@ -51,8 +51,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.menu_synch:
-
+            case R.id.menu_help:
+                //TODO fragment betöltése valahova
                 break;
             case R.id.menu_settings:
                 Intent settings = new Intent(getApplicationContext(), SettingsActivity.class);

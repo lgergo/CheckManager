@@ -20,8 +20,8 @@ public class CustomNotificationManager {
     public void createNotification(Context context, int interval) {
 //
         Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-        cal.set(Calendar.HOUR_OF_DAY, 15);
-        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.HOUR_OF_DAY, 20);
+        cal.set(Calendar.MINUTE, 18);
 
         Intent i = new Intent(context, NotificationReceiver.class);
         i.putExtra("title", "Checkmanager");

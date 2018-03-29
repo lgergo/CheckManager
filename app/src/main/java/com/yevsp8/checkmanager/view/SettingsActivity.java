@@ -1,5 +1,7 @@
 package com.yevsp8.checkmanager.view;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +21,7 @@ import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.util.Constants;
 import com.yevsp8.checkmanager.util.Enums;
 
 import javax.inject.Inject;
@@ -28,12 +31,11 @@ public class SettingsActivity extends BaseActivity {
 
     @Inject
     CustomNotificationManager notManager;
-    private TextView textview_sheetId;
     private EditText edittext_sheetId;
-    private Button button_save;
-    private Button button_test;
     private SeekBar seekBar;
     private TextView seekBarValue;
+    private int notificationInterval;
+    private String sheetId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,35 +54,41 @@ public class SettingsActivity extends BaseActivity {
 //        FragmentManager manager = getSupportFragmentManager();
 //        Fragment fragment = new NotificationListFragment();
 //        replaceFragmentToActivity(manager, fragment, R.id.notificationlist_fragmentcontainer);
+        sheetId = getValueFromSharedPreferences(R.string.sheetId_value, R.string.sheetId_default);
+        notificationInterval = Integer.parseInt(getValueFromSharedPreferences(R.string.notification_interval_value, R.string.notification_interval_default));
 
-        textview_sheetId = findViewById(R.id.textView_sheetId);
+
         edittext_sheetId = findViewById(R.id.editText_settings_sheetId);
-        edittext_sheetId.setText(getValueFromSharedPreferences(R.string.sheetId_value, R.string.sheetId_default), TextView.BufferType.EDITABLE);
+        edittext_sheetId.setText(sheetId, TextView.BufferType.EDITABLE);
         if (edittext_sheetId.getText().length() == 0) {
             edittext_sheetId.setHint("Ide írja a Sheets ID azonosítóját...");
         }
 
-        button_save = findViewById(R.id.button_settings_save);
+        Button button_save = findViewById(R.id.button_settings_save);
         button_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveToSharedPreferences(R.string.sheetId_value, edittext_sheetId.getText().toString());
-                saveToSharedPreferences(R.string.notification_interval_value, String.valueOf(seekBar.getProgress()));
-                Toast.makeText(getApplicationContext(), "Sikeres mentés.", Toast.LENGTH_SHORT).show();
+                saveButtonClicked();
             }
         });
-        button_test = findViewById(R.id.button_settings_test);
+        Button button_test = findViewById(R.id.button_settings_test);
         button_test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 testButtonClicked();
             }
         });
+        Button button_create = findViewById(R.id.button_settings_create);
+        button_create.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createButtonClickeed();
+            }
+        });
 
-        int seekBarValueFromPrefernces = Integer.parseInt(getValueFromSharedPreferences(R.string.notification_interval_value, R.string.notification_interval_default));
         seekBar = findViewById(R.id.seekBar_settings);
-        seekBar.setMax(30);
-        seekBar.setProgress(seekBarValueFromPrefernces);
+        seekBar.setMax(Constants.Max_Notification_Day_Interval);
+        seekBar.setProgress(notificationInterval);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int progressValue;
 
@@ -110,6 +118,47 @@ public class SettingsActivity extends BaseActivity {
         Intent intent = new Intent(this, GoogleApiActivity.class);
         intent.putExtra("callType", Enums.APICallType.ConnectionTest);
         startActivity(intent);
+    }
+
+    private void createButtonClickeed() {
+        if (edittext_sheetId.getText().length() > 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Táblázat létrehozás");
+            builder.setMessage("Az azonosító mező nem üres. Biztos hogy létre akar hozni egy új táblázatot?");
+            builder.setPositiveButton("Igen", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
+                    intent.putExtra("callType", Enums.APICallType.CreateSpreadSheet);
+                    startActivity(intent);
+                }
+            });
+            builder.setNegativeButton("Nem", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+            builder.show();
+        } else {
+            Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
+            intent.putExtra("callType", Enums.APICallType.CreateSpreadSheet);
+            startActivity(intent);
+        }
+    }
+
+    private void saveButtonClicked() {
+        if (!sheetId.equals(edittext_sheetId.getText().toString())) {
+            saveToSharedPreferences(R.string.sheetId_value, edittext_sheetId.getText().toString());
+        }
+        if (notificationInterval != seekBar.getProgress()) {
+            saveToSharedPreferences(R.string.notification_interval_value, String.valueOf(seekBar.getProgress()));
+            notManager.deleteNotification(this);
+            if (notificationInterval != 0) {
+                notManager.createNotification(this, notificationInterval);
+            }
+        }
+        Toast.makeText(getApplicationContext(), R.string.successful_save, Toast.LENGTH_SHORT).show();
     }
 
     @Override

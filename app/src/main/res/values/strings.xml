@@ -33,12 +33,22 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="googlePlay_install">This app requires Google Play Services. Please install Google Play Services on your device and relaunch this app.</string>
     <string name="request_contactAccess">This app needs to access your Google account (via Contacts).</string>
     <string name="no_network">No network connection available.</string>
-    <string name="progress_dialog_upload">Feltöltés folyamatban...</string>
-    <string name="save">Mentés</string>
+    <string name="progress_dialog_upload">Feltöltés folyamatban…</string>
     <string name="sheetId_text">Google Sheets azonosító:</string>
     <string name="active_notifications_title">Aktív értesítések</string>
     <string name="connection_test_successful">A megadott azonosító megfelelő.</string>
     <string name="connection_test_unsuccesful">A megadott azonosító hibás!</string>
+    <string name="button_save">Mentés</string>
+    <string name="button_edit">Szerkesztés</string>
+    <string name="button_upload">Feltöltés</string>
+    <string name="button_create">Létrehoz</string>
+    <string name="button_test">Tesztelés</string>
+    <string name="upload_emptyField">Üres mezővel nem lehetséges a feltöltés!</string>
+    <string name="create_spreadsheet_successful">Táblázat sikeresen létrehozva.</string>
+    <string name="create_spreadsheet_unsuccessful">Táblázat generálása sikertelen.</string>
+    <string name="successful_save">Sikeres mentés.</string>
+    <string name="notification_interval_question">Hány naponta szeretne értesítéseket?</string>
+    <string name="button_delete">Törlés</string>
 
     <string-array name="months">
         <item>Január</item>

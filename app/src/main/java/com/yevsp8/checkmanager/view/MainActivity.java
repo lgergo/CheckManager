@@ -1,8 +1,6 @@
 package com.yevsp8.checkmanager.view;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,20 +14,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yevsp8.checkmanager.CheckListFragment;
-import com.yevsp8.checkmanager.NotificationReceiver;
 import com.yevsp8.checkmanager.R;
-
-import java.util.Calendar;
-
-import static com.yevsp8.checkmanager.util.Constants.NotificationRequestCode;
 
 public class MainActivity extends BaseActivity {
 
     private CheckListFragment fragment;
     private TextView latestSyncTextView;
     private FloatingActionButton newImageButton;
-    private FloatingActionButton testApiButton;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,14 +43,6 @@ public class MainActivity extends BaseActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), NewImageActivity.class);
                 startActivity(intent);
-            }
-        });
-
-        testApiButton = findViewById(R.id.testGoogleApi_button);
-        testApiButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                demoNitification();
             }
         });
 
@@ -89,20 +72,6 @@ public class MainActivity extends BaseActivity {
             }
         });
         builder.show();
-    }
-
-    private void demoNitification() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 11);
-        cal.set(Calendar.MINUTE, 13);
-
-        Intent intent = new Intent(this, NotificationReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), NotificationRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        if (manager != null) {
-            manager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-        }
     }
 
     @Override
