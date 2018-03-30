@@ -49,6 +49,7 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="button_delete">Törlés</string>
     <string name="notification_title">Checkmanager</string>
     <string name="notification_message_text">Befizetted már a számláidat?</string>
+    <string name="settings_empty_shetId_toast">Üres táblázat azonosító!</string>
 
     <string-array name="months">
         <item>Január</item>

@@ -50,9 +50,6 @@ public class SettingsActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
 
-//        FragmentManager manager = getSupportFragmentManager();
-//        Fragment fragment = new NotificationListFragment();
-//        replaceFragmentToActivity(manager, fragment, R.id.notificationlist_fragmentcontainer);
         sheetId = getValueFromSharedPreferences(R.string.sheetId_value, R.string.sheetId_default);
         notificationInterval = Integer.parseInt(getValueFromSharedPreferences(R.string.notification_interval_value, R.string.notification_interval_default));
 
@@ -113,10 +110,14 @@ public class SettingsActivity extends BaseActivity {
     }
 
     private void testButtonClicked() {
-        saveToSharedPreferences(R.string.sheetId_value, edittext_sheetId.getText().toString());
-        Intent intent = new Intent(this, GoogleApiActivity.class);
-        intent.putExtra("callType", Enums.APICallType.ConnectionTest);
-        startActivity(intent);
+        if (edittext_sheetId.getText().length() == 0) {
+            Toast.makeText(getApplicationContext(), R.string.settings_empty_shetId_toast, Toast.LENGTH_SHORT).show();
+        } else {
+            saveToSharedPreferences(R.string.sheetId_value, edittext_sheetId.getText().toString());
+            Intent intent = new Intent(this, GoogleApiActivity.class);
+            intent.putExtra("callType", Enums.APICallType.ConnectionTest);
+            startActivity(intent);
+        }
     }
 
     private void createButtonClickeed() {

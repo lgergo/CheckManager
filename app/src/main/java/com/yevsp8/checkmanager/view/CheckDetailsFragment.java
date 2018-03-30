@@ -124,6 +124,7 @@ public class CheckDetailsFragment extends Fragment {
         if (checkId == null) {
             long today = Calendar.getInstance().getTime().getTime();
             check = new Check(recognisedText[0], today, Integer.parseInt(recognisedText[1]), recognisedText[2], Converter.longDateToString(today));
+            CheckDetailsFragment.this.check = check;
             viewModel.insertCheck(check);
         }
 

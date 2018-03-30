@@ -365,7 +365,7 @@ public class GoogleApiActivity extends BaseActivity
                 valueRange.setRange(range);
                 valueRange.setValues(
                         Arrays.asList(
-                                Arrays.asList((Object) getResources().getStringArray(R.array.headers))//(Object) "hónap", "csekk sorszám", "összeg", "befizetés dátuma")
+                                Arrays.asList((Object[]) getResources().getStringArray(R.array.headers))//(Object) "hónap", "csekk sorszám", "összeg", "befizetés dátuma")
                         ));
                 String range2 = companyName + "!A2:A14";
                 ValueRange valueRange2 = new ValueRange();
@@ -373,7 +373,7 @@ public class GoogleApiActivity extends BaseActivity
                 valueRange2.setRange(range2);
                 valueRange2.setValues(
                         Arrays.asList(
-                                Arrays.asList((Object) getResources().getStringArray(R.array.months))//(Object) "január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december")
+                                Arrays.asList((Object[]) getResources().getStringArray(R.array.months))//(Object) "január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december")
                         ));
 
                 List<ValueRange> data = new ArrayList<>();

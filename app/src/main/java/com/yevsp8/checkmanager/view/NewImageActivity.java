@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
@@ -57,12 +58,13 @@ public class NewImageActivity extends BaseActivity {
                 .contextModule(new ContextModule(this))
                 .tessTwoModule(new TessTwoModule(this))
                 .build();
-
         component.injectNewImageActivtiy(this);
 
         FragmentManager manager = getSupportFragmentManager();
         fragment = new HelpFragment();
         replaceFragmentToActivity(manager, fragment, R.id.helpText_framgentContainer);
+
+        imageView = findViewById(R.id.captured_photo_imageView);
 
         Button buttonTakePhoto = findViewById(R.id.button_capture_photo);
         buttonTakePhoto.setOnClickListener(new View.OnClickListener() {
@@ -83,10 +85,10 @@ public class NewImageActivity extends BaseActivity {
         buttonDemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                loadDemoImage();
                 startPreprocessing();
             }
         });
-        loadDemoImage();
     }
 
     private void dispatchTakePictureIntent() {
@@ -222,5 +224,10 @@ public class NewImageActivity extends BaseActivity {
     private void startPreprocessing() {
         Bitmap b = processor.preProcessing(myBitmap, currentPhotoPath);
         imageView.setImageBitmap(b);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+
     }
 }
