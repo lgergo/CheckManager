@@ -1,6 +1,8 @@
 package com.yevsp8.checkmanager.view;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -16,7 +18,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -82,6 +87,7 @@ public class NewImageActivity extends BaseActivity {
         });
 
         Button buttonDemo = findViewById(R.id.button_demoData);
+        //buttonDemo.setEnabled(false);
         buttonDemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,9 +126,9 @@ public class NewImageActivity extends BaseActivity {
             File imgFile = new File(currentPhotoPath);
             if (imgFile.exists()) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
-                //options.inSampleSize = 2;
+                options.inSampleSize = 4;
                 myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                //        myBitmap = processor.rotate(myBitmap,currentPhotoPath);
+                myBitmap = processor.rotate(myBitmap, currentPhotoPath);
                 imageView.setImageBitmap(myBitmap);
             }
             buttonRecognise.setEnabled(true);
@@ -162,7 +168,7 @@ public class NewImageActivity extends BaseActivity {
                         MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             }
         } else {
-            startRecognition();
+            startPreprocessing();
         }
     }
 
@@ -172,7 +178,7 @@ public class NewImageActivity extends BaseActivity {
             case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startRecognition();
+                    startPreprocessing();
                 } else {
                     buttonRecognise.setEnabled(false);
                 }
@@ -183,14 +189,6 @@ public class NewImageActivity extends BaseActivity {
 
     //TODO ha nem jó a kép akkor ne is mentse le / vagy töröljük
 
-
-    private void startRecognition() {
-        String[] recognisedText = processor.recognition();
-        recognisedText = trimRecogniseResults(recognisedText);
-        Intent intent = new Intent(this, CheckDetailsActivity.class);
-        intent.putExtra("result_array", recognisedText);
-        startActivity(intent);
-    }
 
     private String[] trimRecogniseResults(String[] results) {
         String id = results[0].replaceAll(" ", "");
@@ -205,25 +203,59 @@ public class NewImageActivity extends BaseActivity {
     }
 
     private void loadDemoImage() {
-        String imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
-        currentPhotoPath = imagePath;
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        //options.inSampleSize = 2;
-        myBitmap = BitmapFactory.decodeFile(imagePath, options);
-        myBitmap = processor.rotate(myBitmap, currentPhotoPath);
-        imageView = findViewById(R.id.captured_photo_imageView);
-        imageView.setImageBitmap(myBitmap);
-
-        buttonRecognise.setEnabled(true);
-
-        FragmentManager manager = getSupportFragmentManager();
-        removeFragmentFromActivtiy(manager, fragment);
+//        String imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
+//        currentPhotoPath = imagePath;
+//
+//        BitmapFactory.Options options = new BitmapFactory.Options();
+//        //options.inSampleSize = 2;
+//        myBitmap = BitmapFactory.decodeFile(imagePath, options);
+//        myBitmap = processor.rotate(myBitmap, currentPhotoPath);
+//        imageView = findViewById(R.id.captured_photo_imageView);
+//        imageView.setImageBitmap(myBitmap);
+//
+//        buttonRecognise.setEnabled(true);
+//
+//        FragmentManager manager = getSupportFragmentManager();
+//        removeFragmentFromActivtiy(manager, fragment);
+        imageView.setImageBitmap(processor.preProcessing(myBitmap, currentPhotoPath));
     }
 
     private void startPreprocessing() {
-        Bitmap b = processor.preProcessing(myBitmap, currentPhotoPath);
-        imageView.setImageBitmap(b);
+        try {
+            imageView.setImageBitmap(processor.preProcessing(myBitmap, currentPhotoPath));
+        } catch (OutOfMemoryError err) {
+            Log.e("MEM", err.getMessage());
+            //TODO message hogy próbálja újra
+            Intent settings = new Intent(getApplicationContext(), NewImageActivity.class);
+            startActivity(settings);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Megfelelő a kép?");
+        builder.setNegativeButton("Nem", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Intent settings = new Intent(getApplicationContext(), NewImageActivity.class);
+                startActivity(settings);
+            }
+        });
+        builder.setPositiveButton("Igen", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String[] recognisedText = processor.recognition();
+                recognisedText = trimRecogniseResults(recognisedText);
+                Intent intent = new Intent(getApplicationContext(), CheckDetailsActivity.class);
+                intent.putExtra("result_array", recognisedText);
+                startActivity(intent);
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        WindowManager.LayoutParams wmlp = dialog.getWindow().getAttributes();
+        wmlp.gravity = Gravity.BOTTOM | Gravity.CENTER;
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
     }
 
     @Override

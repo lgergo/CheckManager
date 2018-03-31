@@ -729,9 +729,9 @@ public class GoogleApiActivity extends BaseActivity
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             GoogleApiActivity.REQUEST_AUTHORIZATION);
                 } else {
-                    mOutputText.setText(getString(R.string.universal_error)
-                            + mLastError.getMessage());
-                    //mOutputText.setText(R.string.unsuccesful_update);
+//                    mOutputText.setText(getString(R.string.universal_error)
+//                            + mLastError.getMessage());
+                    mOutputText.setText(R.string.unsuccesful_update);
                 }
             } else {
                 mOutputText.setText(R.string.request_cancelled);

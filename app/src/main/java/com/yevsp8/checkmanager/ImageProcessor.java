@@ -26,7 +26,6 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,26 +66,34 @@ public class ImageProcessor {
 
         Mat src = new Mat(rawBitmap.getHeight(), rawBitmap.getWidth(), CvType.CV_8UC1);
         Utils.bitmapToMat(rawBitmap, src);
+        rawBitmap.recycle();
+        rawBitmap = null;
         Imgproc.cvtColor(src, src, Imgproc.COLOR_BGR2GRAY);
 
         Mat checkRect = src.clone();
         corrected = src.clone();
-        // innentől kétféle kép , egyik a csekk rect megtalálásához
-        // másik pedig majd a szöveg rect-ek felismeréséhez
-//
-        gammaCorrection(checkRect, checkRect);
 
-        //Imgproc.medianBlur(checkRect, checkRect, 7);
+        /*
+        a)
+            Imgproc.medianBlur(checkRect, checkRect, 7);
+            Imgproc.equalizeHist(checkRect, checkRect);
+            Imgproc.Canny(checkRect,checkRect,getMatMean(checkRect)*0.2,getMatMean(checkRect)*1.8);
+
+        b)
+            Imgproc.adaptiveThreshold(checkRect,checkRect,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,11,4);
+            Core.bitwise_not(checkRect,checkRect);
+
+            Mat kernel = Mat.ones(5, 5, CvType.CV_8UC1);
+            Imgproc.erode(checkRect,checkRect,kernel);
+            kernel = Mat.ones(25, 25, CvType.CV_8UC1);
+            Imgproc.dilate(checkRect,checkRect,kernel);
+        */
+
+        Imgproc.medianBlur(checkRect, checkRect, 7);
         Imgproc.equalizeHist(checkRect, checkRect);
 
-        //Imgproc.Laplacian(checkRect,checkRect,CvType.CV_8UC1);
-        //Imgproc.adaptiveThreshold(checkRect,checkRect,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,21,2);
+        Imgproc.threshold(checkRect, checkRect, getMatMean(checkRect) * 0.8, 256, Imgproc.THRESH_BINARY);
 
-        //checkRect=backgroundEqualization(src);
-
-        Imgproc.threshold(checkRect, checkRect, getMatMean(checkRect), 256, Imgproc.THRESH_BINARY);
-        Mat kernel = Mat.ones(7, 7, CvType.CV_8UC1);
-        Imgproc.morphologyEx(checkRect, checkRect, Imgproc.MORPH_OPEN, kernel);
 
         List<MatOfPoint> contours = new ArrayList<>();
         findAndSetContoursList(checkRect, contours);
@@ -94,6 +101,7 @@ public class ImageProcessor {
         Mat cornersOfContour = getCorrectedPerspectiveRectPoints(contours);
         corrected = warp(src, cornersOfContour);
         //corrected=checkRect;
+        //corrected=contoured;
 
         Bitmap output = Bitmap.createBitmap(corrected.cols(), corrected.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(corrected, output);
@@ -104,22 +112,23 @@ public class ImageProcessor {
 
     public String[] recognition() {
 
+        Bitmap rectBitmapTemp;
         //TODO külön szálon fusson
         Mat rect = getRectOfCheckId(corrected);
         preprocessForRectImages(rect, 3, 3);
-        Bitmap rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
+        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
         Utils.matToBitmap(rect, rectBitmapTemp);
         String checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789");
 
         rect = getRectOfAmount(corrected);
         preprocessForRectImages(rect, 1, 1);
-        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
+        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
         Utils.matToBitmap(rect, rectBitmapTemp);
         String amountResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789*");
 
         rect = getRectOfPaidTo(corrected);
         preprocessForRectImages(rect, 3, 3);
-        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_8888);
+        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
         Utils.matToBitmap(rect, rectBitmapTemp);
         String paidToResultLines = tessTwoApi.startRecognition(rectBitmapTemp, null);
         String[] resultLines = paidToResultLines.split("\n");
@@ -129,7 +138,7 @@ public class ImageProcessor {
     }
 
     private void preprocessForRectImages(Mat rect, int erodeSize, int dilateSize) {
-        Imgproc.threshold(rect, rect, 0, 256, Imgproc.THRESH_OTSU);
+        Imgproc.threshold(rect, rect, getMatMean(rect), 256, Imgproc.THRESH_OTSU);
         Core.bitwise_not(rect, rect);
         Mat erode = Mat.ones(new Size(erodeSize, erodeSize), Imgproc.MORPH_RECT);
         Imgproc.erode(rect, rect, erode);
@@ -137,19 +146,19 @@ public class ImageProcessor {
         Imgproc.dilate(rect, rect, dilate);
     }
 
-    private Mat backgroundEqualization(Mat source) {
-        Mat blur = source.clone();
-        Mat forReturn = source.clone();
-        Imgproc.GaussianBlur(source, blur, new Size(151, 151), 20);
-        Mat backgroundRemoved = source.clone();
-        Core.divide(source, blur, backgroundRemoved);
-        Mat temp = source.clone();
-        Core.MinMaxLocResult res = Core.minMaxLoc(source);
-        Core.multiply(backgroundRemoved, new Scalar(res.maxVal), backgroundRemoved);
-        Core.MinMaxLocResult res2 = Core.minMaxLoc(temp);
-        Core.divide(temp, new Scalar(res2.maxVal), forReturn);
-        return forReturn;
-    }
+//    private Mat backgroundEqualization(Mat source) {
+//        Mat blur = source.clone();
+//        Mat forReturn = source.clone();
+//        Imgproc.GaussianBlur(source, blur, new Size(151, 151), 20);
+//        Mat backgroundRemoved = source.clone();
+//        Core.divide(source, blur, backgroundRemoved);
+//        Mat temp = source.clone();
+//        Core.MinMaxLocResult res = Core.minMaxLoc(source);
+//        Core.multiply(backgroundRemoved, new Scalar(res.maxVal), backgroundRemoved);
+//        Core.MinMaxLocResult res2 = Core.minMaxLoc(temp);
+//        Core.divide(temp, new Scalar(res2.maxVal), forReturn);
+//        return forReturn;
+//    }
 
     private void gammaCorrection(Mat source, Mat destination) {
         double gamma = 2.0;
@@ -181,7 +190,7 @@ public class ImageProcessor {
 
         double threshold = 0.1;
 
-        double maxArea = 100;
+        double maxArea = 10000;
         MatOfPoint temp_contour = contours.get(0);
         MatOfPoint2f approxCurve = new MatOfPoint2f();
 
@@ -211,7 +220,7 @@ public class ImageProcessor {
         Point p3 = new Point(temp_double[0], temp_double[1]);
         temp_double = approxCurve.get(3, 0);
         Point p4 = new Point(temp_double[0], temp_double[1]);
-        List<Point> source = new ArrayList<Point>();
+        List<Point> source = new ArrayList<>();
         source.add(p1);
         source.add(p2);
         source.add(p3);
@@ -241,7 +250,7 @@ public class ImageProcessor {
         Point p3 = new Point(resultWidth, resultHeight);
         Point p4 = new Point(0, resultHeight);
 
-        List<Point> dest = new ArrayList<Point>();
+        List<Point> dest = new ArrayList<>();
         dest.add(p1);
         dest.add(p2);
         dest.add(p3);
@@ -256,13 +265,13 @@ public class ImageProcessor {
         return output;
     }
 
-    private void logMatDataToConsole(String name, Mat toLog) {
-        Log.e("IMG_DETAILS: " + name + " ",
-                "dim: " + String.valueOf(toLog.dims())
-                        + "; channel: " + String.valueOf(toLog.channels())
-                        + "; depth: " + String.valueOf(toLog.depth())
-        );
-    }
+//    private void logMatDataToConsole(String name, Mat toLog) {
+//        Log.e("IMG_DETAILS: " + name + " ",
+//                "dim: " + String.valueOf(toLog.dims())
+//                        + "; channel: " + String.valueOf(toLog.channels())
+//                        + "; depth: " + String.valueOf(toLog.depth())
+//        );
+//    }
 
     private Mat getRectOfCheckId(Mat image) {
         Point p1 = new Point(0, image.rows() * Constants.Check_ID_Top_DistFrom_Top);
@@ -287,24 +296,24 @@ public class ImageProcessor {
         return new Mat(image, rect);
     }
 
-    private void writeImage(Bitmap bmp) {
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream("/storage/sdcard/Android/data/com.yevsp8.checkmanager/files/Pictures/edited_d.png");
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    private void writeImage(Bitmap bmp) {
+//        FileOutputStream out = null;
+//        try {
+//            out = new FileOutputStream("/storage/sdcard/Android/data/com.yevsp8.checkmanager/files/Pictures/edited_d.png");
+//            bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+//            // PNG is a lossless format, the compression factor (100) is ignored
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                if (out != null) {
+//                    out.close();
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     public Bitmap rotate(Bitmap source, String currentPhotoPath) {
         ExifInterface exif = null;

@@ -111,7 +111,7 @@ public class SettingsActivity extends BaseActivity {
 
     private void testButtonClicked() {
         if (edittext_sheetId.getText().length() == 0) {
-            Toast.makeText(getApplicationContext(), R.string.settings_empty_shetId_toast, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.settings_empty_sheetId_toast, Toast.LENGTH_SHORT).show();
         } else {
             saveToSharedPreferences(R.string.sheetId_value, edittext_sheetId.getText().toString());
             Intent intent = new Intent(this, GoogleApiActivity.class);
