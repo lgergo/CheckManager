@@ -13,14 +13,15 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.yevsp8.checkmanager.CheckListFragment;
+import com.yevsp8.checkmanager.CustomNotificationManager;
 import com.yevsp8.checkmanager.R;
+
+import javax.inject.Inject;
 
 public class MainActivity extends BaseActivity {
 
-    private CheckListFragment fragment;
-    private TextView latestSyncTextView;
-    private FloatingActionButton newImageButton;
+    @Inject
+    CustomNotificationManager notManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,14 +32,14 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
         FragmentManager manager = getSupportFragmentManager();
-        fragment = new CheckListFragment();
+        CheckListFragment fragment = new CheckListFragment();
         replaceFragmentToActivity(manager, fragment, R.id.checklist_fragmentcontainer);
 
-        latestSyncTextView = findViewById(R.id.latest_synch);
+        TextView latestSyncTextView = findViewById(R.id.latest_synch);
         String lastSync = getValueFromSharedPreferences(R.string.last_sync_value, R.string.last_sync_default);
         latestSyncTextView.setText("Legutoljára szinkronizálva: " + lastSync);
 
-        newImageButton = findViewById(R.id.newImage_button);
+        FloatingActionButton newImageButton = findViewById(R.id.newImage_button);
         newImageButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), NewImageActivity.class);
@@ -54,6 +55,8 @@ public class MainActivity extends BaseActivity {
 
     private void showFirstStartAlertDialog() {
         saveToSharedPreferences(R.string.first_start_value, "0");
+        String notInterval = getValueFromSharedPreferences(R.string.notification_interval_value, R.string.notification_interval_default);
+        notManager.createNotification(this, Integer.parseInt(notInterval));
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("CheckManager");
         builder.setMessage("Hogy ki tudd használni a Google Sheets szinkronizációt, kérlek add meg a dokumentum azonosítóját.");

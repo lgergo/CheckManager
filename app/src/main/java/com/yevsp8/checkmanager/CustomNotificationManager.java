@@ -18,14 +18,13 @@ import static com.yevsp8.checkmanager.util.Constants.NotificationRequestCode;
 public class CustomNotificationManager {
 
     public void createNotification(Context context, int interval) {
-//
         Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-        cal.set(Calendar.HOUR_OF_DAY, 20);
-        cal.set(Calendar.MINUTE, 18);
+        cal.set(Calendar.HOUR_OF_DAY, 16);
+        cal.set(Calendar.MINUTE, 0);
 
         Intent i = new Intent(context, NotificationReceiver.class);
-        i.putExtra("title", "Checkmanager");
-        i.putExtra("message", "Befizetted már a számláidat?");
+        i.putExtra("title", context.getString(R.string.notification_title));
+        i.putExtra("message", context.getString(R.string.notification_message_text));
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationRequestCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager manager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
@@ -36,10 +35,7 @@ public class CustomNotificationManager {
 
     public void deleteNotification(Context context) {
         Intent i = new Intent(context, NotificationReceiver.class);
-//        i.putExtra("title",title);
-//        i.putExtra("message",message);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationRequestCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
-
         AlarmManager manager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         if (manager != null) {
             manager.cancel(pendingIntent);

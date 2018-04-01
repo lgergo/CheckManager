@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
 import com.yevsp8.checkmanager.data.CheckRepository;
-import com.yevsp8.checkmanager.data.NotificationRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -18,12 +17,10 @@ import javax.inject.Singleton;
 public class CustomViewModelFactory implements ViewModelProvider.Factory {
 
     private final CheckRepository checkRepository;
-    private final NotificationRepository notificationRepository;
 
     @Inject
-    public CustomViewModelFactory(CheckRepository checkRepository, NotificationRepository notificationRepository) {
+    public CustomViewModelFactory(CheckRepository checkRepository) {
         this.checkRepository = checkRepository;
-        this.notificationRepository = notificationRepository;
     }
 
     @NonNull
@@ -33,8 +30,6 @@ public class CustomViewModelFactory implements ViewModelProvider.Factory {
             return (T) new CheckListViewModel(checkRepository);
         else if (modelClass.isAssignableFrom(CheckViewModel.class))
             return (T) new CheckViewModel(checkRepository);
-        else if (modelClass.isAssignableFrom(NotificationListViewModel.class))
-            return (T) new NotificationListViewModel(notificationRepository);
         else
             throw new IllegalArgumentException("Illegal view model type");
     }

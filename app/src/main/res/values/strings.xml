@@ -1,14 +1,18 @@
 <resources>
     <string name="app_name">Checkmanager</string>
 
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_check_details">CheckDetailsActivity</string>
-    <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_main">Dashboard</string>
+    <string name="title_activity_check_details">Csekk adatai</string>
+    <string name="title_activity_settings">Beállítésok</string>
+    <string name="title_activity_main">Checkmanager</string>
+    <string name="title_activity_help">Útmutató</string>
+    <string name="title_activity_newImage">Új kép készítése</string>
+    <string name="title_activity_googleApi">Google Sheets</string>
+
     <string name="helpText">
         <b>Fontos ajánlások a programmal kapcsolatban:</b>
 A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. Az beállításoknál megadhatjuk, hogy az adatokainkat melyik Google Sheets munkafüzetbe szeretnénk tárolni. Ha nem rendelkezünk még vele, akkor generáltathatunk egyet az applikációval a Beállítások menüpontban.
 Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. Lényeges funkció, hogy figyelmeztetést kapunk ha az adott hónapban még nem történt bejegyzés a csekkhez a megadott időszakban. Ebből feltételezhető hogy még a csekk nem került befizetésre, vagy csak még nem töltötük fel. Az értesítések időszakra vonatkozó beállításait a Beállítások menüpontban adhatja meg.
+
         <b>Fontos ajánlások a kép készítésére vonatkozóan:</b>
 A képet próbáljuk világos helyen elkészíteni. A csekk háttere lehetőleg egyszínű, a csekkt színétől nagyban eltérő legyen. Próbáljuk a kezünkkel vagy a telefonunkkal nem beárnyékolni a készülő képet, illetve hogy a kép éles legyen.
 Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és segít teljesen kihasználni az applikációban rejlő lehetőségeket !
@@ -24,7 +28,7 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="notification_interval_value">7</string>
 
     <string name="succesful_update">Sikeres feltöltés.</string>
-    <string name="unsuccesful_update">Sikertelen feltöltés!</string>
+    <string name="unsuccesful_update">Sikertelen feltöltés! Ellenőrizze az internet kapcsolatot és a megadott Google Táblázat azonosítót!</string>
     <string name="universal_error">Hiba:</string>
     <string name="request_cancelled">A kérés törölve.</string>
     <string name="no_results">No results returned.</string>
@@ -43,10 +47,16 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="button_test">Tesztelés</string>
     <string name="upload_emptyField">Üres mezővel nem lehetséges a feltöltés!</string>
     <string name="create_spreadsheet_successful">Táblázat sikeresen létrehozva.</string>
-    <string name="create_spreadsheet_unsuccessful">Táblázat generálása sikertelen.</string>
+    <string name="create_spreadsheet_unsuccessful">Táblázat generálása sikertelen. Ellenőrizze az internet kapcsolatot és a megadott Google Táblázat azonosítót!</string>
     <string name="successful_save">Sikeres mentés.</string>
     <string name="notification_interval_question">Hány naponta szeretne értesítéseket?</string>
     <string name="button_delete">Törlés</string>
+    <string name="notification_title">Checkmanager</string>
+    <string name="notification_message_text">Befizetted már a számláidat?</string>
+    <string name="settings_empty_sheetId_toast">Üres táblázat azonosító!</string>
+    <string name="button_recognise">Felismerés</string>
+    <string name="button_capture">Fotó készítése</string>
+    <string name="image_content_description_capture_a_photo">Capture a photo</string>
 
     <string-array name="months">
         <item>Január</item>

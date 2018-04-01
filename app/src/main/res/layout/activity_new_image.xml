@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:theme="@style/Theme.DoNotDim"
     tools:context="com.yevsp8.checkmanager.view.NewImageActivity">
-
 
     <FrameLayout
         android:id="@+id/helpText_framgentContainer"
@@ -13,11 +13,10 @@
         android:layout_height="match_parent" />
 
     <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/captured_photo_imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-        android:contentDescription="Capture a photo" />
+        android:id="@+id/captured_photo_imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/image_content_description_capture_a_photo" />
 
         <Button
             android:id="@+id/button_capture_photo"
@@ -25,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:text="Capture" />
+            android:text="@string/button_capture" />
 
         <Button
             android:id="@+id/button_recognise_photo"
@@ -33,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:text="Recognise" />
+            android:text="@string/button_recognise" />
 
         <Button
             android:id="@+id/button_demoData"
