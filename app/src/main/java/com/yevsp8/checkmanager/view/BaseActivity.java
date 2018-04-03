@@ -2,7 +2,6 @@ package com.yevsp8.checkmanager.view;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -13,8 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.yevsp8.checkmanager.R;
+
+import java.io.File;
 
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -54,19 +56,12 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         switch (id) {
             case R.id.menu_images:
-                String ext = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "";
-                if (ext != null) {
-                    Uri selectedUri = Uri.parse(ext);
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(selectedUri, "resource/folder");
-
-                    if (intent.resolveActivityInfo(getPackageManager(), 0) != null) {
-                        startActivity(intent);
-                    } else {
-                        // if you reach this place, it means there is no any file
-                        // explorer app installed on your device
-                    }
+                File storage = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                for (File c : storage.listFiles()) {
+                    c.delete();
                 }
+                Toast t = Toast.makeText(getApplicationContext(), R.string.successful_delete, Toast.LENGTH_SHORT);
+                t.show();
                 break;
             case R.id.menu_help:
                 Intent help = new Intent(getApplicationContext(), HelpActivity.class);
@@ -92,5 +87,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected String getValueFromSharedPreferences(int key, int defaultValue) {
         return sharedPref.getString(getString(key), getString(defaultValue));
+    }
+
+    protected int getIntegerFromSharedPreferences(int key, int defaultValue) {
+        return getResources().getInteger(key);
     }
 }

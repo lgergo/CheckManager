@@ -71,6 +71,8 @@ public class GoogleApiActivity extends BaseActivity
     private static final String PREF_ACCOUNT_NAME = "accountName";
     APICallType type;
     @Inject
+    Converter converter;
+    @Inject
     HttpTransport transport;
     @Inject
     JsonFactory jsonFactory;
@@ -80,7 +82,8 @@ public class GoogleApiActivity extends BaseActivity
     ViewModelProvider.Factory viewModelFactory;
     CheckViewModel viewModel;
     ProgressDialog progress;
-    private String spreadsheetId;// = "1BWj04i6jH6jgA95ExEx3ke0ENo7LuAFHuofeU0lcjKs";
+    private String spreadsheetId;
+    private int levensthein;
     private TextView mOutputText;
     private String[] checkDetailsdataArray;
 
@@ -98,6 +101,7 @@ public class GoogleApiActivity extends BaseActivity
         type = (APICallType) getIntent().getSerializableExtra("callType");
         checkDetailsdataArray = getIntent().getStringArrayExtra("result_array");
         spreadsheetId = getValueFromSharedPreferences(R.string.sheetId_value, R.string.sheetId_default);
+        levensthein = getIntegerFromSharedPreferences(R.integer.levenshtein_value, 0);
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckViewModel.class);
 
@@ -119,14 +123,6 @@ public class GoogleApiActivity extends BaseActivity
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Attempt to call the API, after verifying that all the preconditions are
-     * satisfied. The preconditions are: Google Play Services installed, an
-     * account was selected and the device currently has online access. If any
-     * of the preconditions are not satisfied, the app will prompt the user as
-     * appropriate.
-     */
-
     public void callGoogleApi(APICallType type) {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
@@ -136,9 +132,9 @@ public class GoogleApiActivity extends BaseActivity
             mOutputText.setText(R.string.no_network);
         } else {
             switch (type) {
-                case Get_data:
-                    new GetDataTask(transport, jsonFactory, mCredential).execute();
-                    break;
+//                case Get_data:
+//                    new GetDataTask(transport, jsonFactory, mCredential).execute();
+//                    break;
                 case Update_data:
                     new UpdateRequestTask(transport, jsonFactory, mCredential).execute(checkDetailsdataArray);
                     break;
@@ -151,16 +147,6 @@ public class GoogleApiActivity extends BaseActivity
         }
     }
 
-    /**
-     * Attempts to set the account used with the API credentials. If an account
-     * name was previously saved it will use that one; otherwise an account
-     * picker dialog will be shown to the user. Note that the setting the
-     * account to use with the credentials object requires the app to have the
-     * GET_ACCOUNTS permission, which is requested here if it is not already
-     * present. The AfterPermissionGranted annotation indicates that this
-     * function will be rerun automatically whenever the GET_ACCOUNTS permission
-     * is granted.
-     */
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
@@ -186,17 +172,6 @@ public class GoogleApiActivity extends BaseActivity
         }
     }
 
-    /**
-     * Called when an activity launched here (specifically, AccountPicker
-     * and authorization) exits, giving you the requestCode you started it with,
-     * the resultCode it returned, and any additional data from it.
-     *
-     * @param requestCode code indicating which activity result is incoming.
-     * @param resultCode  code indicating the result of the incoming
-     *                    activity result.
-     * @param data        Intent (containing result data) returned by incoming
-     *                    activity result.
-     */
     @Override
     protected void onActivityResult(
             int requestCode, int resultCode, Intent data) {
@@ -235,15 +210,6 @@ public class GoogleApiActivity extends BaseActivity
         }
     }
 
-    /**
-     * Respond to requests for permissions at runtime for API 23 and above.
-     *
-     * @param requestCode  The request code passed in
-     *                     requestPermissions(android.app.Activity, String, int, String[])
-     * @param permissions  The requested permissions. Never null.
-     * @param grantResults The grant results for the corresponding permissions
-     *                     which is either PERMISSION_GRANTED or PERMISSION_DENIED. Never null.
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -253,37 +219,14 @@ public class GoogleApiActivity extends BaseActivity
                 requestCode, permissions, grantResults, this);
     }
 
-    /**
-     * Callback for when a permission is granted using the EasyPermissions
-     * library.
-     *
-     * @param requestCode The request code associated with the requested
-     *                    permission
-     * @param list        The requested permission list. Never null.
-     */
     @Override
     public void onPermissionsGranted(int requestCode, List<String> list) {
-        // Do nothing.
     }
 
-    /**
-     * Callback for when a permission is denied using the EasyPermissions
-     * library.
-     *
-     * @param requestCode The request code associated with the requested
-     *                    permission
-     * @param list        The requested permission list. Never null.
-     */
     @Override
     public void onPermissionsDenied(int requestCode, List<String> list) {
-        // Do nothing.
     }
 
-    /**
-     * Checks whether the device currently has a network connection.
-     *
-     * @return true if the device has a network connection, false otherwise.
-     */
     private boolean isDeviceOnline() {
         ConnectivityManager connMgr =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -291,12 +234,6 @@ public class GoogleApiActivity extends BaseActivity
         return (networkInfo != null && networkInfo.isConnected());
     }
 
-    /**
-     * Check that Google Play services APK is installed and up to date.
-     *
-     * @return true if Google Play Services is available and up to
-     * date on this device; false otherwise.
-     */
     private boolean isGooglePlayServicesAvailable() {
         GoogleApiAvailability apiAvailability =
                 GoogleApiAvailability.getInstance();
@@ -305,10 +242,6 @@ public class GoogleApiActivity extends BaseActivity
         return connectionStatusCode == ConnectionResult.SUCCESS;
     }
 
-    /**
-     * Attempt to resolve a missing, out-of-date, invalid or disabled Google
-     * Play Services installation via a user dialog, if possible.
-     */
     private void acquireGooglePlayServices() {
         GoogleApiAvailability apiAvailability =
                 GoogleApiAvailability.getInstance();
@@ -319,13 +252,6 @@ public class GoogleApiActivity extends BaseActivity
         }
     }
 
-    /**
-     * Display an error dialog showing that Google Play Services is missing
-     * or out of date.
-     *
-     * @param connectionStatusCode code describing the presence (or lack of)
-     *                             Google Play Services on this device.
-     */
     void showGooglePlayServicesAvailabilityErrorDialog(
             final int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
@@ -443,7 +369,7 @@ public class GoogleApiActivity extends BaseActivity
         protected void onPreExecute() {
             mOutputText.setText("");
             progress = new ProgressDialog(GoogleApiActivity.this);
-            progress.setMessage("Feltöltés folyamatban...");
+            progress.setMessage("Lekérdezés folyamatban...");
             progress.show();
         }
 
@@ -470,8 +396,8 @@ public class GoogleApiActivity extends BaseActivity
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             GoogleApiActivity.REQUEST_AUTHORIZATION);
                 } else {
-                    mOutputText.setText(R.string.universal_error
-                            + mLastError.getMessage());
+//                    mOutputText.setText(R.string.universal_error
+//                            + mLastError.getMessage());
                 }
             } else {
                 mOutputText.setText(R.string.request_cancelled);
@@ -511,8 +437,11 @@ public class GoogleApiActivity extends BaseActivity
         @Override
         protected void onPreExecute() {
             mOutputText.setText("");
+            if (spreadsheetId.length() == 0) {
+                cancel(true);
+            }
             progress = new ProgressDialog(GoogleApiActivity.this);
-            progress.setMessage("Kapcsolódás...");
+            progress.setMessage(getString(R.string.googleApi_connectionTest_progressDialogText));
             progress.show();
         }
 
@@ -543,7 +472,7 @@ public class GoogleApiActivity extends BaseActivity
                     mOutputText.setText(R.string.connection_test_unsuccesful);
                 }
             } else {
-                mOutputText.setText(R.string.request_cancelled);
+                mOutputText.setText(R.string.sheetId_isRequired);
             }
             progress.dismiss();
         }
@@ -584,7 +513,7 @@ public class GoogleApiActivity extends BaseActivity
             List<Request> reqList = new ArrayList<>();
             reqList.add(new Request().setUpdateSpreadsheetProperties(new UpdateSpreadsheetPropertiesRequest()
                     .setProperties(new SpreadsheetProperties()
-                            .setTitle("Checkmanager"))
+                            .setTitle(getString(R.string.google_spreadsheet_file_name)))
                     .setFields("title")));
 
             BatchUpdateSpreadsheetRequest body = new BatchUpdateSpreadsheetRequest().setRequests(reqList);
@@ -596,7 +525,7 @@ public class GoogleApiActivity extends BaseActivity
         protected void onPreExecute() {
             mOutputText.setText("");
             progress = new ProgressDialog(GoogleApiActivity.this);
-            progress.setMessage("Táblázat generálása...");
+            progress.setMessage(getString(R.string.googleApi_generate_progressDialogText));
             progress.show();
         }
 
@@ -665,17 +594,26 @@ public class GoogleApiActivity extends BaseActivity
             Spreadsheet spreadsheet = this.mService.spreadsheets().get(spreadsheetId).execute();
             List<Sheet> sheets = spreadsheet.getSheets();
             int i = 0;
-            while (i < sheets.size() && !sheets.get(i).getProperties().getTitle().equals(checkDetails[3])) {
+            while (i < sheets.size() &&
+                    !converter.insideLevenshteinDistance(sheets.get(i).getProperties().getTitle(),
+                            checkDetails[3],
+                            levensthein
+                    )) {//!sheets.get(i).getProperties().getTitle().equals(checkDetails[3])) {
                 i++;
             }
+            String newSheetTitle;
             if (i == sheets.size()) {
                 if (!createCompanyTemplateForSheet(checkDetails[3], this.mService)) {
                     return false;
+                } else {
+                    newSheetTitle = checkDetails[3];
                 }
+            } else {
+                newSheetTitle = sheets.get(i).getProperties().getTitle();
             }
 
             dataRange = "B" + checkDetails[4] + ":D" + checkDetails[4]; //TODO új év esetén range ??
-            title = checkDetails[3] + "!"; //TODO közelítő szöveg egyezés ???
+            title = newSheetTitle + "!";
 
             String range = title + dataRange;
             String majorDim = MajorDimension.ROWS.toString();
@@ -700,6 +638,9 @@ public class GoogleApiActivity extends BaseActivity
         @Override
         protected void onPreExecute() {
             mOutputText.setText("");
+            if (spreadsheetId.length() == 0) {
+                cancel(true);
+            }
             progress = new ProgressDialog(GoogleApiActivity.this);
             progress.setMessage(getString(R.string.progress_dialog_upload));
             progress.show();
@@ -708,7 +649,7 @@ public class GoogleApiActivity extends BaseActivity
         @Override
         protected void onPostExecute(Boolean output) {
             if (output) {
-                mOutputText.setText(R.string.succesful_update);
+                mOutputText.setText(R.string.successful_update);
             } else {
                 mOutputText.setText(R.string.unsuccesful_update);
             }
@@ -734,7 +675,7 @@ public class GoogleApiActivity extends BaseActivity
                     mOutputText.setText(R.string.unsuccesful_update);
                 }
             } else {
-                mOutputText.setText(R.string.request_cancelled);
+                mOutputText.setText(R.string.sheetId_isRequired);
             }
             progress.dismiss();
         }

@@ -5,21 +5,21 @@
     <item
         android:id="@+id/menu_home"
         android:icon="@drawable/ic_home_24dp"
-        android:title="Home"
+        android:title="@string/menu_home"
         app:showAsAction="always" />
     <item
         android:id="@+id/menu_settings"
         android:icon="@drawable/ic_settings_24dp"
-        android:title="Settings"
+        android:title="@string/menu_settings"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_images"
         android:icon="@drawable/ic_camera_alt_24dp"
-        android:title="Images"
+        android:title="@string/menu_delete_images"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_help"
         android:icon="@drawable/ic_help_24dp"
-        android:title="Help"
+        android:title="@string/menu_help"
         app:showAsAction="ifRoom" />
 </menu>

@@ -27,7 +27,7 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="notification_interval_default">7</string>
     <string name="notification_interval_value">7</string>
 
-    <string name="succesful_update">Sikeres feltöltés.</string>
+
     <string name="unsuccesful_update">Sikertelen feltöltés! Ellenőrizze az internet kapcsolatot és a megadott Google Táblázat azonosítót!</string>
     <string name="universal_error">Hiba:</string>
     <string name="request_cancelled">A kérés törölve.</string>
@@ -37,6 +37,7 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="no_network">No network connection available.</string>
     <string name="progress_dialog_upload">Feltöltés folyamatban…</string>
     <string name="sheetId_text">Google Sheets azonosító:</string>
+    <string name="sheetId_isRequired">Nincs megadva Google Táblázat azonosító!</string>
     <string name="active_notifications_title">Aktív értesítések</string>
     <string name="connection_test_successful">A megadott azonosító megfelelő.</string>
     <string name="connection_test_unsuccesful">A megadott azonosító hibás!</string>
@@ -45,18 +46,29 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="button_upload">Feltöltés</string>
     <string name="button_create">Létrehoz</string>
     <string name="button_test">Tesztelés</string>
+    <string name="button_delete">Törlés</string>
+    <string name="button_recognise">Felismerés</string>
+    <string name="button_capture">Fotó készítése</string>
     <string name="upload_emptyField">Üres mezővel nem lehetséges a feltöltés!</string>
     <string name="create_spreadsheet_successful">Táblázat sikeresen létrehozva.</string>
-    <string name="create_spreadsheet_unsuccessful">Táblázat generálása sikertelen. Ellenőrizze az internet kapcsolatot és a megadott Google Táblázat azonosítót!</string>
-    <string name="successful_save">Sikeres mentés.</string>
+    <string name="create_spreadsheet_unsuccessful">Táblázat generálása sikertelen. Ellenőrizze az internet kapcsolatot!</string>
+    <string name="successful_save">Sikeres mentés</string>
+    <string name="successful_delete">Sikeres törlés</string>
+    <string name="successful_update">Sikeres feltöltés.</string>
     <string name="notification_interval_question">Hány naponta szeretne értesítéseket?</string>
-    <string name="button_delete">Törlés</string>
     <string name="notification_title">Checkmanager</string>
     <string name="notification_message_text">Befizetted már a számláidat?</string>
     <string name="settings_empty_sheetId_toast">Üres táblázat azonosító!</string>
-    <string name="button_recognise">Felismerés</string>
-    <string name="button_capture">Fotó készítése</string>
     <string name="image_content_description_capture_a_photo">Capture a photo</string>
+    <string name="menu_home">Főoldal</string>
+    <string name="menu_settings">Beállítások</string>
+    <string name="menu_delete_images">Képek törlése</string>
+    <string name="menu_help">Segítség</string>
+    <string name="googleApi_connectionTest_progressDialogText">Kapcsolódás...</string>
+    <string name="googleApi_generate_progressDialogText">Táblázat generálása...</string>
+    <string name="google_spreadsheet_file_name">Checkmanager</string>
+    <string name="tesseract_recognition_processDialog">Felsimerés folyamatban...</string>
+    <string name="imageProc_processing_processDialog">Kép feldolgozása...</string>
 
     <string-array name="months">
         <item>Január</item>

@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     tools:context="com.yevsp8.checkmanager.view.SettingsActivity">
 
     <include
@@ -67,12 +69,5 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@id/seekBar_value"
         android:text="@string/button_save" />
-
-    <!--<FrameLayout-->
-    <!--android:id="@+id/notificationlist_fragmentcontainer"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_below="@id/button_settings_test"-->
-    <!--android:padding="10dp" />-->
 
 </RelativeLayout>

@@ -15,6 +15,10 @@ import android.widget.Toast;
 
 import com.yevsp8.checkmanager.CustomNotificationManager;
 import com.yevsp8.checkmanager.R;
+import com.yevsp8.checkmanager.di.ApplicationModule;
+import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.di.ContextModule;
+import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
 
 import javax.inject.Inject;
 
@@ -27,6 +31,12 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        CheckManagerApplicationComponent component = DaggerCheckManagerApplicationComponent.builder()
+                .contextModule(new ContextModule(this))
+                .applicationModule(new ApplicationModule(getApplication()))
+                .build();
+        component.injectMainActivity(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);

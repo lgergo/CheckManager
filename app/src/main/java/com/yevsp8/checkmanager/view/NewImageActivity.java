@@ -1,14 +1,14 @@
 package com.yevsp8.checkmanager.view;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
@@ -18,10 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -50,6 +47,8 @@ public class NewImageActivity extends BaseActivity {
     private ImageView imageView;
     private Bitmap myBitmap;
     private String currentPhotoPath;
+    private ProgressDialog progress;
+    private String[] recognisedTexts;
 
     private HelpFragment fragment;
 
@@ -87,11 +86,9 @@ public class NewImageActivity extends BaseActivity {
         });
 
         Button buttonDemo = findViewById(R.id.button_demoData);
-        //buttonDemo.setEnabled(false);
         buttonDemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadDemoImage();
                 startPreprocessing();
             }
         });
@@ -131,14 +128,12 @@ public class NewImageActivity extends BaseActivity {
                 myBitmap = processor.rotate(myBitmap, currentPhotoPath);
                 imageView.setImageBitmap(myBitmap);
             }
-            buttonRecognise.setEnabled(true);
             FragmentManager manager = getSupportFragmentManager();
             removeFragmentFromActivtiy(manager, fragment);
         }
     }
 
     private File createImageFile() throws IOException {
-        // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -149,6 +144,18 @@ public class NewImageActivity extends BaseActivity {
         );
         currentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+    public String[] trimRecogniseResults(String[] results) {
+        String id = results[0].replaceAll(" ", "");
+        int amountValue;
+        String trimmed = results[1].replaceAll("(\\*| )", "");
+        try {
+            amountValue = Integer.parseInt(trimmed);
+        } catch (Exception ex) {
+            amountValue = -1;
+        }
+        return new String[]{id, String.valueOf(amountValue), results[2]};
     }
 
     private void permissionCheck() {
@@ -168,7 +175,7 @@ public class NewImageActivity extends BaseActivity {
                         MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             }
         } else {
-            startPreprocessing();
+            startRecognition();
         }
     }
 
@@ -178,7 +185,7 @@ public class NewImageActivity extends BaseActivity {
             case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startPreprocessing();
+                    startRecognition();
                 } else {
                     buttonRecognise.setEnabled(false);
                 }
@@ -187,79 +194,135 @@ public class NewImageActivity extends BaseActivity {
         }
     }
 
-    //TODO ha nem jó a kép akkor ne is mentse le / vagy töröljük
-
-
-    private String[] trimRecogniseResults(String[] results) {
-        String id = results[0].replaceAll(" ", "");
-        int amountValue;
-        String trimmed = results[1].replaceAll("(\\*| )", "");
-        try {
-            amountValue = Integer.parseInt(trimmed);
-        } catch (Exception ex) {
-            amountValue = -1;
-        }
-        return new String[]{id, String.valueOf(amountValue), results[2]};
-    }
-
-    private void loadDemoImage() {
-//        String imagePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
-//        currentPhotoPath = imagePath;
-//
-//        BitmapFactory.Options options = new BitmapFactory.Options();
-//        //options.inSampleSize = 2;
-//        myBitmap = BitmapFactory.decodeFile(imagePath, options);
-//        myBitmap = processor.rotate(myBitmap, currentPhotoPath);
-//        imageView = findViewById(R.id.captured_photo_imageView);
-//        imageView.setImageBitmap(myBitmap);
-//
-//        buttonRecognise.setEnabled(true);
-//
-//        FragmentManager manager = getSupportFragmentManager();
-//        removeFragmentFromActivtiy(manager, fragment);
-        imageView.setImageBitmap(processor.preProcessing(myBitmap, currentPhotoPath));
-    }
-
     private void startPreprocessing() {
+
+
+        //demohoz
+        currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
+
+        new ImagePreprocessingTask().execute(currentPhotoPath);
+
+
+//            Log.e("MEM", err.getMessage());
+//            //TODO message hogy próbálja újra
+//            Intent settings = new Intent(getApplicationContext(), NewImageActivity.class);
+//            startActivity(settings);
+
+    }
+
+    private void startRecognition() {
+
+
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setMessage("Megfelelő a kép?");
+//        builder.setNegativeButton("Nem", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i) {
+//                Intent settings = new Intent(getApplicationContext(), NewImageActivity.class);
+//                startActivity(settings);
+//            }
+//        });
+//        builder.setPositiveButton("Igen", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i) {
+//        String[] recognisedText = processor.recognition();
+
         try {
-            imageView.setImageBitmap(processor.preProcessing(myBitmap, currentPhotoPath));
-        } catch (OutOfMemoryError err) {
-            Log.e("MEM", err.getMessage());
-            //TODO message hogy próbálja újra
-            Intent settings = new Intent(getApplicationContext(), NewImageActivity.class);
-            startActivity(settings);
+            new TextRecognitionTask().execute();
+        } catch (Exception ex) {
+            Log.e("rec", ex.getMessage());
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Megfelelő a kép?");
-        builder.setNegativeButton("Nem", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Intent settings = new Intent(getApplicationContext(), NewImageActivity.class);
-                startActivity(settings);
-            }
-        });
-        builder.setPositiveButton("Igen", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String[] recognisedText = processor.recognition();
-                recognisedText = trimRecogniseResults(recognisedText);
-                Intent intent = new Intent(getApplicationContext(), CheckDetailsActivity.class);
-                intent.putExtra("result_array", recognisedText);
-                startActivity(intent);
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        WindowManager.LayoutParams wmlp = dialog.getWindow().getAttributes();
-        wmlp.gravity = Gravity.BOTTOM | Gravity.CENTER;
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
+
+//            }
+//        });
+//        AlertDialog dialog = builder.create();
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        WindowManager.LayoutParams wmlp = dialog.getWindow().getAttributes();
+//        wmlp.gravity = Gravity.BOTTOM | Gravity.CENTER;
+//        dialog.setCancelable(false);
+//        dialog.setCanceledOnTouchOutside(false);
+//        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+//        dialog.show();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
 
+    }
+
+    private class ImagePreprocessingTask extends AsyncTask<String, Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            try {
+                return startPreprocessing(strings[0]);
+            } catch (Exception e) {
+                cancel(true);
+                return null;
+            }
+        }
+
+        private Bitmap startPreprocessing(String path) throws Exception {
+            return processor.preProcessing(path);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progress = new ProgressDialog(NewImageActivity.this);
+            progress.setMessage(getString(R.string.imageProc_processing_processDialog));
+            progress.show();
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap output) {
+            FragmentManager manager = getSupportFragmentManager();
+            removeFragmentFromActivtiy(manager, fragment);
+            imageView.setImageBitmap(output);
+            buttonRecognise.setEnabled(true);
+            progress.dismiss();
+        }
+
+        @Override
+        protected void onCancelled() {
+            progress.dismiss();
+        }
+    }
+
+    private class TextRecognitionTask extends AsyncTask<Void, Void, String[]> {
+        @Override
+        protected String[] doInBackground(Void... voids) {
+            try {
+                return startRecognition();
+            } catch (Exception e) {
+                cancel(true);
+                return null;
+            }
+        }
+
+        private String[] startRecognition() throws Exception {
+            return processor.recognition();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progress = new ProgressDialog(NewImageActivity.this);
+            progress.setMessage(getString(R.string.tesseract_recognition_processDialog));
+            progress.show();
+        }
+
+        @Override
+        protected void onPostExecute(String[] output) {
+            recognisedTexts = output;
+            recognisedTexts = trimRecogniseResults(recognisedTexts);
+            progress.dismiss();
+            Intent intent = new Intent(getApplicationContext(), CheckDetailsActivity.class);
+            intent.putExtra("result_array", recognisedTexts);
+            startActivity(intent);
+        }
+
+        @Override
+        protected void onCancelled() {
+            progress.dismiss();
+        }
     }
 }

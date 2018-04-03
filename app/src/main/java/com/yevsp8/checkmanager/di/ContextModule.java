@@ -2,6 +2,8 @@ package com.yevsp8.checkmanager.di;
 
 import android.content.Context;
 
+import com.yevsp8.checkmanager.util.Converter;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -12,7 +14,6 @@ import dagger.Provides;
 @Module
 public class ContextModule {
 
-    //external dependency
     private final Context context;
 
     public ContextModule(Context context) {
@@ -23,6 +24,12 @@ public class ContextModule {
     @CustomScope
     Context provideContext() {
         return context;
+    }
+
+    @Provides
+    @CustomScope
+    Converter provideconverter() {
+        return new Converter();
     }
 }
 

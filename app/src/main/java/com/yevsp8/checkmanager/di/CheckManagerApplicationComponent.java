@@ -4,6 +4,7 @@ import com.yevsp8.checkmanager.CheckManagerApplication;
 import com.yevsp8.checkmanager.view.CheckDetailsFragment;
 import com.yevsp8.checkmanager.view.CheckListFragment;
 import com.yevsp8.checkmanager.view.GoogleApiActivity;
+import com.yevsp8.checkmanager.view.MainActivity;
 import com.yevsp8.checkmanager.view.SettingsActivity;
 
 import dagger.Component;
@@ -24,4 +25,6 @@ public interface CheckManagerApplicationComponent {
     void injectGooglaApiActivity(GoogleApiActivity googleApiActivity);
 
     void injectSettingsActivity(SettingsActivity createSettingsActivity);
+
+    void injectMainActivity(MainActivity mainActivity);
 }
