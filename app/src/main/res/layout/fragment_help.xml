@@ -1,13 +1,49 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.yevsp8.checkmanager.view.HelpFragment">
 
     <TextView
-        android:id="@+id/help_textView"
+        android:id="@+id/help_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/helpText" />
+        style="@style/TextTitle"
+        android:text="@string/help_fragment_title" />
+    
+    <TextView
+        android:id="@+id/help_textBeforeListitems"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/help_fragment_textBeforelistitems" 
+        android:layout_below="@id/help_title"/>
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/help_listitem_1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/help_fragment_listitem_1" 
+        android:layout_below="@id/help_textBeforeListitems"/>
+
+    <TextView
+        android:id="@+id/help_listitem_2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/help_fragment_listitem_2" 
+        android:layout_below="@id/help_listitem_1"/>
+    
+    <TextView
+        android:id="@+id/help_listitem_3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/help_fragment_listitem_3" 
+        android:layout_below="@id/help_listitem_2"/>
+    
+    <TextView
+        android:id="@+id/help_programUsage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/help_fragment_programUsage" 
+        android:layout_below="@id/help_listitem_3"/>
+
+</RelativeLayout>
