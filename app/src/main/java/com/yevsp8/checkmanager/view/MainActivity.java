@@ -57,27 +57,27 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        String val = getValueFromSharedPreferences(R.string.first_start_value, R.string.first_start_default);
-        if (val.equals("1")) {
+        int firstStart=getIntegerFromSharedPreferences(R.integer.first_start_value, R.integer.first_start_default);
+        if (firstStart==1) {
             showFirstStartAlertDialog();
         }
     }
 
     private void showFirstStartAlertDialog() {
-        saveToSharedPreferences(R.string.first_start_value, "0");
-        String notInterval = getValueFromSharedPreferences(R.string.notification_interval_value, R.string.notification_interval_default);
-        notManager.createNotification(this, Integer.parseInt(notInterval));
+        saveIntegerToSharedPreferences(R.integer.first_start);
+        int notInterval = getIntegerFromSharedPreferences(R.integer.notification_interval);
+        notManager.createNotification(this, notInterval);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("CheckManager");
-        builder.setMessage("Hogy ki tudd használni a Google Sheets szinkronizációt, kérlek add meg a dokumentum azonosítóját.");
-        builder.setNegativeButton("Most nem", new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.firstStartMessage_title);
+        builder.setMessage(R.string.firstStartMessage_message);
+        builder.setNegativeButton(R.string.button_notNow, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Toast t = Toast.makeText(getApplicationContext(), "Később is lehetőséged lesz megadni a Beállítások menüpont alatt.", Toast.LENGTH_SHORT);
+                Toast t = Toast.makeText(getApplicationContext(), R.string.firstStartMessage_toast, Toast.LENGTH_SHORT);
                 t.show();
             }
         });
-        builder.setPositiveButton("Megadom", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.button_fill, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Intent settings = new Intent(getApplicationContext(), SettingsActivity.class);
