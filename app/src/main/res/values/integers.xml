@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="levenshtein_value">2</integer>
+    <integer name="notification_interval">7</integer>
+    <integer name="first_start">1</integer>
 </resources>
