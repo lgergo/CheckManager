@@ -8,24 +8,16 @@
     <string name="title_activity_newImage">Új kép készítése</string>
     <string name="title_activity_googleApi">Google Sheets</string>
 
-    <string name="helpText">
+    <string name="help_fragment_programUsage">
         <b>Fontos ajánlások a programmal kapcsolatban:</b>
 A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. Az beállításoknál megadhatjuk, hogy az adatokainkat melyik Google Sheets munkafüzetbe szeretnénk tárolni. Ha nem rendelkezünk még vele, akkor generáltathatunk egyet az applikációval a Beállítások menüpontban.
 Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. Lényeges funkció, hogy figyelmeztetést kapunk ha az adott hónapban még nem történt bejegyzés a csekkhez a megadott időszakban. Ebből feltételezhető hogy még a csekk nem került befizetésre, vagy csak még nem töltötük fel. Az értesítések időszakra vonatkozó beállításait a Beállítások menüpontban adhatja meg.
-
-        <b>Fontos ajánlások a kép készítésére vonatkozóan:</b>
-A képet próbáljuk világos helyen elkészíteni. A csekk háttere lehetőleg egyszínű, a csekkt színétől nagyban eltérő legyen. Próbáljuk a kezünkkel vagy a telefonunkkal nem beárnyékolni a készülő képet, illetve hogy a kép éles legyen.
-Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és segít teljesen kihasználni az applikációban rejlő lehetőségeket !
     </string>
 
     <string name="last_sync_default">Még nem szinkronizált</string>
     <string name="last_sync_value">2018.01.01</string>
-    <string name="first_start_default">1</string>
-    <string name="first_start_value">1</string>
     <string name="sheetId_default"></string>
     <string name="sheetId_value"></string>
-    <string name="notification_interval_default">7</string>
-    <string name="notification_interval_value">7</string>
 
 
     <string name="unsuccesful_update">Sikertelen feltöltés! Ellenőrizze az internet kapcsolatot és a megadott Google Táblázat azonosítót!</string>
@@ -69,6 +61,11 @@ Ezen ajánlások betartása mind nagyban elősegíti a pontos felismerést és s
     <string name="google_spreadsheet_file_name">Checkmanager</string>
     <string name="tesseract_recognition_processDialog">Felsimerés folyamatban...</string>
     <string name="imageProc_processing_processDialog">Kép feldolgozása...</string>
+    <string name="help_fragment_title">Az alábbi ajánlások betartásával elősegíti a felismerés pontosságát.</string>
+    <string name="help_fragment_textBeforelistitems">A kép készítésekor: </srting>
+    <string name="help_fragment_listitem_1">\u25CF A háttér konstrasztos, egyszínű legyen</srting>
+    <string name="help_fragment_listitem_2">\u25CF Ne árnyékoljuk be a képet</srting>
+    <string name="help_fragment_listitem_3">\u25CF Világos környezet legyen</srting>
 
     <string-array name="months">
         <item>Január</item>
