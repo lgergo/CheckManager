@@ -41,6 +41,8 @@ Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. Lé
     <string name="button_delete">Törlés</string>
     <string name="button_recognise">Felismerés</string>
     <string name="button_capture">Fotó készítése</string>
+    <string name="button_notNow">Most nem</string>
+    <string name="button_fill">Megadom</string>
     <string name="upload_emptyField">Üres mezővel nem lehetséges a feltöltés!</string>
     <string name="create_spreadsheet_successful">Táblázat sikeresen létrehozva.</string>
     <string name="create_spreadsheet_unsuccessful">Táblázat generálása sikertelen. Ellenőrizze az internet kapcsolatot!</string>
@@ -62,10 +64,13 @@ Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. Lé
     <string name="tesseract_recognition_processDialog">Felsimerés folyamatban...</string>
     <string name="imageProc_processing_processDialog">Kép feldolgozása...</string>
     <string name="help_fragment_title">Az alábbi ajánlások betartásával elősegíti a felismerés pontosságát.</string>
-    <string name="help_fragment_textBeforelistitems">A kép készítésekor: </srting>
-    <string name="help_fragment_listitem_1">\u25CF A háttér konstrasztos, egyszínű legyen</srting>
-    <string name="help_fragment_listitem_2">\u25CF Ne árnyékoljuk be a képet</srting>
-    <string name="help_fragment_listitem_3">\u25CF Világos környezet legyen</srting>
+    <string name="help_fragment_textBeforelistitems">A kép készítésekor: </string>
+    <string name="help_fragment_listitem_1">\u25CF A háttér konstrasztos, egyszínű legyen</string>
+    <string name="help_fragment_listitem_2">\u25CF Ne árnyékoljuk be a képet</string>
+    <string name="help_fragment_listitem_3">\u25CF Világos környezet legyen</string>
+    <string name="firstStartMessage_title">Checkmanager</string>
+    <string name="firstStartMessage_message">Hogy ki tudd használni a Google Sheets szinkronizációt, kérlek add meg a dokumentum azonosítóját.</string>
+    <string name="firstStartMessage_toast">Később is lehetőséged lesz megadni a Beállítások menüpont alatt.</string>
 
     <string-array name="months">
         <item>Január</item>
