@@ -9,4 +9,16 @@
         android:key="@string/first_start_value"
         android:defaultValue="@string/first_start_default"
     </Preference>
+    <Preference>
+        android:key="@string/levenshtein_value"
+        android:defaultValue="@string/levenshtein_default"
+    </Preference>
+    <Preference>
+        android:key="@string/notification_interval_value"
+        android:defaultValue="@string/notification_interval_default"
+    </Preference>
+    <Preference>
+        android:key="@string/sheetId_value"
+        android:defaultValue="@string/sheetId_default"
+    </Preference>
 </PreferenceScreen>

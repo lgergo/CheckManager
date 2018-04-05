@@ -41,9 +41,6 @@ import javax.inject.Inject;
 
 public class ImageProcessor {
 
-
-    //TODO tesseract függőség a newImageActivtiy-be
-
     @Inject
     TessTwoApi tessTwoApi;
     private Mat corrected;
@@ -76,10 +73,7 @@ public class ImageProcessor {
         loadImageGromFile(filePath);
         Mat src = new Mat(sourceBitmap.getHeight(), sourceBitmap.getWidth(), CvType.CV_8UC1);
         Utils.bitmapToMat(sourceBitmap, src);
-//        rawBitmap.recycle();
-//        rawBitmap = null;
         Imgproc.cvtColor(src, src, Imgproc.COLOR_BGR2GRAY);
-
         Mat checkRect = src.clone();
         corrected = src.clone();
 
@@ -90,20 +84,30 @@ public class ImageProcessor {
             Imgproc.Canny(checkRect,checkRect,getMatMean(checkRect)*0.2,getMatMean(checkRect)*1.8);
 
         b)
-            Imgproc.adaptiveThreshold(checkRect,checkRect,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,11,4);
+            Imgproc.medianBlur(checkRect, checkRect, 13);
+            Imgproc.adaptiveThreshold(checkRect,checkRect,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,13,3);
             Core.bitwise_not(checkRect,checkRect);
 
-            Mat kernel = Mat.ones(5, 5, CvType.CV_8UC1);
-            Imgproc.erode(checkRect,checkRect,kernel);
-            kernel = Mat.ones(25, 25, CvType.CV_8UC1);
-            Imgproc.dilate(checkRect,checkRect,kernel);
+            Mat kernel = Mat.ones(7, 7, CvType.CV_8UC1);
+            Imgproc.morphologyEx(checkRect,checkRect,Imgproc.MORPH_OPEN,kernel);
+
+        c)
+            Imgproc.medianBlur(checkRect, checkRect, 7);
+            Imgproc.equalizeHist(checkRect, checkRect);
+
+            Imgproc.threshold(checkRect, checkRect, getMatMean(checkRect) * 1.1, 256, Imgproc.THRESH_BINARY);
+
         */
 
-        Imgproc.medianBlur(checkRect, checkRect, 7);
-        Imgproc.equalizeHist(checkRect, checkRect);
+        //Mat checkTemp=checkRect.clone();
+        //Imgproc.bilateralFilter(checkTemp, checkRect,19,37.0,37.0);
 
-        Imgproc.threshold(checkRect, checkRect, getMatMean(checkRect) * 1.1, 256, Imgproc.THRESH_BINARY);
+        Imgproc.medianBlur(checkRect, checkRect, 13);
+        Imgproc.adaptiveThreshold(checkRect, checkRect, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 13, 3);
+        Core.bitwise_not(checkRect, checkRect);
 
+        Mat kernel = Mat.ones(9, 9, CvType.CV_8UC1);
+        Imgproc.morphologyEx(checkRect, checkRect, Imgproc.MORPH_GRADIENT, kernel);
 
         List<MatOfPoint> contours = new ArrayList<>();
         findAndSetContoursList(checkRect, contours);
@@ -111,15 +115,13 @@ public class ImageProcessor {
         Mat cornersOfContour = getCorrectedPerspectiveRectPoints(contours);
         corrected = warp(src, cornersOfContour);
 
-        Imgproc.threshold(corrected, corrected, getMatMean(corrected) * 0.8, 256, Imgproc.THRESH_BINARY_INV);
 
-
-//        corrected=checkRect;
+        //corrected=checkRect;
         //corrected=contoured;
 
 
-//        Mat rect = getRectOfPaidTo(corrected);
-//        preprocessForRectImages(rect, 3, 1);
+//        Mat rect = getRectOfCheckId(corrected);
+//        preprocessForRectImages(rect, 1, 3);
 //        Bitmap rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
 //        Utils.matToBitmap(rect, rectBitmapTemp);
 //        return  rectBitmapTemp;
@@ -140,7 +142,7 @@ public class ImageProcessor {
         String amountResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789*");
 
         rect = getRectOfCheckId(corrected);
-        //preprocessForRectImages(rect, 1, 3);
+        preprocessForRectImages(rect, 1, 3);
         rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
         Utils.matToBitmap(rect, rectBitmapTemp);
         String checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789");
@@ -157,6 +159,7 @@ public class ImageProcessor {
     }
 
     private void preprocessForRectImages(Mat rect, int erodeSize, int dilateSize) {
+        Imgproc.threshold(corrected, corrected, 0, 255, Imgproc.THRESH_OTSU);
         if (erodeSize != 0) {
             Mat erode = Mat.ones(new Size(erodeSize, erodeSize), Imgproc.MORPH_RECT);
             Imgproc.erode(rect, rect, erode);
@@ -165,7 +168,6 @@ public class ImageProcessor {
             Mat dilate = Mat.ones(new Size(dilateSize, dilateSize), Imgproc.MORPH_RECT);
             Imgproc.dilate(rect, rect, dilate);
         }
-        //Core.bitwise_not(rect, rect);
     }
 
     private void gammaCorrection(Mat source, Mat destination) {
@@ -183,7 +185,7 @@ public class ImageProcessor {
     }
 
     private void findAndSetContoursList(Mat source, List<MatOfPoint> contours) {
-        Imgproc.findContours(source, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(source, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
     }
 
     private Mat drawContours(Mat source, List<MatOfPoint> contours) {
@@ -194,9 +196,9 @@ public class ImageProcessor {
     }
 
     private Mat getCorrectedPerspectiveRectPoints(List<MatOfPoint> contours) {
-        double threshold = 0.1;
-        double maxArea = 100;
-        MatOfPoint temp_contour = contours.get(0);
+        double threshold = 0.5;
+        double maxArea = 1000;
+        MatOfPoint temp_contour;
         MatOfPoint2f approxCurve = new MatOfPoint2f();
 
         for (int idx = 0; idx < contours.size(); idx++) {
@@ -279,8 +281,8 @@ public class ImageProcessor {
 //    }
 
     private Mat getRectOfCheckId(Mat image) {
-        Point p1 = new Point(0, image.rows() * Constants.Check_ID_Top_DistFrom_Top);
-        Point p2 = new Point(image.cols(), image.rows() * Constants.Check_ID_Bottom_DistFrom_Top);
+        Point p1 = new Point(image.cols() * Constants.Check_ID_Left_DistFrom_Left, image.rows() * Constants.Check_ID_Top_DistFrom_Top);
+        Point p2 = new Point(image.cols() * Constants.Check_ID_Right_DistFrom_Left, image.rows() * Constants.Check_ID_Bottom_DistFrom_Top);
         return getMatOfRect(image, p1, p2);
     }
 
@@ -291,8 +293,8 @@ public class ImageProcessor {
     }
 
     private Mat getRectOfPaidTo(Mat image) {
-        Point p1 = new Point(0, image.rows() * Constants.Check_PaidTo_Top_DistFrom_Top);
-        Point p2 = new Point(image.cols(), image.rows() * Constants.Check_PaidTo_Bottom_DistFrom_Top);
+        Point p1 = new Point(image.cols() * Constants.Check_PaidTo_Left_DistFrom_Left, image.rows() * Constants.Check_PaidTo_Top_DistFrom_Top);
+        Point p2 = new Point(image.cols() * Constants.Check_PaidTo_Right_DistFrom_Left, image.rows() * Constants.Check_PaidTo_Bottom_DistFrom_Top);
         return getMatOfRect(image, p1, p2);
     }
 

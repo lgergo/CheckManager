@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -34,6 +36,7 @@ public class SettingsActivity extends BaseActivity {
     private SeekBar seekBar;
     private TextView seekBarValue;
     private int notificationInterval;
+    private int levenshtein;
     private String sheetId;
 
     @Override
@@ -50,14 +53,32 @@ public class SettingsActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
 
+        CheckBox cb = findViewById(R.id.checkbox_levenshtein);
+
         sheetId = getValueFromSharedPreferences(R.string.sheetId_value, R.string.sheetId_default);
         notificationInterval = Integer.parseInt(getValueFromSharedPreferences(R.string.notification_interval_value, R.string.notification_interval_default));
+        levenshtein = Integer.parseInt(getValueFromSharedPreferences(R.string.levenshtein_value, R.string.levenshtein_default));
+        if (levenshtein != 0) {
+            cb.setChecked(true);
+        } else {
+            cb.setChecked(false);
+        }
 
-
+        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    saveToSharedPreferences(R.string.levenshtein_value, "3");
+                } else {
+                    saveToSharedPreferences(R.string.levenshtein_value, "0");
+                }
+                levenshtein = Integer.parseInt(getValueFromSharedPreferences(R.string.levenshtein_value, R.string.levenshtein_default));
+            }
+        });
         edittext_sheetId = findViewById(R.id.editText_settings_sheetId);
         edittext_sheetId.setText(sheetId, TextView.BufferType.EDITABLE);
         if (edittext_sheetId.getText().length() == 0) {
-            edittext_sheetId.setHint("Ide írja a Sheets ID azonosítóját...");
+            edittext_sheetId.setHint(R.string.googleSheetId_hint);
         }
 
         Button button_save = findViewById(R.id.button_settings_save);

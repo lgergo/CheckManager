@@ -1,6 +1,17 @@
 <resources>
     <string name="app_name">Checkmanager</string>
 
+    <string name="levenshtein_value">3</string>
+    <string name="levenshtein_default">0</string>
+    <string name="notification_interval_value">7</string>
+    <string name="notification_interval_default">7</string>
+    <string name="first_start_value">1</string>
+    <string name="first_start_default">1</string>
+    <string name="last_sync_default">Még nem szinkronizált</string>
+    <string name="last_sync_value">2018.01.01</string>
+    <string name="sheetId_default"></string>
+    <string name="sheetId_value"></string>
+
     <string name="title_activity_check_details">Csekk adatai</string>
     <string name="title_activity_settings">Beállítésok</string>
     <string name="title_activity_main">Checkmanager</string>
@@ -10,14 +21,9 @@
 
     <string name="help_fragment_programUsage">
         <b>Fontos ajánlások a programmal kapcsolatban:</b>
-A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. Az beállításoknál megadhatjuk, hogy az adatokainkat melyik Google Sheets munkafüzetbe szeretnénk tárolni. Ha nem rendelkezünk még vele, akkor generáltathatunk egyet az applikációval a Beállítások menüpontban.
-Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. Lényeges funkció, hogy figyelmeztetést kapunk ha az adott hónapban még nem történt bejegyzés a csekkhez a megadott időszakban. Ebből feltételezhető hogy még a csekk nem került befizetésre, vagy csak még nem töltötük fel. Az értesítések időszakra vonatkozó beállításait a Beállítások menüpontban adhatja meg.
+A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. Az beállításoknál megadhatjuk, hogy az adatokainkat melyik Google Táblázat munkafüzetbe szeretnénk tárolni. Ha nem rendelkezünk még vele, akkor generáltathatunk egyet az applikációval a Beállítások menüpontban.
+Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. A program értesít minket megadott időközönként, hogy ne felejtsük el a csekkjeinket befizetni.
     </string>
-
-    <string name="last_sync_default">Még nem szinkronizált</string>
-    <string name="last_sync_value">2018.01.01</string>
-    <string name="sheetId_default"></string>
-    <string name="sheetId_value"></string>
 
 
     <string name="unsuccesful_update">Sikertelen feltöltés! Ellenőrizze az internet kapcsolatot és a megadott Google Táblázat azonosítót!</string>
@@ -65,12 +71,13 @@ Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. Lé
     <string name="imageProc_processing_processDialog">Kép feldolgozása...</string>
     <string name="help_fragment_title">Az alábbi ajánlások betartásával elősegíti a felismerés pontosságát.</string>
     <string name="help_fragment_textBeforelistitems">A kép készítésekor: </string>
-    <string name="help_fragment_listitem_1">\u25CF A háttér konstrasztos, egyszínű legyen</string>
-    <string name="help_fragment_listitem_2">\u25CF Ne árnyékoljuk be a képet</string>
-    <string name="help_fragment_listitem_3">\u25CF Világos környezet legyen</string>
+    <string name="help_fragment_listitem_1">\u25CF  A háttér konstrasztos, egyszínű legyen</string>
+    <string name="help_fragment_listitem_2">\u25CF  Ne árnyékoljuk be a képet</string>
+    <string name="help_fragment_listitem_3">\u25CF  Világos környezet legyen</string>
     <string name="firstStartMessage_title">Checkmanager</string>
     <string name="firstStartMessage_message">Hogy ki tudd használni a Google Sheets szinkronizációt, kérlek add meg a dokumentum azonosítóját.</string>
     <string name="firstStartMessage_toast">Később is lehetőséged lesz megadni a Beállítások menüpont alatt.</string>
+    <string name="googleSheetId_hint">Ide írja a Google Táblázat azonosítóját...</string>
 
     <string-array name="months">
         <item>Január</item>

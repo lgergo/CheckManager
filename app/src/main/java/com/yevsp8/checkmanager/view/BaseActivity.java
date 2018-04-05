@@ -88,14 +88,4 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected String getValueFromSharedPreferences(int key, int defaultValue) {
         return sharedPref.getString(getString(key), getString(defaultValue));
     }
-    
-    protected void saveIntegerToSharedPreferences(int key, int value) {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(getString(key), value);
-        editor.apply();
-    }
-
-    protected int getIntegerFromSharedPreferences(int key, int defaultValue) {
-        return sharedPref.getInteger(key);
-    }
 }

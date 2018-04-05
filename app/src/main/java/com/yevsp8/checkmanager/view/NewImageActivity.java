@@ -198,7 +198,7 @@ public class NewImageActivity extends BaseActivity {
 
 
         //demohoz
-        currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
+        //currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
 
         new ImagePreprocessingTask().execute(currentPhotoPath);
 

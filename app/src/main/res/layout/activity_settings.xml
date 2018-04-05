@@ -70,4 +70,13 @@
         android:layout_below="@id/seekBar_value"
         android:text="@string/button_save" />
 
+    <android.support.v7.widget.AppCompatCheckBox
+        android:id="@+id/checkbox_levenshtein"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/button_settings_save"
+        android:layoutDirection="rtl"
+        android:text="Lehet minimális eltérés beolvasott cégnév és a Google Táblázatban lévő között?" />
+
 </RelativeLayout>

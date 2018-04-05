@@ -57,15 +57,15 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        int firstStart=getIntegerFromSharedPreferences(R.integer.first_start_value, R.integer.first_start_default);
-        if (firstStart==1) {
+        String firstStart = getValueFromSharedPreferences(R.string.first_start_value, R.string.first_start_default);
+        if (firstStart == "1") {
             showFirstStartAlertDialog();
         }
     }
 
     private void showFirstStartAlertDialog() {
-        saveIntegerToSharedPreferences(R.integer.first_start);
-        int notInterval = getIntegerFromSharedPreferences(R.integer.notification_interval);
+        saveToSharedPreferences(R.string.first_start_value, "0");
+        int notInterval = Integer.parseInt(getValueFromSharedPreferences(R.string.notification_interval_value, R.string.notification_interval_default));
         notManager.createNotification(this, notInterval);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.firstStartMessage_title);

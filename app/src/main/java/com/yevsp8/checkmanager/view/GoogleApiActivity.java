@@ -101,7 +101,7 @@ public class GoogleApiActivity extends BaseActivity
         type = (APICallType) getIntent().getSerializableExtra("callType");
         checkDetailsdataArray = getIntent().getStringArrayExtra("result_array");
         spreadsheetId = getValueFromSharedPreferences(R.string.sheetId_value, R.string.sheetId_default);
-        levensthein = getIntegerFromSharedPreferences(R.integer.levenshtein_value, 0);
+        levensthein = Integer.parseInt(getValueFromSharedPreferences(R.string.levenshtein_value, R.string.levenshtein_default));
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckViewModel.class);
 
