@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:text="Csekk adatai" />
+        android:text="@string/checkDetails_title" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/check_details_id_label"
@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic__paycheque"
             android:enabled="false"
-            android:hint="Csekk azonosító"
+            android:hint="@string/checkDetails_id"
             android:inputType="number" />
     </android.support.design.widget.TextInputLayout>
 
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_camera_alt_24dp"
             android:enabled="false"
-            android:hint="Létrehozás dátuma"
+            android:hint="@string/checkDetails_creationDate"
             android:inputType="date" />
     </android.support.design.widget.TextInputLayout>
 
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_monetization_on_24dp"
             android:enabled="false"
-            android:hint="Összeg"
+            android:hint="@string/checkDetails_Amount"
             android:inputType="number" />
     </android.support.design.widget.TextInputLayout>
 
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_sentiment_satisfied_24dp"
             android:enabled="false"
-            android:hint="Befizetve"
+            android:hint="@string/checkDetails_paidAt"
             android:inputType="date" />
     </android.support.design.widget.TextInputLayout>
 
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_business_24dp"
             android:enabled="false"
-            android:hint="Cég neve" />
+            android:hint="@string/checkDetails_paidTo" />
     </android.support.design.widget.TextInputLayout>
 
     <Button

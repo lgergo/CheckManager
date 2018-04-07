@@ -20,7 +20,7 @@ public class Check {
     private String paidTo;
     private String paidDate;
 
-    public Check(String checkId, long creationDate, int amount, String paidTo, String paidDate) {
+    public Check(@NonNull String checkId, long creationDate, int amount, String paidTo, String paidDate) {
         this.checkId = checkId;
         this.creationDate = creationDate;
         this.amount = amount;
@@ -28,6 +28,7 @@ public class Check {
         this.paidDate = paidDate;
     }
 
+    @NonNull
     public String getCheckId() {
         return checkId;
     }

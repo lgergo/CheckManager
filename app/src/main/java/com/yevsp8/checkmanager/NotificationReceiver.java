@@ -23,15 +23,17 @@ public class NotificationReceiver extends BroadcastReceiver {
         Intent repeatingIntent = new Intent(context, MainActivity.class);
         repeatingIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pending = PendingIntent.getActivity(context, NotificationRequestCode, repeatingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        String channelId = "11";
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setContentIntent(pending)
                 .setSmallIcon(R.drawable.ic_home_24dp)
                 .setContentTitle(intent.getExtras().getString("title"))
                 .setContentText(intent.getExtras().getString("message"))
                 .setAutoCancel(true);
 
-        manager.notify(NotificationRequestCode, builder.build());
-
+        if (manager != null) {
+            manager.notify(NotificationRequestCode, builder.build());
+        }
     }
 }

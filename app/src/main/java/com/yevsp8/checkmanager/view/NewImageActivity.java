@@ -1,7 +1,9 @@
 package com.yevsp8.checkmanager.view;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -28,11 +30,13 @@ import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerImageProcessingComponent;
 import com.yevsp8.checkmanager.di.ImageProcessingComponent;
 import com.yevsp8.checkmanager.di.TessTwoModule;
+import com.yevsp8.checkmanager.util.Constants;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -45,10 +49,8 @@ public class NewImageActivity extends BaseActivity {
 
     private Button buttonRecognise;
     private ImageView imageView;
-    private Bitmap myBitmap;
     private String currentPhotoPath;
     private ProgressDialog progress;
-    private String[] recognisedTexts;
 
     private HelpFragment fragment;
 
@@ -124,7 +126,7 @@ public class NewImageActivity extends BaseActivity {
             if (imgFile.exists()) {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inSampleSize = 4;
-                myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                 myBitmap = processor.rotate(myBitmap, currentPhotoPath);
                 imageView.setImageBitmap(myBitmap);
             }
@@ -134,7 +136,7 @@ public class NewImageActivity extends BaseActivity {
     }
 
     private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = new SimpleDateFormat(Constants.LongDateTimePattern, Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
@@ -149,7 +151,7 @@ public class NewImageActivity extends BaseActivity {
     public String[] trimRecogniseResults(String[] results) {
         String id = results[0].replaceAll(" ", "");
         int amountValue;
-        String trimmed = results[1].replaceAll("(\\*| )", "");
+        String trimmed = results[1].replaceAll("\\*|", "");
         try {
             amountValue = Integer.parseInt(trimmed);
         } catch (Exception ex) {
@@ -195,19 +197,10 @@ public class NewImageActivity extends BaseActivity {
     }
 
     private void startPreprocessing() {
-
-
         //demohoz
         //currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
 
         new ImagePreprocessingTask().execute(currentPhotoPath);
-
-
-//            Log.e("MEM", err.getMessage());
-//            //TODO message hogy próbálja újra
-//            Intent settings = new Intent(getApplicationContext(), NewImageActivity.class);
-//            startActivity(settings);
-
     }
 
     private void startRecognition() {
@@ -312,7 +305,7 @@ public class NewImageActivity extends BaseActivity {
 
         @Override
         protected void onPostExecute(String[] output) {
-            recognisedTexts = output;
+            String[] recognisedTexts = output;
             recognisedTexts = trimRecogniseResults(recognisedTexts);
             progress.dismiss();
             Intent intent = new Intent(getApplicationContext(), CheckDetailsActivity.class);
@@ -323,6 +316,17 @@ public class NewImageActivity extends BaseActivity {
         @Override
         protected void onCancelled() {
             progress.dismiss();
+            AlertDialog.Builder builder = new AlertDialog.Builder(NewImageActivity.this);
+            builder.setTitle(R.string.newImage_tessError_alertDialog_title);
+            builder.setMessage(R.string.newImage_tessError_alertDialog_message);
+            builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Intent main = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(main);
+                }
+            });
+            builder.show();
         }
     }
 }

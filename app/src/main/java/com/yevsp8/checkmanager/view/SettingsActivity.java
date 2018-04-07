@@ -68,9 +68,9 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    saveToSharedPreferences(R.string.levenshtein_value, "3");
+                    saveToSharedPreferences(R.string.levenshtein_value, Constants.Levensthein_Value);
                 } else {
-                    saveToSharedPreferences(R.string.levenshtein_value, "0");
+                    saveToSharedPreferences(R.string.levenshtein_value, Constants.Levensthein_Default);
                 }
                 levenshtein = Integer.parseInt(getValueFromSharedPreferences(R.string.levenshtein_value, R.string.levenshtein_default));
             }
@@ -112,7 +112,7 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 progressValue = i;
-                seekBarValue.setText(i + " naponta szeretnék értesítést.");
+                seekBarValue.setText(getString(R.string.notificaton_interval_settings_text, i));
             }
 
             @Override
@@ -122,12 +122,11 @@ public class SettingsActivity extends BaseActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                seekBarValue.setText(progressValue + " naponta szeretnék értesítést.");
+                seekBarValue.setText(getString(R.string.notificaton_interval_settings_text, progressValue));
             }
         });
         seekBarValue = findViewById(R.id.seekBar_value);
-        seekBarValue.setText(seekBar.getProgress() + " naponta szeretnék értesítést.");
-        //TODO link hogy honann szerezheti meg a sheet id-t
+        seekBarValue.setText(getString(R.string.notificaton_interval_settings_text, seekBar.getProgress()));
     }
 
     private void testButtonClicked() {
@@ -144,9 +143,9 @@ public class SettingsActivity extends BaseActivity {
     private void createButtonClickeed() {
         if (edittext_sheetId.getText().length() > 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Táblázat létrehozás");
-            builder.setMessage("Az azonosító mező nem üres. Biztos hogy létre akar hozni egy új táblázatot?");
-            builder.setPositiveButton("Igen", new DialogInterface.OnClickListener() {
+            builder.setTitle(R.string.createTable_alertDialog_title);
+            builder.setMessage(R.string.create_table_alertDialog_message);
+            builder.setPositiveButton(R.string.createTable_alertDialog_yes, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
@@ -154,7 +153,7 @@ public class SettingsActivity extends BaseActivity {
                     startActivity(intent);
                 }
             });
-            builder.setNegativeButton("Nem", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(R.string.createTable_alertDialog_no, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     dialogInterface.dismiss();

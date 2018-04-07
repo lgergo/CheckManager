@@ -15,7 +15,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -132,9 +131,6 @@ public class GoogleApiActivity extends BaseActivity
             mOutputText.setText(R.string.no_network);
         } else {
             switch (type) {
-//                case Get_data:
-//                    new GetDataTask(transport, jsonFactory, mCredential).execute();
-//                    break;
                 case Update_data:
                     new UpdateRequestTask(transport, jsonFactory, mCredential).execute(checkDetailsdataArray);
                     break;
@@ -157,13 +153,11 @@ public class GoogleApiActivity extends BaseActivity
                 mCredential.setSelectedAccountName(accountName);
                 callGoogleApi(type);
             } else {
-                // Start a dialog from which the user can choose an account
                 startActivityForResult(
                         mCredential.newChooseAccountIntent(),
                         REQUEST_ACCOUNT_PICKER);
             }
         } else {
-            // Request the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
                     this,
                     getString(R.string.request_contactAccess),
@@ -230,8 +224,11 @@ public class GoogleApiActivity extends BaseActivity
     private boolean isDeviceOnline() {
         ConnectivityManager connMgr =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return (networkInfo != null && networkInfo.isConnected());
+        if (connMgr != null) {
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            return (networkInfo != null && networkInfo.isConnected());
+        }
+        return false;
     }
 
     private boolean isGooglePlayServicesAvailable() {
@@ -325,87 +322,6 @@ public class GoogleApiActivity extends BaseActivity
 
     //region AsyncTasks
 
-    private class GetDataTask extends AsyncTask<String, Void, List<String>> {
-        com.google.api.services.sheets.v4.Sheets mService = null;
-        private Exception mLastError = null;
-
-        GetDataTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
-            mService = new com.google.api.services.sheets.v4.Sheets.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Google Sheets API Android Quickstart")
-                    .build();
-        }
-
-        @Override
-        protected List<String> doInBackground(String... params) {
-            try {
-                return getDataFromApi(params[0]);
-            } catch (Exception e) {
-                mLastError = e;
-                cancel(true);
-                return null;
-            }
-        }
-
-        private List<String> getDataFromApi(String name) throws Exception {
-            String range = name + "F1:H4";
-            String majorDim = MajorDimension.COLUMNS.toString();
-            List<String> results = new ArrayList<>();
-            ValueRange response = this.mService.spreadsheets().values()
-                    .get(spreadsheetId, range).setMajorDimension(majorDim)
-                    .execute();
-            List<List<Object>> values = response.getValues();
-            if (values != null) {
-                for (int i = 0; i < values.size(); i++) {
-                    for (int j = 0; j < values.get(i).size(); j++) {
-                        results.add(values.get(i).get(j).toString());
-                    }
-                }
-            }
-            return results;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            mOutputText.setText("");
-            progress = new ProgressDialog(GoogleApiActivity.this);
-            progress.setMessage("Lekérdezés folyamatban...");
-            progress.show();
-        }
-
-        @Override
-        protected void onPostExecute(List<String> output) {
-            if (output == null || output.size() == 0) {
-                mOutputText.setText(R.string.no_results);
-            } else {
-                output.add(0, "Data retrieved using the Google Sheets API:");
-                mOutputText.setText(TextUtils.join("\n", output));
-            }
-            progress.dismiss();
-        }
-
-        @Override
-        protected void onCancelled() {
-            if (mLastError != null) {
-                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());
-                } else if (mLastError instanceof UserRecoverableAuthIOException) {
-                    startActivityForResult(
-                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            GoogleApiActivity.REQUEST_AUTHORIZATION);
-                } else {
-//                    mOutputText.setText(R.string.universal_error
-//                            + mLastError.getMessage());
-                }
-            } else {
-                mOutputText.setText(R.string.request_cancelled);
-            }
-            progress.dismiss();
-        }
-    }
-
     private class ConnectionTestTask extends AsyncTask<Void, Void, Boolean> {
         com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
@@ -467,8 +383,6 @@ public class GoogleApiActivity extends BaseActivity
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             GoogleApiActivity.REQUEST_AUTHORIZATION);
                 } else {
-//                    mOutputText.setText(R.string.universal_error
-//                            + mLastError.getMessage());
                     mOutputText.setText(R.string.connection_test_unsuccesful);
                 }
             } else {
@@ -598,7 +512,7 @@ public class GoogleApiActivity extends BaseActivity
                     !converter.insideLevenshteinDistance(sheets.get(i).getProperties().getTitle(),
                             checkDetails[3],
                             levensthein
-                    )) {//!sheets.get(i).getProperties().getTitle().equals(checkDetails[3])) {
+                    )) {
                 i++;
             }
             String newSheetTitle;
@@ -612,7 +526,7 @@ public class GoogleApiActivity extends BaseActivity
                 newSheetTitle = sheets.get(i).getProperties().getTitle();
             }
 
-            dataRange = "B" + checkDetails[4] + ":D" + checkDetails[4]; //TODO új év esetén range ??
+            dataRange = "B" + checkDetails[4] + ":D" + checkDetails[4];
             title = newSheetTitle + "!";
 
             String range = title + dataRange;
@@ -670,8 +584,6 @@ public class GoogleApiActivity extends BaseActivity
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             GoogleApiActivity.REQUEST_AUTHORIZATION);
                 } else {
-//                    mOutputText.setText(getString(R.string.universal_error)
-//                            + mLastError.getMessage());
                     mOutputText.setText(R.string.unsuccesful_update);
                 }
             } else {

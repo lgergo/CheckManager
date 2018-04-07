@@ -19,6 +19,7 @@ import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.util.Constants;
 
 import javax.inject.Inject;
 
@@ -47,7 +48,7 @@ public class MainActivity extends BaseActivity {
 
         TextView latestSyncTextView = findViewById(R.id.latest_synch);
         String lastSync = getValueFromSharedPreferences(R.string.last_sync_value, R.string.last_sync_default);
-        latestSyncTextView.setText("Legutoljára szinkronizálva: " + lastSync);
+        latestSyncTextView.setText(getString(R.string.main_latestSync, lastSync));
 
         FloatingActionButton newImageButton = findViewById(R.id.newImage_button);
         newImageButton.setOnClickListener(new View.OnClickListener() {
@@ -58,13 +59,13 @@ public class MainActivity extends BaseActivity {
         });
 
         String firstStart = getValueFromSharedPreferences(R.string.first_start_value, R.string.first_start_default);
-        if (firstStart == "1") {
+        if (firstStart.equals(Constants.FirstStart_Default)) {
             showFirstStartAlertDialog();
         }
     }
 
     private void showFirstStartAlertDialog() {
-        saveToSharedPreferences(R.string.first_start_value, "0");
+        saveToSharedPreferences(R.string.first_start_value, Constants.FirstStart_Value);
         int notInterval = Integer.parseInt(getValueFromSharedPreferences(R.string.notification_interval_value, R.string.notification_interval_default));
         notManager.createNotification(this, notInterval);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

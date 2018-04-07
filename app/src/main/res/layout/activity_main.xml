@@ -12,18 +12,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <FrameLayout
-        android:id="@+id/checklist_fragmentcontainer"
+    <RelativeLayout
+        style="@style/ToolbarActivityStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar_main"
-        android:padding="10dp" />
+        android:layout_below="@id/toolbar_main">
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/latest_synch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/checklist_fragmentcontainer" />
+
+        <FrameLayout
+            android:id="@+id/checklist_fragmentcontainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/latest_synch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/checklist_fragmentcontainer"
+            android:text="@string/main_latestSync" />
+
+    </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/newImage_button"
@@ -32,9 +40,11 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_gravity="bottom|end"
-        android:layout_margin="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginEnd="15dp"
         android:src="@drawable/ic_add_24dp"
         android:tint="#fff"
         app:backgroundTint="@color/colorPrimary" />
+
 
 </RelativeLayout>

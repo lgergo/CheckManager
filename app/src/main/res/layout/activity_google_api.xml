@@ -18,5 +18,4 @@
         android:layout_below="@id/toolbar_checkDetails"
         android:textAlignment="center"
         android:textSize="28sp" />
-
 </RelativeLayout>

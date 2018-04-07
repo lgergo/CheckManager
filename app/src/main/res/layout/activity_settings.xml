@@ -13,70 +13,85 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/textView_sheetId"
-        style="@style/TextTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar_settings"
-        android:text="@string/sheetId_text" />
-
-    <android.support.v7.widget.AppCompatEditText
-        android:id="@+id/editText_settings_sheetId"
+    <RelativeLayout
+        style="@style/ToolbarActivityStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/textView_sheetId"
-        android:maxLines="2" />
+        android:layout_below="@id/toolbar_settings">
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/button_settings_test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/editText_settings_sheetId"
-        android:text="@string/button_test" />
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/textView_sheetId"
+            style="@style/TextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sheetId_text" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/button_settings_create"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/editText_settings_sheetId"
-        android:text="@string/button_create" />
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/editText_settings_sheetId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_sheetId"
+            android:maxLines="2" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/notification_interval_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/button_settings_test"
-        android:text="@string/notification_interval_question" />
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_settings_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/editText_settings_sheetId"
+            android:text="@string/button_test" />
 
-    <SeekBar
-        android:id="@+id/seekBar_settings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/notification_interval_label" />
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_settings_create"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editText_settings_sheetId"
+            android:text="@string/button_create" />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/seekBar_value"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/seekBar_settings" />
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/notification_interval_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/button_settings_test"
+            android:layout_marginTop="32dp"
+            android:text="@string/notification_interval_question" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/button_settings_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/seekBar_value"
-        android:text="@string/button_save" />
+        <SeekBar
+            android:id="@+id/seekBar_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/notification_interval_label" />
 
-    <android.support.v7.widget.AppCompatCheckBox
-        android:id="@+id/checkbox_levenshtein"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/button_settings_save"
-        android:layoutDirection="rtl"
-        android:text="Lehet minimális eltérés beolvasott cégnév és a Google Táblázatban lévő között?" />
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/seekBar_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/seekBar_settings"
+            android:layout_marginBottom="32dp"
+            android:textAlignment="center"
+            android:textColor="#AABBCC"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_levenshtein"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/seekBar_value"
+            android:layoutDirection="rtl"
+            android:paddingStart="20dp"
+            android:text="@string/settings_checkbox_message" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_settings_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:text="@string/button_save" />
+
+    </RelativeLayout>
+
 
 </RelativeLayout>

@@ -57,11 +57,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         switch (id) {
             case R.id.menu_images:
                 File storage = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                for (File c : storage.listFiles()) {
-                    c.delete();
+                if (storage != null) {
+                    for (File c : storage.listFiles()) {
+                        c.delete();
+                    }
+                    Toast t = Toast.makeText(getApplicationContext(), R.string.successful_delete, Toast.LENGTH_SHORT);
+                    t.show();
                 }
-                Toast t = Toast.makeText(getApplicationContext(), R.string.successful_delete, Toast.LENGTH_SHORT);
-                t.show();
                 break;
             case R.id.menu_help:
                 Intent help = new Intent(getApplicationContext(), HelpActivity.class);

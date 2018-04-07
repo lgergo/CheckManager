@@ -21,24 +21,20 @@
 
     <string name="help_fragment_programUsage">
         <b>Fontos ajánlások a programmal kapcsolatban:</b>
-A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. Az beállításoknál megadhatjuk, hogy az adatokainkat melyik Google Táblázat munkafüzetbe szeretnénk tárolni. Ha nem rendelkezünk még vele, akkor generáltathatunk egyet az applikációval a Beállítások menüpontban.
-Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. A program értesít minket megadott időközönként, hogy ne felejtsük el a csekkjeinket befizetni.
+A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. A beállításoknál megadhatja, hogy az adatokat melyik Google Táblázatban szeretné tárolni. Ha nem rendelkezik még vele, akkor generáltathat egyet az applikációval a Beállítások menüpontban.
     </string>
 
-
     <string name="unsuccesful_update">Sikertelen feltöltés! Ellenőrizze az internet kapcsolatot és a megadott Google Táblázat azonosítót!</string>
-    <string name="universal_error">Hiba:</string>
     <string name="request_cancelled">A kérés törölve.</string>
-    <string name="no_results">No results returned.</string>
-    <string name="googlePlay_install">This app requires Google Play Services. Please install Google Play Services on your device and relaunch this app.</string>
-    <string name="request_contactAccess">This app needs to access your Google account (via Contacts).</string>
-    <string name="no_network">No network connection available.</string>
+    <string name="no_results">Nincs megjeleníthető eredmény.</string>
+    <string name="googlePlay_install">Az alkalmazásnak szüksége van a Google Play Szolgáltatásokra. Telepítse fel, majd indítsa újra az alkalmazást.</string>
+    <string name="request_contactAccess">Az alkalmazásnak szüksége van a Google fiókra.</string>
+    <string name="no_network">Nincs elérhető internet kapcsolat.</string>
     <string name="progress_dialog_upload">Feltöltés folyamatban…</string>
-    <string name="sheetId_text">Google Sheets azonosító:</string>
+    <string name="sheetId_text">Google Táblázat azonosító:</string>
     <string name="sheetId_isRequired">Nincs megadva Google Táblázat azonosító!</string>
-    <string name="active_notifications_title">Aktív értesítések</string>
-    <string name="connection_test_successful">A megadott azonosító megfelelő.</string>
-    <string name="connection_test_unsuccesful">A megadott azonosító hibás!</string>
+    <string name="connection_test_successful">A megadott Google Táblázat azonosító megfelelő.</string>
+    <string name="connection_test_unsuccesful">A megadott Google Táblázat azonosító hibás!</string>
     <string name="button_save">Mentés</string>
     <string name="button_edit">Szerkesztés</string>
     <string name="button_upload">Feltöltés</string>
@@ -46,9 +42,10 @@ Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. A p
     <string name="button_test">Tesztelés</string>
     <string name="button_delete">Törlés</string>
     <string name="button_recognise">Felismerés</string>
-    <string name="button_capture">Fotó készítése</string>
+    <string name="button_capture">Új kép</string>
     <string name="button_notNow">Most nem</string>
     <string name="button_fill">Megadom</string>
+    <string name="button_preprocessing">Kész</string>
     <string name="upload_emptyField">Üres mezővel nem lehetséges a feltöltés!</string>
     <string name="create_spreadsheet_successful">Táblázat sikeresen létrehozva.</string>
     <string name="create_spreadsheet_unsuccessful">Táblázat generálása sikertelen. Ellenőrizze az internet kapcsolatot!</string>
@@ -57,18 +54,19 @@ Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. A p
     <string name="successful_update">Sikeres feltöltés.</string>
     <string name="notification_interval_question">Hány naponta szeretne értesítéseket?</string>
     <string name="notification_title">Checkmanager</string>
-    <string name="notification_message_text">Befizetted már a számláidat?</string>
-    <string name="settings_empty_sheetId_toast">Üres táblázat azonosító!</string>
-    <string name="image_content_description_capture_a_photo">Capture a photo</string>
+    <string name="notification_message_text">Szinkronizáltad már a számláidat?</string>
+    <string name="notificaton_interval_settings_text">%1$d naponta szeretnék értesítést.</string>
+    <string name="settings_empty_sheetId_toast">Üres Google Táblázat azonosító!</string>
+    <string name="image_content_description_capture_a_photo">Készíts egy képet!</string>
     <string name="menu_home">Főoldal</string>
     <string name="menu_settings">Beállítások</string>
     <string name="menu_delete_images">Képek törlése</string>
     <string name="menu_help">Segítség</string>
-    <string name="googleApi_connectionTest_progressDialogText">Kapcsolódás...</string>
-    <string name="googleApi_generate_progressDialogText">Táblázat generálása...</string>
+    <string name="googleApi_connectionTest_progressDialogText">Kapcsolódás…</string>
+    <string name="googleApi_generate_progressDialogText">Táblázat generálása…</string>
     <string name="google_spreadsheet_file_name">Checkmanager</string>
-    <string name="tesseract_recognition_processDialog">Felsimerés folyamatban...</string>
-    <string name="imageProc_processing_processDialog">Kép feldolgozása...</string>
+    <string name="tesseract_recognition_processDialog">Felsimerés folyamatban…</string>
+    <string name="imageProc_processing_processDialog">Kép feldolgozása…</string>
     <string name="help_fragment_title">Az alábbi ajánlások betartásával elősegíti a felismerés pontosságát.</string>
     <string name="help_fragment_textBeforelistitems">A kép készítésekor: </string>
     <string name="help_fragment_listitem_1">\u25CF  A háttér konstrasztos, egyszínű legyen</string>
@@ -77,7 +75,29 @@ Másik fontos ajánlás, hogy ne tiltsuk le az applikáció értesítéseit. A p
     <string name="firstStartMessage_title">Checkmanager</string>
     <string name="firstStartMessage_message">Hogy ki tudd használni a Google Sheets szinkronizációt, kérlek add meg a dokumentum azonosítóját.</string>
     <string name="firstStartMessage_toast">Később is lehetőséged lesz megadni a Beállítások menüpont alatt.</string>
-    <string name="googleSheetId_hint">Ide írja a Google Táblázat azonosítóját...</string>
+    <string name="googleSheetId_hint">Ide írja a Google Táblázat azonosítóját…</string>
+    <string name="createTable_alertDialog_title">Táblázat létrehozás</string>
+    <string name="create_table_alertDialog_message">Az azonosító mező nem üres. Biztos hogy létre akar hozni egy új táblázatot?</string>
+    <string name="createTable_alertDialog_yes">Igen</string>
+    <string name="createTable_alertDialog_no">Nem</string>
+    <string name="checkList_title">Nem szinkronizált csekkek</string>
+    <string name="settings_checkbox_message">Legyen megengedett egy minimális eltérés beolvasott cégnév és a Google Táblázatban lévő között?</string>
+    <string name="checkDetails_title">Csekk adatai</string>
+    <string name="checkDetails_id">Csekk azonosító</string>
+    <string name="checkDetails_creationDate">Létrehozás dátuma</string>
+    <string name="checkDetails_Amount">Összeg</string>
+    <string name="checkDetails_paidAt">Befizetve</string>
+    <string name="checkDetails_paidTo">Cég neve</string>
+    <string name="main_latestSync">Legutoljára szinkronizálva: %1$s</string>
+    <string name="tesseract_tessdata">/tessdata</string>
+    <string name="tesseract_lang">hun</string>
+    <string name="tesseract_dottraineddata">.traineddata</string>
+    <string name="tesseract_errorTag">Tesseract error</string>
+    <string name="tesseract_error_loadTesseract">Tesseract API betöltése sikertelen.</string>
+    <string name="tesseract_eroor_getUTFText">Tesseract szöveg felismerése sikertelen.</string>
+    <string name="newImage_tessError_alertDialog_title">Tesseract hiba</string>
+    <string name="newImage_tessError_alertDialog_message">A .tessdata fájl nem található az Android/data/com.yevsp8.checkmanager/files/tessdata mappában! Az alkalmazás újratelepítése megoldhatja a problémát.</string>
+    <string name="button_ok">OK</string>
 
     <string-array name="months">
         <item>Január</item>

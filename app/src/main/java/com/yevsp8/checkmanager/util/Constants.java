@@ -7,11 +7,17 @@ package com.yevsp8.checkmanager.util;
 public class Constants {
 
     public static final String DateTimePattern = "yyyy/MM/dd";
+    public static final String LongDateTimePattern = "yyyyMMdd_HHmmss";
     public static int NotificationRequestCode = 111;
     public static int Max_Notification_Day_Interval = 30;
+    public static String Levensthein_Value = "3";
+    public static String Levensthein_Default = "0";
+    public static String FirstStart_Default = "1";
+    public static String FirstStart_Value = "0";
+
     private static double height = 10.6;
-    public static double Check_Amount_Top_DistFrom_Top = 0.88 / height;
-    public static double Check_Amount_Bottom_DistFrom_Top = 1.28 / height;
+    public static double Check_Amount_Top_DistFrom_Top = 0.9 / height;
+    public static double Check_Amount_Bottom_DistFrom_Top = 1.32 / height;
     public static double Check_PaidTo_Top_DistFrom_Top = 8.45 / height;
     public static double Check_PaidTo_Bottom_DistFrom_Top = 9.58 / height;
     public static double Check_ID_Top_DistFrom_Top = 9.7 / height;

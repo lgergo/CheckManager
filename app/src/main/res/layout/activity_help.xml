@@ -15,7 +15,6 @@
         android:id="@+id/help_fragmentcontainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar_main"
-        android:padding="20dp" />
+        android:layout_below="@id/toolbar_main" />
 
 </RelativeLayout>
