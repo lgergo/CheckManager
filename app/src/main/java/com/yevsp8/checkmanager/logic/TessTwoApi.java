@@ -1,10 +1,11 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.logic;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
+import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerImageProcessingComponent;
 import com.yevsp8.checkmanager.di.ImageProcessingComponent;

@@ -58,7 +58,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <receiver android:name=".NotificationReceiver" />
+        <receiver android:name=".logic.NotificationReceiver" />
 
     </application>
 </manifest>

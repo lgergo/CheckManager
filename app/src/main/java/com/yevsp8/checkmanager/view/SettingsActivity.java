@@ -16,12 +16,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.yevsp8.checkmanager.CustomNotificationManager;
 import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.logic.CustomNotificationManager;
 import com.yevsp8.checkmanager.util.Constants;
 import com.yevsp8.checkmanager.util.Enums;
 

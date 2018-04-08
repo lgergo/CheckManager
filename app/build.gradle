@@ -53,8 +53,12 @@ android {
         //tesseract
         compile 'com.rmtheis:tess-two:8.0.0'
         //test
-        testImplementation 'junit:junit:4.12'
-        androidTestImplementation 'com.android.support.test:runner:1.0.1'
+        androidTestCompile 'com.android.support.test:runner:1.0.1'
+        testCompile 'junit:junit:4.12'
+        testCompile 'org.mockito:mockito-core:1.10.19'
         implementation project(':openCVLibrary341')
     }
+}
+dependencies {
+    androidTestCompile 'junit:junit:4.12'
 }

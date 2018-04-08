@@ -1,9 +1,11 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.logic;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+
+import com.yevsp8.checkmanager.R;
 
 import java.util.Calendar;
 import java.util.TimeZone;

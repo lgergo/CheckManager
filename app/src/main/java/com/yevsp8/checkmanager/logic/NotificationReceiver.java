@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.logic;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
+import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.view.MainActivity;
 
 import static com.yevsp8.checkmanager.util.Constants.NotificationRequestCode;

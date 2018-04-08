@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.logic;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -27,6 +27,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,7 +61,7 @@ public class ImageProcessor {
         }
     }
 
-    private void loadImageGromFile(String path) {
+    private void loadImageFromFile(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         //options.inSampleSize = 2;
         sourceBitmap = BitmapFactory.decodeFile(path, options);
@@ -69,7 +70,7 @@ public class ImageProcessor {
 
     public Bitmap preProcessing(String filePath) {
 
-        loadImageGromFile(filePath);
+        loadImageFromFile(filePath);
         Mat src = new Mat(sourceBitmap.getHeight(), sourceBitmap.getWidth(), CvType.CV_8UC1);
         Utils.bitmapToMat(sourceBitmap, src);
         Imgproc.cvtColor(src, src, Imgproc.COLOR_BGR2GRAY);
@@ -99,7 +100,7 @@ public class ImageProcessor {
         Imgproc.adaptiveThreshold(checkRect, checkRect, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 13, 3);
         Core.bitwise_not(checkRect, checkRect);
 
-        Mat kernel = Mat.ones(9, 9, CvType.CV_8UC1);
+        Mat kernel = Mat.ones(11, 11, CvType.CV_8UC1);
         Imgproc.morphologyEx(checkRect, checkRect, Imgproc.MORPH_GRADIENT, kernel);
 
         List<MatOfPoint> contours = new ArrayList<>();
@@ -111,13 +112,15 @@ public class ImageProcessor {
         //corrected=checkRect;
         //corrected=contoured;
 
-//        Mat rect = getRectOfAmount(corrected);
-//        preprocessForRectImages(rect, 1, 2);
+//        Mat rect = getRectOfPaidTo(corrected);
+//        preprocessForRectImages(rect, 4, 1);
 //        Bitmap rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
 //        Utils.matToBitmap(rect, rectBitmapTemp);
 //        return  rectBitmapTemp;
 
+
         Utils.matToBitmap(corrected, sourceBitmap);
+        //writeImage(sourceBitmap);
         return sourceBitmap;
     }
 
@@ -295,24 +298,24 @@ public class ImageProcessor {
         return new Mat(image, rect);
     }
 
-//    private void writeImage(Bitmap bmp) {
-//        FileOutputStream out = null;
-//        try {
-//            out = new FileOutputStream("/storage/sdcard/Android/data/com.yevsp8.checkmanager/files/Pictures/edited_d.png");
-//            bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-//            // PNG is a lossless format, the compression factor (100) is ignored
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                if (out != null) {
-//                    out.close();
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
+    private void writeImage(Bitmap bmp) {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream("/storage/sdcard/Android/data/com.yevsp8.checkmanager/files/Pictures/corrected.png");
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public Bitmap rotate(Bitmap source, String currentPhotoPath) {
         ExifInterface exif;

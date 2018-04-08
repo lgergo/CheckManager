@@ -1,7 +1,7 @@
 package com.yevsp8.checkmanager.di;
 
-import com.yevsp8.checkmanager.ImageProcessor;
-import com.yevsp8.checkmanager.TessTwoApi;
+import com.yevsp8.checkmanager.logic.ImageProcessor;
+import com.yevsp8.checkmanager.logic.TessTwoApi;
 import com.yevsp8.checkmanager.view.NewImageActivity;
 
 import dagger.Component;

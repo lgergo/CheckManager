@@ -3,8 +3,8 @@ package com.yevsp8.checkmanager.di;
 import android.content.Context;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
-import com.yevsp8.checkmanager.ImageProcessor;
-import com.yevsp8.checkmanager.TessTwoApi;
+import com.yevsp8.checkmanager.logic.ImageProcessor;
+import com.yevsp8.checkmanager.logic.TessTwoApi;
 
 import dagger.Module;
 import dagger.Provides;

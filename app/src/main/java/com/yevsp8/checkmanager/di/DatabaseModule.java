@@ -4,10 +4,10 @@ import android.app.Application;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.persistence.room.Room;
 
-import com.yevsp8.checkmanager.CustomNotificationManager;
 import com.yevsp8.checkmanager.data.CheckDAO;
 import com.yevsp8.checkmanager.data.CheckDatabase;
 import com.yevsp8.checkmanager.data.CheckRepository;
+import com.yevsp8.checkmanager.logic.CustomNotificationManager;
 import com.yevsp8.checkmanager.viewModel.CustomViewModelFactory;
 
 import dagger.Module;

@@ -24,12 +24,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.yevsp8.checkmanager.ImageProcessor;
 import com.yevsp8.checkmanager.R;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerImageProcessingComponent;
 import com.yevsp8.checkmanager.di.ImageProcessingComponent;
 import com.yevsp8.checkmanager.di.TessTwoModule;
+import com.yevsp8.checkmanager.logic.ImageProcessor;
 import com.yevsp8.checkmanager.util.Constants;
 
 import java.io.File;
@@ -198,7 +198,7 @@ public class NewImageActivity extends BaseActivity {
 
     private void startPreprocessing() {
         //demohoz
-        //currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/normal.jpg";
+        currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test.jpg";
 
         new ImagePreprocessingTask().execute(currentPhotoPath);
     }
