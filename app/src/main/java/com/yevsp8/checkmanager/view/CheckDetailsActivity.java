@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.yevsp8.checkmanager.R;
+import com.yevsp8.checkmanager.util.Constants;
 
 public class CheckDetailsActivity extends BaseActivity {
 
@@ -18,14 +19,14 @@ public class CheckDetailsActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_checkDetails);
         setSupportActionBar(toolbar);
 
-        String checkId = getIntent().getExtras().getString("selected_check_id");
-        String[] recognisedText = getIntent().getExtras().getStringArray("result_array");
+        String checkId = getIntent().getExtras().getString(Constants.SelectedCheckId);
+        String[] recognisedText = getIntent().getExtras().getStringArray(Constants.RecognisedTextsArray);
 
         FragmentManager manager = getSupportFragmentManager();
         CheckDetailsFragment fragment = new CheckDetailsFragment();
         Bundle bundle = new Bundle();
-        bundle.putString("selected_check_id", checkId);
-        bundle.putStringArray("result_array", recognisedText);
+        bundle.putString(Constants.SelectedCheckId, checkId);
+        bundle.putStringArray(Constants.RecognisedTextsArray, recognisedText);
         fragment.setArguments(bundle);
 
         replaceFragmentToActivity(manager, fragment, R.id.checkdetails_fragmentcontainer);

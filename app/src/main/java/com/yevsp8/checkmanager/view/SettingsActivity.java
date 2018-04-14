@@ -135,7 +135,7 @@ public class SettingsActivity extends BaseActivity {
         } else {
             saveToSharedPreferences(R.string.sheetId_value, edittext_sheetId.getText().toString());
             Intent intent = new Intent(this, GoogleApiActivity.class);
-            intent.putExtra("callType", Enums.APICallType.ConnectionTest);
+            intent.putExtra(Constants.GooglaApiCallType, Enums.APICallType.ConnectionTest);
             startActivity(intent);
         }
     }
@@ -149,7 +149,7 @@ public class SettingsActivity extends BaseActivity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
-                    intent.putExtra("callType", Enums.APICallType.CreateSpreadSheet);
+                    intent.putExtra(Constants.GooglaApiCallType, Enums.APICallType.CreateSpreadSheet);
                     startActivity(intent);
                 }
             });
@@ -162,7 +162,7 @@ public class SettingsActivity extends BaseActivity {
             builder.show();
         } else {
             Intent intent = new Intent(getApplicationContext(), GoogleApiActivity.class);
-            intent.putExtra("callType", Enums.APICallType.CreateSpreadSheet);
+            intent.putExtra(Constants.GooglaApiCallType, Enums.APICallType.CreateSpreadSheet);
             startActivity(intent);
         }
     }

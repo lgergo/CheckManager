@@ -20,6 +20,7 @@ import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.util.Constants;
 import com.yevsp8.checkmanager.util.Converter;
 import com.yevsp8.checkmanager.util.Enums;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
@@ -65,8 +66,8 @@ public class CheckDetailsFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_check_details, container, false);
 
         Bundle args = getArguments();
-        checkId = args.getString("selected_check_id");
-        recognisedText = args.getStringArray("result_array");
+        checkId = args.getString(Constants.SelectedCheckId);
+        recognisedText = args.getStringArray(Constants.RecognisedTextsArray);
 
         button_edit_save = rootView.findViewById(R.id.button_details_edit_save);
         button_edit_save.setOnClickListener(new View.OnClickListener() {
@@ -155,9 +156,9 @@ public class CheckDetailsFragment extends Fragment {
     private void uploadClicked() {
         if (id.getText().length() > 0 && amount.getText().length() > 0 && paidto.getText().length() > 0 && paiddate.getText().length() > 0) {
             Intent intent = new Intent(getContext(), GoogleApiActivity.class);
-            intent.putExtra("callType", Enums.APICallType.Update_data);
+            intent.putExtra(Constants.GooglaApiCallType, Enums.APICallType.Update_data);
             String[] param = viewModel.checkDetailsToGoogleRequestFormat(check);
-            intent.putExtra("result_array", param);
+            intent.putExtra(Constants.RecognisedTextsArray, param);
             startActivity(intent);
         } else {
             Toast t = Toast.makeText(getContext(), R.string.upload_emptyField, Toast.LENGTH_LONG);

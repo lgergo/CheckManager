@@ -22,12 +22,10 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,7 +61,7 @@ public class ImageProcessor {
 
     private void loadImageFromFile(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-        //options.inSampleSize = 2;
+        options.inSampleSize = 1;
         sourceBitmap = BitmapFactory.decodeFile(path, options);
         sourceBitmap = rotate(sourceBitmap, path);
     }
@@ -131,19 +129,19 @@ public class ImageProcessor {
 
         Mat rect = getRectOfAmount(corrected);
         preprocessForRectImages(rect, 1, 2);
-        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
+        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.RGB_565);
         Utils.matToBitmap(rect, rectBitmapTemp);
         String amountResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789*");
 
         rect = getRectOfCheckId(corrected);
         preprocessForRectImages(rect, 1, 3);
-        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
+        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.RGB_565);
         Utils.matToBitmap(rect, rectBitmapTemp);
         String checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789");
 
         rect = getRectOfPaidTo(corrected);
         preprocessForRectImages(rect, 4, 1);
-        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
+        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.RGB_565);
         Utils.matToBitmap(rect, rectBitmapTemp);
         String paidToResultLines = tessTwoApi.startRecognition(rectBitmapTemp, null);
         String[] resultLines = paidToResultLines.split("\n");
@@ -183,12 +181,12 @@ public class ImageProcessor {
         Imgproc.findContours(source, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
     }
 
-    private Mat drawContours(Mat source, List<MatOfPoint> contours) {
-        Mat tempSrc = source.clone();
-        Mat contoured = new Mat(tempSrc.rows(), tempSrc.cols(), CvType.CV_8UC1);
-        Imgproc.drawContours(contoured, contours, -1, new Scalar(255), 5);
-        return contoured;
-    }
+//    private Mat drawContours(Mat source, List<MatOfPoint> contours) {
+//        Mat tempSrc = source.clone();
+//        Mat contoured = new Mat(tempSrc.rows(), tempSrc.cols(), CvType.CV_8UC1);
+//        Imgproc.drawContours(contoured, contours, -1, new Scalar(255), 5);
+//        return contoured;
+//    }
 
     private Mat getCorrectedPerspectiveRectPoints(List<MatOfPoint> contours) {
         double threshold = 0.5;
@@ -199,9 +197,7 @@ public class ImageProcessor {
         for (int idx = 0; idx < contours.size(); idx++) {
             temp_contour = contours.get(idx);
             double contourArea = Imgproc.contourArea(temp_contour);
-            // compare to previous largest contour
             if (contourArea > maxArea) {
-                // check if this contour is a square
                 MatOfPoint2f square = new MatOfPoint2f(temp_contour.toArray());
                 int contourSize = (int) temp_contour.total();
                 MatOfPoint2f approxCurve_temp = new MatOfPoint2f();
@@ -267,14 +263,6 @@ public class ImageProcessor {
         return output;
     }
 
-//    private void logMatDataToConsole(String name, Mat toLog) {
-//        Log.e("IMG_DETAILS: " + name + " ",
-//                "dim: " + String.valueOf(toLog.dims())
-//                        + "; channel: " + String.valueOf(toLog.channels())
-//                        + "; depth: " + String.valueOf(toLog.depth())
-//        );
-//    }
-
     private Mat getRectOfCheckId(Mat image) {
         Point p1 = new Point(image.cols() * Constants.Check_ID_Left_DistFrom_Left, image.rows() * Constants.Check_ID_Top_DistFrom_Top);
         Point p2 = new Point(image.cols() * Constants.Check_ID_Right_DistFrom_Left, image.rows() * Constants.Check_ID_Bottom_DistFrom_Top);
@@ -298,24 +286,23 @@ public class ImageProcessor {
         return new Mat(image, rect);
     }
 
-    private void writeImage(Bitmap bmp) {
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream("/storage/sdcard/Android/data/com.yevsp8.checkmanager/files/Pictures/corrected.png");
-            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    private void writeImage(Bitmap bmp) {
+//        FileOutputStream out = null;
+//        try {
+//            out = new FileOutputStream("/storage/sdcard/Android/data/com.yevsp8.checkmanager/files/Pictures/corrected.png");
+//            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                if (out != null) {
+//                    out.close();
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     public Bitmap rotate(Bitmap source, String currentPhotoPath) {
         ExifInterface exif;

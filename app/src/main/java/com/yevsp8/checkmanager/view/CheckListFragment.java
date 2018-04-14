@@ -20,6 +20,7 @@ import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.util.Constants;
 import com.yevsp8.checkmanager.viewModel.CheckListViewModel;
 
 import java.util.List;
@@ -84,7 +85,7 @@ public class CheckListFragment extends Fragment {
                 Check selected = adapter.getItem(i);
 
                 Intent intent = new Intent(getContext(), CheckDetailsActivity.class);
-                intent.putExtra("selected_check_id", selected.getCheckId());
+                intent.putExtra(Constants.SelectedCheckId, selected.getCheckId());
                 startActivity(intent);
 
             }

@@ -28,6 +28,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.AddSheetRequest;
+import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
@@ -45,6 +46,7 @@ import com.yevsp8.checkmanager.di.ApplicationModule;
 import com.yevsp8.checkmanager.di.CheckManagerApplicationComponent;
 import com.yevsp8.checkmanager.di.ContextModule;
 import com.yevsp8.checkmanager.di.DaggerCheckManagerApplicationComponent;
+import com.yevsp8.checkmanager.util.Constants;
 import com.yevsp8.checkmanager.util.Converter;
 import com.yevsp8.checkmanager.util.Enums.APICallType;
 import com.yevsp8.checkmanager.viewModel.CheckViewModel;
@@ -61,13 +63,6 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class GoogleApiActivity extends BaseActivity
         implements EasyPermissions.PermissionCallbacks {
 
-    static final int REQUEST_ACCOUNT_PICKER = 1000;
-    static final int REQUEST_AUTHORIZATION = 1001;
-    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
-    static final int UPDATED_CELL_COUNT = 3;
-    static final int CREATED_COMPANY_CELL_COUNT = 16;
-    private static final String PREF_ACCOUNT_NAME = "accountName";
     APICallType type;
     @Inject
     Converter converter;
@@ -97,8 +92,8 @@ public class GoogleApiActivity extends BaseActivity
                 .build();
         component.injectGooglaApiActivity(this);
 
-        type = (APICallType) getIntent().getSerializableExtra("callType");
-        checkDetailsdataArray = getIntent().getStringArrayExtra("result_array");
+        type = (APICallType) getIntent().getSerializableExtra(Constants.GooglaApiCallType);
+        checkDetailsdataArray = getIntent().getStringArrayExtra(Constants.RecognisedTextsArray);
         spreadsheetId = getValueFromSharedPreferences(R.string.sheetId_value, R.string.sheetId_default);
         levensthein = Integer.parseInt(getValueFromSharedPreferences(R.string.levenshtein_value, R.string.levenshtein_default));
 
@@ -143,25 +138,25 @@ public class GoogleApiActivity extends BaseActivity
         }
     }
 
-    @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
+    @AfterPermissionGranted(Constants.REQUEST_PERMISSION_GET_ACCOUNTS)
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
                 this, Manifest.permission.GET_ACCOUNTS)) {
             String accountName = getPreferences(Context.MODE_PRIVATE)
-                    .getString(PREF_ACCOUNT_NAME, null);
+                    .getString(Constants.PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
                 callGoogleApi(type);
             } else {
                 startActivityForResult(
                         mCredential.newChooseAccountIntent(),
-                        REQUEST_ACCOUNT_PICKER);
+                        Constants.REQUEST_ACCOUNT_PICKER);
             }
         } else {
             EasyPermissions.requestPermissions(
                     this,
                     getString(R.string.request_contactAccess),
-                    REQUEST_PERMISSION_GET_ACCOUNTS,
+                    Constants.REQUEST_PERMISSION_GET_ACCOUNTS,
                     Manifest.permission.GET_ACCOUNTS);
         }
     }
@@ -171,7 +166,7 @@ public class GoogleApiActivity extends BaseActivity
             int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case REQUEST_GOOGLE_PLAY_SERVICES:
+            case Constants.REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
                     mOutputText.setText(
                             getString(R.string.googlePlay_install));
@@ -179,7 +174,7 @@ public class GoogleApiActivity extends BaseActivity
                     callGoogleApi(type);
                 }
                 break;
-            case REQUEST_ACCOUNT_PICKER:
+            case Constants.REQUEST_ACCOUNT_PICKER:
                 if (resultCode == RESULT_OK && data != null &&
                         data.getExtras() != null) {
                     String accountName =
@@ -188,7 +183,7 @@ public class GoogleApiActivity extends BaseActivity
                         SharedPreferences settings =
                                 getPreferences(Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = settings.edit();
-                        editor.putString(PREF_ACCOUNT_NAME, accountName);
+                        editor.putString(Constants.PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
                         mCredential.setSelectedAccountName(accountName);
 
@@ -196,7 +191,7 @@ public class GoogleApiActivity extends BaseActivity
                     }
                 }
                 break;
-            case REQUEST_AUTHORIZATION:
+            case Constants.REQUEST_AUTHORIZATION:
                 if (resultCode == RESULT_OK) {
                     callGoogleApi(type);
                 }
@@ -255,48 +250,69 @@ public class GoogleApiActivity extends BaseActivity
         Dialog dialog = apiAvailability.getErrorDialog(
                 GoogleApiActivity.this,
                 connectionStatusCode,
-                REQUEST_GOOGLE_PLAY_SERVICES);
+                Constants.REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
 
-    private boolean createCompanyTemplateForSheet(String companyName, com.google.api.services.sheets.v4.Sheets mService) throws Exception {
+    private boolean createCompanyTemplateForSheet(String companyName, boolean isNewYear, com.google.api.services.sheets.v4.Sheets mService) throws Exception {
         if (companyName != null) {
             try {
-                BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
-                List<Request> requests = new ArrayList<>();
 
-                //create sheet
-                Request addSheetRequest = new Request();
-                AddSheetRequest addSheet = new AddSheetRequest();
-                SheetProperties prop = new SheetProperties();
-                prop.setTitle(companyName);
-                addSheet.setProperties(prop);
-                addSheetRequest.setAddSheet(addSheet);
-                requests.add(addSheetRequest);
+                int row = 1;
+                if (isNewYear) {
+                    String range = companyName + "!A1";
+                    ValueRange requestBody = new ValueRange();
+                    requestBody.setMajorDimension(MajorDimension.ROWS.toString());
+                    requestBody.setRange(range);
+                    String valueInputOption = "RAW";
+                    String insertDataOption = "OVERWRITE";
 
-                batchUpdateSpreadsheetRequest.setRequests(requests);
-                Sheets.Spreadsheets.BatchUpdate createSheetRequest = mService.spreadsheets().batchUpdate(spreadsheetId, batchUpdateSpreadsheetRequest);
-                BatchUpdateSpreadsheetResponse createSheetResponse = createSheetRequest.execute();
-                if (createSheetResponse.getReplies().size() < 1) {
-                    return false;
+                    Sheets.Spreadsheets.Values.Append request =
+                            mService.spreadsheets().values().append(spreadsheetId, range, requestBody);
+                    request.setValueInputOption(valueInputOption);
+                    request.setInsertDataOption(insertDataOption);
+
+                    AppendValuesResponse response = request.execute();
+                    String res = response.getUpdates().getUpdatedRange();
+                    String[] result = res.split("!");
+                    res = result[1].substring(1);
+                    row = Integer.parseInt(res) + 1;
+                } else {
+                    BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
+                    List<Request> requests = new ArrayList<>();
+
+                    //create sheet
+                    Request addSheetRequest = new Request();
+                    AddSheetRequest addSheet = new AddSheetRequest();
+                    SheetProperties prop = new SheetProperties();
+                    prop.setTitle(companyName);
+                    addSheet.setProperties(prop);
+                    addSheetRequest.setAddSheet(addSheet);
+                    requests.add(addSheetRequest);
+
+                    batchUpdateSpreadsheetRequest.setRequests(requests);
+                    Sheets.Spreadsheets.BatchUpdate createSheetRequest = mService.spreadsheets().batchUpdate(spreadsheetId, batchUpdateSpreadsheetRequest);
+                    BatchUpdateSpreadsheetResponse createSheetResponse = createSheetRequest.execute();
+                    if (createSheetResponse.getReplies().size() < 1) {
+                        return false;
+                    }
                 }
-
                 //update with template
-                String range = companyName + "!A1:D1";
+                String range = companyName + "!A" + String.valueOf(row) + ":D" + String.valueOf(row);
                 ValueRange valueRange = new ValueRange();
                 valueRange.setMajorDimension(MajorDimension.ROWS.toString());
                 valueRange.setRange(range);
                 valueRange.setValues(
                         Arrays.asList(
-                                Arrays.asList((Object[]) getResources().getStringArray(R.array.headers))//(Object) "hónap", "csekk sorszám", "összeg", "befizetés dátuma")
+                                Arrays.asList((Object[]) getResources().getStringArray(R.array.headers))
                         ));
-                String range2 = companyName + "!A2:A14";
+                String range2 = companyName + "!A" + String.valueOf(row + 1) + ":D" + String.valueOf(row + 13); // "!A2:A14";
                 ValueRange valueRange2 = new ValueRange();
                 valueRange2.setMajorDimension(MajorDimension.COLUMNS.toString());
                 valueRange2.setRange(range2);
                 valueRange2.setValues(
                         Arrays.asList(
-                                Arrays.asList((Object[]) getResources().getStringArray(R.array.months))//(Object) "január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december")
+                                Arrays.asList((Object[]) getResources().getStringArray(R.array.months))
                         ));
 
                 List<ValueRange> data = new ArrayList<>();
@@ -309,10 +325,10 @@ public class GoogleApiActivity extends BaseActivity
 
                 Sheets.Spreadsheets.Values.BatchUpdate batchUpdateRequest = mService.spreadsheets().values().batchUpdate(spreadsheetId, updateRequestBody);
                 BatchUpdateValuesResponse updateValueResponse = batchUpdateRequest.execute();
-                return updateValueResponse.getTotalUpdatedCells() == CREATED_COMPANY_CELL_COUNT;
+                return updateValueResponse.getTotalUpdatedCells() == Constants.CREATED_COMPANY_CELL_COUNT;
 
             } catch (UserRecoverableAuthIOException e) {
-                startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+                startActivityForResult(e.getIntent(), Constants.REQUEST_AUTHORIZATION);
             }
         }
         return false;
@@ -381,7 +397,7 @@ public class GoogleApiActivity extends BaseActivity
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            GoogleApiActivity.REQUEST_AUTHORIZATION);
+                            Constants.REQUEST_AUTHORIZATION);
                 } else {
                     mOutputText.setText(R.string.connection_test_unsuccesful);
                 }
@@ -464,7 +480,7 @@ public class GoogleApiActivity extends BaseActivity
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            GoogleApiActivity.REQUEST_AUTHORIZATION);
+                            Constants.REQUEST_AUTHORIZATION);
                 } else {
                     mOutputText.setText(R.string.connection_test_unsuccesful);
                 }
@@ -517,13 +533,16 @@ public class GoogleApiActivity extends BaseActivity
             }
             String newSheetTitle;
             if (i == sheets.size()) {
-                if (!createCompanyTemplateForSheet(checkDetails[3], this.mService)) {
+                if (!createCompanyTemplateForSheet(checkDetails[3], false, this.mService)) {
                     return false;
                 } else {
                     newSheetTitle = checkDetails[3];
                 }
             } else {
                 newSheetTitle = sheets.get(i).getProperties().getTitle();
+                if (checkDetails[4] == "1") {
+                    createCompanyTemplateForSheet(newSheetTitle, true, this.mService);
+                }
             }
 
             dataRange = "B" + checkDetails[4] + ":D" + checkDetails[4];
@@ -542,9 +561,9 @@ public class GoogleApiActivity extends BaseActivity
                 UpdateValuesResponse response = this.mService.spreadsheets().values()
                         .update(spreadsheetId, range, valueRange).setValueInputOption("RAW")
                         .execute();
-                return response.getUpdatedCells() == UPDATED_CELL_COUNT;
+                return response.getUpdatedCells() == Constants.UPDATED_CELL_COUNT;
             } catch (UserRecoverableAuthIOException e) {
-                startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+                startActivityForResult(e.getIntent(), Constants.REQUEST_AUTHORIZATION);
             }
             return false;
         }
@@ -582,7 +601,7 @@ public class GoogleApiActivity extends BaseActivity
                 } else if (mLastError instanceof UserRecoverableAuthIOException) {
                     startActivityForResult(
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            GoogleApiActivity.REQUEST_AUTHORIZATION);
+                            Constants.REQUEST_AUTHORIZATION);
                 } else {
                     mOutputText.setText(R.string.unsuccesful_update);
                 }

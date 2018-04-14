@@ -8,13 +8,24 @@ public class Constants {
 
     public static final String DateTimePattern = "yyyy/MM/dd";
     public static final String LongDateTimePattern = "yyyyMMdd_HHmmss";
+    //GoogleApi
+    public static final int REQUEST_ACCOUNT_PICKER = 1000;
+    public static final int REQUEST_AUTHORIZATION = 1001;
+    public static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    public static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
+    public static final int UPDATED_CELL_COUNT = 3;
+    public static final int CREATED_COMPANY_CELL_COUNT = 16;
+    public static final String PREF_ACCOUNT_NAME = "accountName";
     public static int NotificationRequestCode = 111;
     public static int Max_Notification_Day_Interval = 30;
     public static String Levensthein_Value = "3";
     public static String Levensthein_Default = "0";
     public static String FirstStart_Default = "1";
     public static String FirstStart_Value = "0";
-
+    //intents
+    public static String RecognisedTextsArray = "result_array";
+    public static String SelectedCheckId = "selected_check_id";
+    public static String GooglaApiCallType = "callType";
     private static double height = 10.6;
     public static double Check_Amount_Top_DistFrom_Top = 0.9 / height;
     public static double Check_Amount_Bottom_DistFrom_Top = 1.32 / height;

@@ -21,6 +21,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -80,7 +81,7 @@ public class NewImageActivity extends BaseActivity {
         });
 
         buttonRecognise = findViewById(R.id.button_recognise_photo);
-        buttonRecognise.setEnabled(false);
+        buttonRecognise.setVisibility(View.GONE);
         buttonRecognise.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 permissionCheck();
@@ -189,7 +190,7 @@ public class NewImageActivity extends BaseActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startRecognition();
                 } else {
-                    buttonRecognise.setEnabled(false);
+                    buttonRecognise.setVisibility(View.GONE);
                 }
                 return;
             }
@@ -264,6 +265,8 @@ public class NewImageActivity extends BaseActivity {
             progress = new ProgressDialog(NewImageActivity.this);
             progress.setMessage(getString(R.string.imageProc_processing_processDialog));
             progress.show();
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         }
 
         @Override
@@ -271,13 +274,15 @@ public class NewImageActivity extends BaseActivity {
             FragmentManager manager = getSupportFragmentManager();
             removeFragmentFromActivtiy(manager, fragment);
             imageView.setImageBitmap(output);
-            buttonRecognise.setEnabled(true);
+            buttonRecognise.setVisibility(View.VISIBLE);
             progress.dismiss();
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         }
 
         @Override
         protected void onCancelled() {
             progress.dismiss();
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         }
     }
 
@@ -301,6 +306,8 @@ public class NewImageActivity extends BaseActivity {
             progress = new ProgressDialog(NewImageActivity.this);
             progress.setMessage(getString(R.string.tesseract_recognition_processDialog));
             progress.show();
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         }
 
         @Override
@@ -308,14 +315,16 @@ public class NewImageActivity extends BaseActivity {
             String[] recognisedTexts = output;
             recognisedTexts = trimRecogniseResults(recognisedTexts);
             progress.dismiss();
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             Intent intent = new Intent(getApplicationContext(), CheckDetailsActivity.class);
-            intent.putExtra("result_array", recognisedTexts);
+            intent.putExtra(Constants.RecognisedTextsArray, recognisedTexts);
             startActivity(intent);
         }
 
         @Override
         protected void onCancelled() {
             progress.dismiss();
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             AlertDialog.Builder builder = new AlertDialog.Builder(NewImageActivity.this);
             builder.setTitle(R.string.newImage_tessError_alertDialog_title);
             builder.setMessage(R.string.newImage_tessError_alertDialog_message);

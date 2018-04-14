@@ -31,7 +31,7 @@ A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. A be�
     <string name="request_contactAccess">Az alkalmazásnak szüksége van a Google fiókra.</string>
     <string name="no_network">Nincs elérhető internet kapcsolat.</string>
     <string name="progress_dialog_upload">Feltöltés folyamatban…</string>
-    <string name="sheetId_text">Google Táblázat azonosító:</string>
+    <string name="sheetId_text">Itt adhatja meg Google Táblázat azonosítóját. Ha nincs létező, akkor létre is hozhat egyet.</string>
     <string name="sheetId_isRequired">Nincs megadva Google Táblázat azonosító!</string>
     <string name="connection_test_successful">A megadott Google Táblázat azonosító megfelelő.</string>
     <string name="connection_test_unsuccesful">A megadott Google Táblázat azonosító hibás!</string>
