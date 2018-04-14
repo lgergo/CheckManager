@@ -20,11 +20,19 @@
         android:text="@string/help_fragment_textBeforelistitems" />
 
     <TextView
-        android:id="@+id/help_listitem_1"
+        android:id="@+id/help_listitem_0"
         style="@style/CustomList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/help_textBeforeListitems"
+        android:text="@string/help_fragment_listitem_0" />
+
+    <TextView
+        android:id="@+id/help_listitem_1"
+        style="@style/CustomList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/help_listitem_0"
         android:text="@string/help_fragment_listitem_1" />
 
     <TextView

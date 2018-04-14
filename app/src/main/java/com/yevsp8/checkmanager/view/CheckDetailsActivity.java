@@ -19,8 +19,12 @@ public class CheckDetailsActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_checkDetails);
         setSupportActionBar(toolbar);
 
-        String checkId = getIntent().getExtras().getString(Constants.SelectedCheckId);
-        String[] recognisedText = getIntent().getExtras().getStringArray(Constants.RecognisedTextsArray);
+        String[] recognisedText = new String[3];
+        String checkId = "";
+        if (getIntent().getExtras() != null) {
+            recognisedText = getIntent().getExtras().getStringArray(Constants.RecognisedTextsArray);
+            checkId = getIntent().getExtras().getString(Constants.SelectedCheckId);
+        }
 
         FragmentManager manager = getSupportFragmentManager();
         CheckDetailsFragment fragment = new CheckDetailsFragment();

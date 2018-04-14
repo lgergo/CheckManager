@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -43,7 +44,7 @@ import javax.inject.Inject;
 
 public class NewImageActivity extends BaseActivity {
 
-    static final int REQUEST_TAKE_PHOTO = 1;
+    private static final int REQUEST_TAKE_PHOTO = 1;
     private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     @Inject
     ImageProcessor processor;
@@ -149,7 +150,7 @@ public class NewImageActivity extends BaseActivity {
         return image;
     }
 
-    public String[] trimRecogniseResults(String[] results) {
+    private String[] trimRecogniseResults(String[] results) {
         String id = results[0].replaceAll(" ", "");
         int amountValue;
         String trimmed = results[1].replaceAll("\\*|", "");
@@ -183,7 +184,7 @@ public class NewImageActivity extends BaseActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
                 if (grantResults.length > 0
@@ -192,14 +193,13 @@ public class NewImageActivity extends BaseActivity {
                 } else {
                     buttonRecognise.setVisibility(View.GONE);
                 }
-                return;
             }
         }
     }
 
     private void startPreprocessing() {
         //demohoz
-        currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test.jpg";
+        //currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test.jpg";
 
         new ImagePreprocessingTask().execute(currentPhotoPath);
     }
@@ -287,11 +287,13 @@ public class NewImageActivity extends BaseActivity {
     }
 
     private class TextRecognitionTask extends AsyncTask<Void, Void, String[]> {
+        Exception lastError;
         @Override
         protected String[] doInBackground(Void... voids) {
             try {
                 return startRecognition();
             } catch (Exception e) {
+                lastError = e;
                 cancel(true);
                 return null;
             }
@@ -313,7 +315,9 @@ public class NewImageActivity extends BaseActivity {
         @Override
         protected void onPostExecute(String[] output) {
             String[] recognisedTexts = output;
-            recognisedTexts = trimRecogniseResults(recognisedTexts);
+            if (recognisedTexts != null) {
+                recognisedTexts = trimRecogniseResults(recognisedTexts);
+            }
             progress.dismiss();
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             Intent intent = new Intent(getApplicationContext(), CheckDetailsActivity.class);
@@ -324,10 +328,16 @@ public class NewImageActivity extends BaseActivity {
         @Override
         protected void onCancelled() {
             progress.dismiss();
+            String message = getResources().getString(R.string.newImage_tessError_universal);
+            if (lastError instanceof RuntimeException) {
+                message = getResources().getString(R.string.newImage_tessError_tooLowQuality);
+            } else if (lastError instanceof IOException) {
+                message = getResources().getString(R.string.newImage_tessError_traineddatzaNotFound);
+            }
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             AlertDialog.Builder builder = new AlertDialog.Builder(NewImageActivity.this);
             builder.setTitle(R.string.newImage_tessError_alertDialog_title);
-            builder.setMessage(R.string.newImage_tessError_alertDialog_message);
+            builder.setMessage(message);
             builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {

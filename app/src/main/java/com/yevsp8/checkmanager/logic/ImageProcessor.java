@@ -55,19 +55,20 @@ public class ImageProcessor {
         try {
             OpenCVLoader.initDebug();
         } catch (Exception ex) {
-            Log.e("e", ex.getMessage());
+            Log.e("OpenCV", ex.getMessage());
         }
     }
 
     private void loadImageFromFile(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 1;
+        //options.inSampleSize = 2;
         sourceBitmap = BitmapFactory.decodeFile(path, options);
         sourceBitmap = rotate(sourceBitmap, path);
     }
 
     public Bitmap preProcessing(String filePath) {
 
+        Log.e("Tess", "Ppeprocess started");
         loadImageFromFile(filePath);
         Mat src = new Mat(sourceBitmap.getHeight(), sourceBitmap.getWidth(), CvType.CV_8UC1);
         Utils.bitmapToMat(sourceBitmap, src);
@@ -118,34 +119,33 @@ public class ImageProcessor {
 
 
         Utils.matToBitmap(corrected, sourceBitmap);
-        //writeImage(sourceBitmap);
         return sourceBitmap;
     }
 
-    public String[] recognition() throws IOException {
+    public String[] recognition() throws IOException, RuntimeException {
 
         Bitmap rectBitmapTemp;
         tessTwoApi.initialize();
 
         Mat rect = getRectOfAmount(corrected);
         preprocessForRectImages(rect, 1, 2);
-        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.RGB_565);
+        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
         Utils.matToBitmap(rect, rectBitmapTemp);
-        String amountResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789*");
+        String amountResult = tessTwoApi.startRecognition(rectBitmapTemp, Constants.WhiteListAmount);
 
         rect = getRectOfCheckId(corrected);
         preprocessForRectImages(rect, 1, 3);
-        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.RGB_565);
+        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
         Utils.matToBitmap(rect, rectBitmapTemp);
-        String checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, "0123456789");
+        String checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, Constants.WhiteListId);
 
         rect = getRectOfPaidTo(corrected);
         preprocessForRectImages(rect, 4, 1);
-        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.RGB_565);
+        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
         Utils.matToBitmap(rect, rectBitmapTemp);
         String paidToResultLines = tessTwoApi.startRecognition(rectBitmapTemp, null);
         String[] resultLines = paidToResultLines.split("\n");
-        String paidToResult = resultLines[0];
+        String paidToResult = resultLines[1];
 
         return new String[]{checkIdResult, amountResult, paidToResult};
     }

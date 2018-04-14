@@ -16,7 +16,7 @@ import dagger.Provides;
 @Module(includes = {ContextModule.class})
 public class TessTwoModule {
 
-    public final Context context;
+    private final Context context;
 
     public TessTwoModule(Context context) {
         this.context = context;

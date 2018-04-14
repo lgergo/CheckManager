@@ -25,8 +25,6 @@ A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. A be�
     </string>
 
     <string name="unsuccesful_update">Sikertelen feltöltés! Ellenőrizze az internet kapcsolatot és a megadott Google Táblázat azonosítót!</string>
-    <string name="request_cancelled">A kérés törölve.</string>
-    <string name="no_results">Nincs megjeleníthető eredmény.</string>
     <string name="googlePlay_install">Az alkalmazásnak szüksége van a Google Play Szolgáltatásokra. Telepítse fel, majd indítsa újra az alkalmazást.</string>
     <string name="request_contactAccess">Az alkalmazásnak szüksége van a Google fiókra.</string>
     <string name="no_network">Nincs elérhető internet kapcsolat.</string>
@@ -69,11 +67,12 @@ A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. A be�
     <string name="imageProc_processing_processDialog">Kép feldolgozása…</string>
     <string name="help_fragment_title">Az alábbi ajánlások betartásával elősegíti a felismerés pontosságát.</string>
     <string name="help_fragment_textBeforelistitems">A kép készítésekor: </string>
+    <string name="help_fragment_listitem_0">\u25CF  Mindenképp álló képet készítsünk</string>
     <string name="help_fragment_listitem_1">\u25CF  A háttér konstrasztos, egyszínű legyen</string>
     <string name="help_fragment_listitem_2">\u25CF  Ne árnyékoljuk be a képet</string>
     <string name="help_fragment_listitem_3">\u25CF  Világos környezet legyen</string>
     <string name="firstStartMessage_title">Checkmanager</string>
-    <string name="firstStartMessage_message">Hogy ki tudd használni a Google Sheets szinkronizációt, kérlek add meg a dokumentum azonosítóját.</string>
+    <string name="firstStartMessage_message">Hogy ki tudd használni a Google Táblázat szinkronizációt, kérlek add meg a dokumentum azonosítóját.</string>
     <string name="firstStartMessage_toast">Később is lehetőséged lesz megadni a Beállítások menüpont alatt.</string>
     <string name="googleSheetId_hint">Ide írja a Google Táblázat azonosítóját…</string>
     <string name="createTable_alertDialog_title">Táblázat létrehozás</string>
@@ -96,7 +95,9 @@ A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. A be�
     <string name="tesseract_error_loadTesseract">Tesseract API betöltése sikertelen.</string>
     <string name="tesseract_eroor_getUTFText">Tesseract szöveg felismerése sikertelen.</string>
     <string name="newImage_tessError_alertDialog_title">Tesseract hiba</string>
-    <string name="newImage_tessError_alertDialog_message">A .tessdata fájl nem található az Android/data/com.yevsp8.checkmanager/files/tessdata mappában! Az alkalmazás újratelepítése megoldhatja a problémát.</string>
+    <string name="newImage_tessError_tooLowQuality">A készített kép minősége túl gyenge a felismeréshez.</string>
+    <string name="newImage_tessError_traineddatzaNotFound">A .tessdata fájl nem található az Android/data/com.yevsp8.checkmanager/files/tessdata mappában! Az alkalmazás újratelepítése megoldhatja a problémát.</string>
+    <string name="newImage_tessError_universal">Hiba lépett fel a felismerés közben, kérjük próbálja meg újra.</string>
     <string name="button_ok">OK</string>
 
     <string-array name="months">

@@ -63,7 +63,6 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class GoogleApiActivity extends BaseActivity
         implements EasyPermissions.PermissionCallbacks {
 
-    APICallType type;
     @Inject
     Converter converter;
     @Inject
@@ -74,8 +73,9 @@ public class GoogleApiActivity extends BaseActivity
     GoogleAccountCredential mCredential;
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-    CheckViewModel viewModel;
-    ProgressDialog progress;
+    private APICallType type;
+    private CheckViewModel viewModel;
+    private ProgressDialog progress;
     private String spreadsheetId;
     private int levensthein;
     private TextView mOutputText;
@@ -117,7 +117,7 @@ public class GoogleApiActivity extends BaseActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public void callGoogleApi(APICallType type) {
+    private void callGoogleApi(APICallType type) {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -244,7 +244,7 @@ public class GoogleApiActivity extends BaseActivity
         }
     }
 
-    void showGooglePlayServicesAvailabilityErrorDialog(
+    private void showGooglePlayServicesAvailabilityErrorDialog(
             final int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog = apiAvailability.getErrorDialog(
@@ -540,7 +540,7 @@ public class GoogleApiActivity extends BaseActivity
                 }
             } else {
                 newSheetTitle = sheets.get(i).getProperties().getTitle();
-                if (checkDetails[4] == "1") {
+                if (checkDetails[4].equals("1")) {
                     createCompanyTemplateForSheet(newSheetTitle, true, this.mService);
                 }
             }

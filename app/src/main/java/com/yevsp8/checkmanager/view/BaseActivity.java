@@ -23,13 +23,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPref;
 
-    public void replaceFragmentToActivity(FragmentManager manager, Fragment fragment, int frameId) {
+    void replaceFragmentToActivity(FragmentManager manager, Fragment fragment, int frameId) {
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(frameId, fragment);
         transaction.commit();
     }
 
-    public void removeFragmentFromActivtiy(FragmentManager manager, Fragment fragment) {
+    void removeFragmentFromActivtiy(FragmentManager manager, Fragment fragment) {
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.remove(fragment);
         transaction.commitAllowingStateLoss();
@@ -81,13 +81,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    protected void saveToSharedPreferences(int key, String value) {
+    void saveToSharedPreferences(int key, String value) {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(key), value);
         editor.apply();
     }
 
-    protected String getValueFromSharedPreferences(int key, int defaultValue) {
+    String getValueFromSharedPreferences(int key, int defaultValue) {
         return sharedPref.getString(getString(key), getString(defaultValue));
     }
 }

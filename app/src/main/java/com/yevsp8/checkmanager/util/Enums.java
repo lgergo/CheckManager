@@ -6,5 +6,5 @@ package com.yevsp8.checkmanager.util;
 
 public class Enums {
 
-    public enum APICallType {Get_data, Update_data, ConnectionTest, CreateSpreadSheet}
+    public enum APICallType {Update_data, ConnectionTest, CreateSpreadSheet}
 }

@@ -2,7 +2,6 @@ package com.yevsp8.checkmanager.logic;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 import com.yevsp8.checkmanager.R;
@@ -26,16 +25,15 @@ import javax.inject.Inject;
 public class TessTwoApi {
 
     private final String TESS_DATA;
+    private final String language;
+    private final String requiredTraineddata;
+    private final String tessError_load;
+    private final String tessError_getUtf;
     @Inject
     TessBaseAPI tessBaseAPI;
     @Inject
     Context context;
-    private String language;
-    private String requiredTraineddata;
     private String textResult;
-    private String TAG;
-    private String tessError_load;
-    private String tessError_getUtf;
 
     public TessTwoApi(Context context) {
         this.context = context;
@@ -50,7 +48,7 @@ public class TessTwoApi {
         TESS_DATA = context.getString(R.string.tesseract_tessdata);
         language = context.getString(R.string.tesseract_lang);
         requiredTraineddata = language + context.getString(R.string.tesseract_dottraineddata);
-        TAG = context.getString(R.string.tesseract_errorTag);
+        String TAG = context.getString(R.string.tesseract_errorTag);
         tessError_load = context.getString(R.string.tesseract_error_loadTesseract);
         tessError_getUtf = context.getString(R.string.tesseract_eroor_getUTFText);
 
@@ -60,7 +58,7 @@ public class TessTwoApi {
         prepareTessData();
     }
 
-    String startRecognition(Bitmap bitmap, String whiteList) {
+    String startRecognition(Bitmap bitmap, String whiteList) throws RuntimeException {
         startOCR(bitmap, whiteList);
 
         return textResult;
@@ -94,12 +92,8 @@ public class TessTwoApi {
         }
     }
 
-    private void startOCR(Bitmap bitmap, String whiteList) {
-        try {
-            textResult = this.getText(bitmap, whiteList);
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
+    private void startOCR(Bitmap bitmap, String whiteList) throws RuntimeException {
+        textResult = this.getText(bitmap, whiteList);
     }
 
     private String getText(Bitmap bitmap, String whiteList) {

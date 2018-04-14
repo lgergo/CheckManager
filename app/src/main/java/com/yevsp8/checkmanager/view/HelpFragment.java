@@ -12,7 +12,7 @@ import com.yevsp8.checkmanager.R;
 
 public class HelpFragment extends Fragment {
 
-    View rootView;
+    private View rootView;
 
     public HelpFragment() {
     }

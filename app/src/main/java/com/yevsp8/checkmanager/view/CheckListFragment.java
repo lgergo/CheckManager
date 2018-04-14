@@ -29,12 +29,11 @@ import javax.inject.Inject;
 
 public class CheckListFragment extends Fragment {
 
-    View rootView;
-    List<Check> checkList;
-
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-    CheckListViewModel viewModel;
+    private View rootView;
+    private List<Check> checkList;
+    private CheckListViewModel viewModel;
 
     public CheckListFragment() {
         // Required empty public constructor

@@ -32,22 +32,22 @@ import javax.inject.Inject;
 
 public class CheckDetailsFragment extends Fragment {
 
-    View rootView;
-    Check check;
-    String checkId;
-    String[] recognisedText;
-    EditText id;
-    EditText created;
-    EditText amount;
-    EditText paidto;
-    EditText paiddate;
-    boolean isSaveEnabled = false;
-    Button button_edit_save;
-    Button button_upload;
-    Button button_delete;
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-    CheckViewModel viewModel;
+    private View rootView;
+    private Check check;
+    private String checkId;
+    private String[] recognisedText;
+    private EditText id;
+    private EditText created;
+    private EditText amount;
+    private EditText paidto;
+    private EditText paiddate;
+    private boolean isSaveEnabled = false;
+    private Button button_edit_save;
+    private Button button_upload;
+    private Button button_delete;
+    private CheckViewModel viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
