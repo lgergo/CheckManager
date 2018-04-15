@@ -22,6 +22,7 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
@@ -111,7 +112,7 @@ public class ImageProcessor {
         //corrected=checkRect;
         //corrected=contoured;
 
-//        Mat rect = getRectOfPaidTo(corrected);
+//        Mat                rect = getRectOfPaidTo(corrected);
 //        preprocessForRectImages(rect, 4, 1);
 //        Bitmap rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
 //        Utils.matToBitmap(rect, rectBitmapTemp);
@@ -133,12 +134,6 @@ public class ImageProcessor {
         Utils.matToBitmap(rect, rectBitmapTemp);
         String amountResult = tessTwoApi.startRecognition(rectBitmapTemp, Constants.WhiteListAmount);
 
-        rect = getRectOfCheckId(corrected);
-        preprocessForRectImages(rect, 1, 3);
-        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
-        Utils.matToBitmap(rect, rectBitmapTemp);
-        String checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, Constants.WhiteListId);
-
         rect = getRectOfPaidTo(corrected);
         preprocessForRectImages(rect, 4, 1);
         rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
@@ -147,12 +142,18 @@ public class ImageProcessor {
         String[] resultLines = paidToResultLines.split("\n");
         String paidToResult = resultLines[1];
 
+        rect = getRectOfCheckId(corrected);
+        preprocessForRectImages(rect, 1, 3);
+        rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
+        Utils.matToBitmap(rect, rectBitmapTemp);
+        String checkIdResult = tessTwoApi.startRecognition(rectBitmapTemp, Constants.WhiteListId);
+
         return new String[]{checkIdResult, amountResult, paidToResult};
     }
 
     private void preprocessForRectImages(Mat rect, int erodeSize, int dilateSize) {
-        Imgproc.threshold(corrected, corrected, 0, 255, Imgproc.THRESH_OTSU);
-        Core.bitwise_not(corrected, corrected);
+        Imgproc.threshold(rect, rect, 0, 255, Imgproc.THRESH_OTSU);
+        Core.bitwise_not(rect, rect);
         if (erodeSize != 0) {
             Mat erode = Mat.ones(new Size(erodeSize, erodeSize), Imgproc.MORPH_RECT);
             Imgproc.erode(rect, rect, erode);
@@ -172,10 +173,10 @@ public class ImageProcessor {
 //        Core.LUT(source, lut, destination);
 //    }
 //
-//    private double getMatMean(Mat meanToGet) {
-//        Scalar meanScalar = Core.mean(meanToGet);
-//        return meanScalar.val[0];
-//    }
+private double getMatMean(Mat meanToGet) {
+    Scalar meanScalar = Core.mean(meanToGet);
+    return meanScalar.val[0];
+}
 
     private void findAndSetContoursList(Mat source, List<MatOfPoint> contours) {
         Imgproc.findContours(source, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);

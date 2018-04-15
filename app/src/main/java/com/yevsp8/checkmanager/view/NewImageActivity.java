@@ -199,50 +199,21 @@ public class NewImageActivity extends BaseActivity {
 
     private void startPreprocessing() {
         //demohoz
-        //currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test.jpg";
+        //currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/8.jpg";
 
         new ImagePreprocessingTask().execute(currentPhotoPath);
     }
 
     private void startRecognition() {
-
-
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setMessage("Megfelelő a kép?");
-//        builder.setNegativeButton("Nem", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                Intent settings = new Intent(getApplicationContext(), NewImageActivity.class);
-//                startActivity(settings);
-//            }
-//        });
-//        builder.setPositiveButton("Igen", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//        String[] recognisedText = processor.recognition();
-
         try {
             new TextRecognitionTask().execute();
         } catch (Exception ex) {
             Log.e("rec", ex.getMessage());
         }
-
-
-//            }
-//        });
-//        AlertDialog dialog = builder.create();
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        WindowManager.LayoutParams wmlp = dialog.getWindow().getAttributes();
-//        wmlp.gravity = Gravity.BOTTOM | Gravity.CENTER;
-//        dialog.setCancelable(false);
-//        dialog.setCanceledOnTouchOutside(false);
-//        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-//        dialog.show();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-
     }
 
     private class ImagePreprocessingTask extends AsyncTask<String, Void, Bitmap> {

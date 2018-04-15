@@ -18,7 +18,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar_main">
 
-
         <FrameLayout
             android:id="@+id/checklist_fragmentcontainer"
             android:layout_width="match_parent"
@@ -29,7 +28,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/checklist_fragmentcontainer"
-            android:text="@string/main_latestSync" />
+            android:layout_marginTop="18dp"
+            android:background="#696969"
+            android:padding="8dp"
+            android:text="@string/main_latestSync"
+            android:textAlignment="center" />
 
     </RelativeLayout>
 

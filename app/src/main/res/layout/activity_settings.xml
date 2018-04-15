@@ -68,7 +68,7 @@
             android:layout_below="@id/seekBar_settings"
             android:layout_marginBottom="32dp"
             android:textAlignment="center"
-            android:textColor="#AABBCC"
+            android:textColor="#bdbdbd"
             android:textSize="18sp"
             android:textStyle="bold" />
 
