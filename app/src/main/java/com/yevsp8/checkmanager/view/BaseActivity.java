@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.yevsp8.checkmanager.R;
+import com.yevsp8.checkmanager.util.Constants;
 
 import java.io.File;
 
@@ -29,7 +30,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    void removeFragmentFromActivtiy(FragmentManager manager, Fragment fragment) {
+    void removeFragmentFromActivity(FragmentManager manager, Fragment fragment) {
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.remove(fragment);
         transaction.commitAllowingStateLoss();
@@ -40,7 +41,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
         PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
-        sharedPref = getSharedPreferences("App", MODE_PRIVATE);
+        sharedPref = getSharedPreferences(Constants.SharedPreferencesName, MODE_PRIVATE);
     }
 
     @Override

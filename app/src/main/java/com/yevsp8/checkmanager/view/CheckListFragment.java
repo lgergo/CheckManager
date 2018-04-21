@@ -33,11 +33,6 @@ public class CheckListFragment extends Fragment {
     ViewModelProvider.Factory viewModelFactory;
     private View rootView;
     private List<Check> checkList;
-    private CheckListViewModel viewModel;
-
-    public CheckListFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onCreate(Bundle savedInstancestate) {
@@ -61,7 +56,7 @@ public class CheckListFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckListViewModel.class);
+        CheckListViewModel viewModel = ViewModelProviders.of(this, viewModelFactory).get(CheckListViewModel.class);
 
         viewModel.getCheckList().observe(this, new Observer<List<Check>>() {
             @Override
@@ -78,6 +73,8 @@ public class CheckListFragment extends Fragment {
         final CheckAdapter adapter = new CheckAdapter(checkList);
         ListView listView = rootView.findViewById(R.id.listview_check);
         listView.setAdapter(adapter);
+        View empty = rootView.findViewById(R.id.listview_check_emptyView);
+        listView.setEmptyView(empty);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

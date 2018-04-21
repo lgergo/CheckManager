@@ -28,7 +28,7 @@ public class ContextModule {
 
     @Provides
     @CustomScope
-    Converter provideconverter() {
+    Converter provideConverter() {
         return new Converter();
     }
 }

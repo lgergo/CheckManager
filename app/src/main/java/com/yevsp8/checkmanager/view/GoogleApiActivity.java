@@ -73,6 +73,7 @@ public class GoogleApiActivity extends BaseActivity
     GoogleAccountCredential mCredential;
     @Inject
     ViewModelProvider.Factory viewModelFactory;
+    com.google.api.services.sheets.v4.Sheets mService;
     private APICallType type;
     private CheckViewModel viewModel;
     private ProgressDialog progress;
@@ -92,7 +93,7 @@ public class GoogleApiActivity extends BaseActivity
                 .build();
         component.injectGooglaApiActivity(this);
 
-        type = (APICallType) getIntent().getSerializableExtra(Constants.GooglaApiCallType);
+        type = (APICallType) getIntent().getSerializableExtra(Constants.GoogleApiCallType);
         checkDetailsdataArray = getIntent().getStringArrayExtra(Constants.RecognisedTextsArray);
         spreadsheetId = getValueFromSharedPreferences(R.string.sheetId_value, R.string.sheetId_default);
         levensthein = Integer.parseInt(getValueFromSharedPreferences(R.string.levenshtein_value, R.string.levenshtein_default));
@@ -103,6 +104,10 @@ public class GoogleApiActivity extends BaseActivity
         setSupportActionBar(toolbar);
 
         mOutputText = findViewById(R.id.googleApiResult_textView);
+
+        mService = new com.google.api.services.sheets.v4.Sheets.Builder(
+                transport, jsonFactory, mCredential)
+                .build();
 
         callGoogleApi(type);
     }
@@ -127,13 +132,13 @@ public class GoogleApiActivity extends BaseActivity
         } else {
             switch (type) {
                 case Update_data:
-                    new UpdateRequestTask(transport, jsonFactory, mCredential).execute(checkDetailsdataArray);
+                    new UpdateRequestTask(mService).execute(checkDetailsdataArray);
                     break;
                 case ConnectionTest:
-                    new ConnectionTestTask(transport, jsonFactory, mCredential).execute();
+                    new ConnectionTestTask(mService).execute();
                     break;
                 case CreateSpreadSheet:
-                    new CreateSpreadSheetTask(transport, jsonFactory, mCredential).execute();
+                    new CreateSpreadSheetTask(mService).execute();
             }
         }
     }
@@ -342,11 +347,8 @@ public class GoogleApiActivity extends BaseActivity
         com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
-        ConnectionTestTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
-            mService = new com.google.api.services.sheets.v4.Sheets.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Google Sheets API Test")
-                    .build();
+        ConnectionTestTask(com.google.api.services.sheets.v4.Sheets service) {
+            this.mService = service;
         }
 
         @Override
@@ -413,11 +415,8 @@ public class GoogleApiActivity extends BaseActivity
         private Exception mLastError = null;
         private String tempSpreadSheetId;
 
-        CreateSpreadSheetTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
-            mService = new com.google.api.services.sheets.v4.Sheets.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Google Sheets API Create Spreadsheet")
-                    .build();
+        CreateSpreadSheetTask(com.google.api.services.sheets.v4.Sheets service) {
+            mService = service;
         }
 
         @Override
@@ -495,11 +494,8 @@ public class GoogleApiActivity extends BaseActivity
         private com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
-        UpdateRequestTask(HttpTransport transport, JsonFactory jsonFactory, GoogleAccountCredential credential) {
-            mService = new com.google.api.services.sheets.v4.Sheets.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Google Sheets API Update")
-                    .build();
+        UpdateRequestTask(com.google.api.services.sheets.v4.Sheets service) {
+            mService = service;
         }
 
         @Override

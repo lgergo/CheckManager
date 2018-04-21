@@ -34,7 +34,6 @@ public class CheckDetailsFragment extends Fragment {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-    private View rootView;
     private Check check;
     private String checkId;
     private String[] recognisedText;
@@ -63,7 +62,7 @@ public class CheckDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_check_details, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_check_details, container, false);
 
         Bundle args = getArguments();
         checkId = args.getString(Constants.SelectedCheckId);
@@ -156,7 +155,7 @@ public class CheckDetailsFragment extends Fragment {
     private void uploadClicked() {
         if (id.getText().length() > 0 && amount.getText().length() > 0 && paidto.getText().length() > 0 && paiddate.getText().length() > 0) {
             Intent intent = new Intent(getContext(), GoogleApiActivity.class);
-            intent.putExtra(Constants.GooglaApiCallType, Enums.APICallType.Update_data);
+            intent.putExtra(Constants.GoogleApiCallType, Enums.APICallType.Update_data);
             String[] param = viewModel.checkDetailsToGoogleRequestFormat(check);
             intent.putExtra(Constants.RecognisedTextsArray, param);
             startActivity(intent);

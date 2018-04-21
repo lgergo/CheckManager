@@ -12,15 +12,10 @@ import com.yevsp8.checkmanager.R;
 
 public class HelpFragment extends Fragment {
 
-    private View rootView;
-
-    public HelpFragment() {
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_help, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_help, container, false);
 
         return rootView;
     }

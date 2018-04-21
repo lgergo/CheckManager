@@ -8,6 +8,7 @@ public class Constants {
 
     public static final String DateTimePattern = "yyyy/MM/dd";
     public static final String LongDateTimePattern = "yyyyMMdd_HHmmss";
+
     //GoogleApi
     public static final int REQUEST_ACCOUNT_PICKER = 1000;
     public static final int REQUEST_AUTHORIZATION = 1001;
@@ -22,12 +23,22 @@ public class Constants {
     public static final String Levensthein_Default = "0";
     public static final String FirstStart_Default = "1";
     public static final String FirstStart_Value = "0";
+    public static final int REQUEST_TAKE_PHOTO = 1;
+    public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
+    public static final String SharedPreferencesName = "App";
+    public static final int NotificationHour = 12;
+    public static final int NotificationMinute = 0;
+
     //intents
     public static final String RecognisedTextsArray = "result_array";
     public static final String SelectedCheckId = "selected_check_id";
-    public static final String GooglaApiCallType = "callType";
+    public static final String GoogleApiCallType = "callType";
     public static final String WhiteListAmount = "0123456789*";
     public static final String WhiteListId = "0123456789";
+    public static final String NotificationTitle = "title";
+    public static final String NotificationMessage = "message";
+
+    //image processing
     private static final double height = 10.6;
     public static final double Check_Amount_Top_DistFrom_Top = 0.9 / height;
     public static final double Check_Amount_Bottom_DistFrom_Top = 1.32 / height;

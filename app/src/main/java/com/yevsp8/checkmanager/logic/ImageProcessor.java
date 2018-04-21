@@ -22,7 +22,6 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
@@ -77,25 +76,6 @@ public class ImageProcessor {
         Mat checkRect = src.clone();
         corrected = src.clone();
 
-        /*
-        a)
-            Imgproc.medianBlur(checkRect, checkRect, 7);
-            Imgproc.equalizeHist(checkRect, checkRect);
-            Imgproc.Canny(checkRect,checkRect,getMatMean(checkRect)*0.2,getMatMean(checkRect)*1.8);
-
-        b)
-            Imgproc.medianBlur(checkRect, checkRect, 13);
-            Imgproc.adaptiveThreshold(checkRect,checkRect,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,Imgproc.THRESH_BINARY,13,3);
-            Core.bitwise_not(checkRect,checkRect);
-            Mat kernel = Mat.ones(7, 7, CvType.CV_8UC1);
-            Imgproc.morphologyEx(checkRect,checkRect,Imgproc.MORPH_OPEN,kernel);
-
-        c)
-            Imgproc.medianBlur(checkRect, checkRect, 7);
-            Imgproc.equalizeHist(checkRect, checkRect);
-            Imgproc.threshold(checkRect, checkRect, getMatMean(checkRect) * 1.1, 256, Imgproc.THRESH_BINARY);
-        */
-
         Imgproc.medianBlur(checkRect, checkRect, 13);
         Imgproc.adaptiveThreshold(checkRect, checkRect, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 13, 3);
         Core.bitwise_not(checkRect, checkRect);
@@ -105,19 +85,8 @@ public class ImageProcessor {
 
         List<MatOfPoint> contours = new ArrayList<>();
         findAndSetContoursList(checkRect, contours);
-        //Mat contoured = drawContours(checkRect, contours);
         Mat cornersOfContour = getCorrectedPerspectiveRectPoints(contours);
         corrected = warp(src, cornersOfContour);
-
-        //corrected=checkRect;
-        //corrected=contoured;
-
-//        Mat                rect = getRectOfPaidTo(corrected);
-//        preprocessForRectImages(rect, 4, 1);
-//        Bitmap rectBitmapTemp = Bitmap.createBitmap(rect.cols(), rect.rows(), Bitmap.Config.ARGB_4444);
-//        Utils.matToBitmap(rect, rectBitmapTemp);
-//        return  rectBitmapTemp;
-
 
         Utils.matToBitmap(corrected, sourceBitmap);
         return sourceBitmap;
@@ -164,30 +133,10 @@ public class ImageProcessor {
         }
     }
 
-//    private void gammaCorrection(Mat source, Mat destination) {
-//        double gamma = 2.0;
-//        Mat lut = new Mat(1, 256, CvType.CV_8UC1);
-//        for (int i = 0; i < 256; i++) {
-//            lut.put(0, i, (int) (Math.pow((double) i / 255.0, 1 / gamma) * 255.0));
-//        }
-//        Core.LUT(source, lut, destination);
-//    }
-//
-private double getMatMean(Mat meanToGet) {
-    Scalar meanScalar = Core.mean(meanToGet);
-    return meanScalar.val[0];
-}
-
     private void findAndSetContoursList(Mat source, List<MatOfPoint> contours) {
         Imgproc.findContours(source, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
     }
 
-//    private Mat drawContours(Mat source, List<MatOfPoint> contours) {
-//        Mat tempSrc = source.clone();
-//        Mat contoured = new Mat(tempSrc.rows(), tempSrc.cols(), CvType.CV_8UC1);
-//        Imgproc.drawContours(contoured, contours, -1, new Scalar(255), 5);
-//        return contoured;
-//    }
 
     private Mat getCorrectedPerspectiveRectPoints(List<MatOfPoint> contours) {
         double threshold = 0.5;
@@ -286,24 +235,6 @@ private double getMatMean(Mat meanToGet) {
         Rect rect = new Rect(p1, p2);
         return new Mat(image, rect);
     }
-
-//    private void writeImage(Bitmap bmp) {
-//        FileOutputStream out = null;
-//        try {
-//            out = new FileOutputStream("/storage/sdcard/Android/data/com.yevsp8.checkmanager/files/Pictures/corrected.png");
-//            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                if (out != null) {
-//                    out.close();
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
     public Bitmap rotate(Bitmap source, String currentPhotoPath) {
         ExifInterface exif;

@@ -1,4 +1,4 @@
-package com.yevsp8.checkmanager;
+package com.yevsp8.checkmanager.data;
 
 
 import android.arch.lifecycle.LiveData;
@@ -8,10 +8,6 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-
-import com.yevsp8.checkmanager.data.Check;
-import com.yevsp8.checkmanager.data.CheckDAO;
-import com.yevsp8.checkmanager.data.CheckDatabase;
 
 import org.junit.After;
 import org.junit.Before;
@@ -53,7 +49,6 @@ public class CheckDAOInstrumentedTests {
         };
         liveData.observeForever(observer);
         latch.await(2, TimeUnit.SECONDS);
-        //noinspection unchecked
         return (T) data[0];
     }
 

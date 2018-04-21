@@ -19,8 +19,8 @@ public class CheckManagerApplication extends Application {
 
     @Inject
     Context context;
-    @Inject
-    com.google.api.services.sheets.v4.Sheets googleSheetApi;
+//    @Inject
+//    com.google.api.services.sheets.v4.Sheets googleSheetApi;
 
     @Override
     public void onCreate() {

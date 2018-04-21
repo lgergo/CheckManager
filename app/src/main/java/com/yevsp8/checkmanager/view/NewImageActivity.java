@@ -44,8 +44,6 @@ import javax.inject.Inject;
 
 public class NewImageActivity extends BaseActivity {
 
-    private static final int REQUEST_TAKE_PHOTO = 1;
-    private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     @Inject
     ImageProcessor processor;
 
@@ -105,7 +103,7 @@ public class NewImageActivity extends BaseActivity {
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                // TODO Error occurred while creating the File
+                return;
             }
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
@@ -113,7 +111,7 @@ public class NewImageActivity extends BaseActivity {
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 try {
-                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                    startActivityForResult(takePictureIntent, Constants.REQUEST_TAKE_PHOTO);
                 } catch (Exception ex) {
                     Log.e("CAM", ex.getMessage());
                 }
@@ -133,7 +131,7 @@ public class NewImageActivity extends BaseActivity {
                 imageView.setImageBitmap(myBitmap);
             }
             FragmentManager manager = getSupportFragmentManager();
-            removeFragmentFromActivtiy(manager, fragment);
+            removeFragmentFromActivity(manager, fragment);
         }
     }
 
@@ -169,14 +167,10 @@ public class NewImageActivity extends BaseActivity {
             if (ActivityCompat.shouldShowRequestPermissionRationale(NewImageActivity.this,
                     Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
             } else {
                 ActivityCompat.requestPermissions(NewImageActivity.this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                        Constants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             }
         } else {
             startRecognition();
@@ -186,7 +180,7 @@ public class NewImageActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+            case Constants.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startRecognition();
@@ -243,7 +237,7 @@ public class NewImageActivity extends BaseActivity {
         @Override
         protected void onPostExecute(Bitmap output) {
             FragmentManager manager = getSupportFragmentManager();
-            removeFragmentFromActivtiy(manager, fragment);
+            removeFragmentFromActivity(manager, fragment);
             imageView.setImageBitmap(output);
             buttonRecognise.setVisibility(View.VISIBLE);
             progress.dismiss();

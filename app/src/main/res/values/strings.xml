@@ -99,6 +99,7 @@ A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. A be�
     <string name="newImage_tessError_traineddatzaNotFound">A .tessdata fájl nem található az Android/data/com.yevsp8.checkmanager/files/tessdata mappában! Az alkalmazás újratelepítése megoldhatja a problémát.</string>
     <string name="newImage_tessError_universal">Hiba lépett fel a felismerés közben, kérjük próbálja meg újra.</string>
     <string name="button_ok">OK</string>
+    <string name="listview_checkList_emptyText">Nincs szinkronizálatlan csekk</string>
 
     <string-array name="months">
         <item>Január</item>

@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar_checkDetails"
+        android:layout_marginTop="18dp"
         android:textAlignment="center"
-        android:textSize="28sp" />
+        android:textSize="24sp" />
 </RelativeLayout>

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import com.yevsp8.checkmanager.R;
+import com.yevsp8.checkmanager.util.Constants;
 import com.yevsp8.checkmanager.view.MainActivity;
 
 import static com.yevsp8.checkmanager.util.Constants.NotificationRequestCode;
@@ -24,13 +25,13 @@ public class NotificationReceiver extends BroadcastReceiver {
         Intent repeatingIntent = new Intent(context, MainActivity.class);
         repeatingIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pending = PendingIntent.getActivity(context, NotificationRequestCode, repeatingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        String channelId = "11";
+        String channelId = "111";
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setContentIntent(pending)
                 .setSmallIcon(R.drawable.ic_home_24dp)
-                .setContentTitle(intent.getExtras().getString("title"))
-                .setContentText(intent.getExtras().getString("message"))
+                .setContentTitle(intent.getExtras().getString(Constants.NotificationTitle))
+                .setContentText(intent.getExtras().getString(Constants.NotificationMessage))
                 .setAutoCancel(true);
 
         if (manager != null) {
