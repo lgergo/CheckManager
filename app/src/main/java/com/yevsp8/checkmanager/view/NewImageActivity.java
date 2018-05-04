@@ -192,9 +192,7 @@ public class NewImageActivity extends BaseActivity {
     }
 
     private void startPreprocessing() {
-        //demohoz
-        //currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/8.jpg";
-
+        //currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test.jpg";
         new ImagePreprocessingTask().execute(currentPhotoPath);
     }
 

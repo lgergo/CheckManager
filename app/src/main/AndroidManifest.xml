@@ -34,7 +34,7 @@
         </activity>
         <activity
             android:name=".view.CheckDetailsActivity"
-            android:label="@string/title_activity_check_details" />
+            android:label="@string/title_activity_check_details"></activity>
         <activity
             android:name=".view.NewImageActivity"
             android:label="@string/title_activity_newImage" />
@@ -46,7 +46,7 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".view.HelpActivity"
-            android:label="@string/title_activity_help" />
+            android:label="@string/title_activity_help"></activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

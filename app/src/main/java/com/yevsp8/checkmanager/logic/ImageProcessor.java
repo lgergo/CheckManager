@@ -61,14 +61,12 @@ public class ImageProcessor {
 
     private void loadImageFromFile(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-        //options.inSampleSize = 2;
         sourceBitmap = BitmapFactory.decodeFile(path, options);
         sourceBitmap = rotate(sourceBitmap, path);
     }
 
     public Bitmap preProcessing(String filePath) {
 
-        Log.e("Tess", "Ppeprocess started");
         loadImageFromFile(filePath);
         Mat src = new Mat(sourceBitmap.getHeight(), sourceBitmap.getWidth(), CvType.CV_8UC1);
         Utils.bitmapToMat(sourceBitmap, src);
@@ -109,7 +107,12 @@ public class ImageProcessor {
         Utils.matToBitmap(rect, rectBitmapTemp);
         String paidToResultLines = tessTwoApi.startRecognition(rectBitmapTemp, null);
         String[] resultLines = paidToResultLines.split("\n");
-        String paidToResult = resultLines[1];
+        String paidToResult;
+        if (!resultLines[1].isEmpty()) {
+            paidToResult = resultLines[1];
+        } else {
+            paidToResult = resultLines[2];
+        }
 
         rect = getRectOfCheckId(corrected);
         preprocessForRectImages(rect, 1, 3);

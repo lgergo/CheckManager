@@ -260,12 +260,14 @@ public class GoogleApiActivity extends BaseActivity
     }
 
     private boolean createCompanyTemplateForSheet(String companyName, boolean isNewYear, com.google.api.services.sheets.v4.Sheets mService) throws Exception {
+        String firstColumn = "!A1";
+        String lastColumn = ":D";
+
         if (companyName != null) {
             try {
-
                 int row = 1;
                 if (isNewYear) {
-                    String range = companyName + "!A1";
+                    String range = companyName + firstColumn;
                     ValueRange requestBody = new ValueRange();
                     requestBody.setMajorDimension(MajorDimension.ROWS.toString());
                     requestBody.setRange(range);
@@ -303,7 +305,7 @@ public class GoogleApiActivity extends BaseActivity
                     }
                 }
                 //update with template
-                String range = companyName + "!A" + String.valueOf(row) + ":D" + String.valueOf(row);
+                String range = companyName + firstColumn + String.valueOf(row) + lastColumn + String.valueOf(row);
                 ValueRange valueRange = new ValueRange();
                 valueRange.setMajorDimension(MajorDimension.ROWS.toString());
                 valueRange.setRange(range);
@@ -311,7 +313,7 @@ public class GoogleApiActivity extends BaseActivity
                         Arrays.asList(
                                 Arrays.asList((Object[]) getResources().getStringArray(R.array.headers))
                         ));
-                String range2 = companyName + "!A" + String.valueOf(row + 1) + ":D" + String.valueOf(row + 13); // "!A2:A14";
+                String range2 = companyName + firstColumn + String.valueOf(row + 1) + lastColumn + String.valueOf(row + 13);
                 ValueRange valueRange2 = new ValueRange();
                 valueRange2.setMajorDimension(MajorDimension.COLUMNS.toString());
                 valueRange2.setRange(range2);

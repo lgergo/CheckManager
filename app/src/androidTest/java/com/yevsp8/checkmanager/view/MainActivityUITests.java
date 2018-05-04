@@ -87,17 +87,6 @@ public class MainActivityUITests {
 
     @Test
     public void mainActivity_UITest_elementsArePresent() {
-        ViewInteraction appCompatButton = onView(
-                allOf(withId(android.R.id.button2), withText("Most nem"),
-                        childAtPosition(
-                                allOf(withClassName(is("android.widget.LinearLayout")),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.LinearLayout")),
-                                                3)),
-                                2),
-                        isDisplayed()));
-        appCompatButton.perform(click());
-
         ViewInteraction view = onView(
                 allOf(withId(R.id.toolbar_main),
                         childAtPosition(
@@ -109,7 +98,7 @@ public class MainActivityUITests {
         view.check(matches(isDisplayed()));
 
         ViewInteraction textView = onView(
-                allOf(withText("Nem szinkroniz?lt csekkek"),
+                allOf(withText(R.string.checkList_title),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.checklist_fragmentcontainer),
@@ -119,17 +108,17 @@ public class MainActivityUITests {
         textView.check(matches(isDisplayed()));
 
         ViewInteraction textView2 = onView(
-                allOf(withText("Nem szinkroniz?lt csekkek"),
+                allOf(withText(R.string.checkList_title),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.checklist_fragmentcontainer),
                                         0),
                                 0),
                         isDisplayed()));
-        textView2.check(matches(withText("Nem szinkroniz?lt csekkek")));
+        textView2.check(matches(withText(R.string.checkList_title)));
 
         ViewInteraction textView3 = onView(
-                allOf(withId(R.id.latest_synch), withText("Legutolj?ra szinkroniz?lva: M?g nem szinkroniz?lt"),
+                allOf(withId(R.id.latest_synch),
                         childAtPosition(
                                 childAtPosition(
                                         IsInstanceOf.<View>instanceOf(android.widget.RelativeLayout.class),

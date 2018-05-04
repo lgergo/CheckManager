@@ -127,12 +127,13 @@ public class CheckDetailsFragment extends Fragment {
             CheckDetailsFragment.this.check = check;
             viewModel.insertCheck(check);
         }
-
-        id.setText(check.getCheckId());
-        created.setText(Converter.longDateToString(check.getCreationDate()));
-        amount.setText(String.valueOf(check.getAmount()));
-        paidto.setText(check.getPaidTo());
-        paiddate.setText(check.getPaidDate());
+        if (check != null) {
+            id.setText(check.getCheckId());
+            created.setText(Converter.longDateToString(check.getCreationDate()));
+            amount.setText(String.valueOf(check.getAmount()));
+            paidto.setText(check.getPaidTo());
+            paiddate.setText(check.getPaidDate());
+        }
     }
 
     private void editSaveClicked() {
