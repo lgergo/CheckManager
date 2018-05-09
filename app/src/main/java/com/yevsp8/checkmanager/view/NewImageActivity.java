@@ -118,6 +118,8 @@ public class NewImageActivity extends BaseActivity {
                 }
             }
         }
+        buttonRecognise.setVisibility(View.GONE);
+        buttonPreprocess.setVisibility(View.VISIBLE);
     }
 
     @Override
