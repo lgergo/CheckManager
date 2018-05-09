@@ -89,11 +89,13 @@ public class CheckDAOInstrumentedTests {
 
     @Test
     public void insertCheck_InstrumentedTest() throws InterruptedException {
-        Check c = new Check("1111", Calendar.getInstance().getTimeInMillis(), 1000, "TestCompany", "2018.01.01");
+        Check c1 = new Check("1111", Calendar.getInstance().getTimeInMillis(), 1000, "TestCompany", "2018.01.01");
+        Check c2 = new Check("2222", Calendar.getInstance().getTimeInMillis(), 1000, "TestCompany", "2018.01.01");
 
-        dao.insertCheck(c);
+        dao.insertCheck(c1);
+        dao.insertCheck(c2);
 
-        assertTrue(getValue(dao.getCheckList()).size() == 1);
+        assertTrue(getValue(dao.getCheckList()).size() == 2);
     }
 
     @Test

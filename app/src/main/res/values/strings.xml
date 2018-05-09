@@ -43,7 +43,7 @@ A program teljes kihasználásához rendelkeznie kell egy Google fiókkal. A be�
     <string name="button_capture">Új kép</string>
     <string name="button_notNow">Most nem</string>
     <string name="button_fill">Megadom</string>
-    <string name="button_preprocessing">Kész</string>
+    <string name="button_preprocessing">Tovább</string>
     <string name="upload_emptyField">Üres mezővel nem lehetséges a feltöltés!</string>
     <string name="create_spreadsheet_successful">Táblázat sikeresen létrehozva.</string>
     <string name="create_spreadsheet_unsuccessful">Táblázat generálása sikertelen. Ellenőrizze az internet kapcsolatot!</string>

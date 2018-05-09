@@ -48,6 +48,7 @@ public class NewImageActivity extends BaseActivity {
     ImageProcessor processor;
 
     private Button buttonRecognise;
+    private Button buttonPreprocess;
     private ImageView imageView;
     private String currentPhotoPath;
     private ProgressDialog progress;
@@ -87,8 +88,8 @@ public class NewImageActivity extends BaseActivity {
             }
         });
 
-        Button buttonDemo = findViewById(R.id.button_demoData);
-        buttonDemo.setOnClickListener(new View.OnClickListener() {
+        buttonPreprocess = findViewById(R.id.button_preprocess);
+        buttonPreprocess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startPreprocessing();
@@ -192,7 +193,6 @@ public class NewImageActivity extends BaseActivity {
     }
 
     private void startPreprocessing() {
-        //currentPhotoPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/test.jpg";
         new ImagePreprocessingTask().execute(currentPhotoPath);
     }
 
@@ -238,6 +238,7 @@ public class NewImageActivity extends BaseActivity {
             removeFragmentFromActivity(manager, fragment);
             imageView.setImageBitmap(output);
             buttonRecognise.setVisibility(View.VISIBLE);
+            buttonPreprocess.setVisibility(View.GONE);
             progress.dismiss();
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         }
